@@ -1,9 +1,9 @@
-import Image from "next/image";
-
 export default function Home() {
   return (
     <>
-      <h1>hello world</h1>
+      <div className="flex h-screen w-screen items-center justify-center">
+        <span className="text-6xl">Welcome to tokei</span>
+      </div>
     </>
   );
 }
