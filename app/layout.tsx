@@ -11,7 +11,7 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: "Tokei",
+  title: "tokei",
   description: "Sequential timers for power users",
 };
 
