@@ -1,3 +1,4 @@
+import { TimePicker } from "@/components/custom/timepicker";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -14,6 +15,7 @@ export default function Home() {
         <Button variant="outline" color="accent">
           shadcn button test
         </Button>
+        <TimePicker />
       </div>
     </>
   );

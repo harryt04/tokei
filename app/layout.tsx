@@ -4,7 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 
 import { cn } from "@/lib/utils";
-import { PostHogProvider } from "./_providers/posthogProvider";
+import { PostHogProvider } from "@/providers/posthogProvider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
