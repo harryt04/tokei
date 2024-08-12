@@ -1,4 +1,4 @@
-import { TimePicker } from "@/components/custom/TimePicker/time-picker";
+import { DateTimePickerForm } from "@/components/time-picker/date-time-picker-form";
 import { cn } from "@/lib/utils";
 
 export default function Home() {
@@ -10,7 +10,7 @@ export default function Home() {
         className={cn(
           "flex flex-col items-center justify-center gap-4 py-20 px-10 min-h-screen",
         )}>
-        <TimePicker />
+        <DateTimePickerForm />
       </div>
     </>
   );
