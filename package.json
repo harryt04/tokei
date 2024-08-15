@@ -29,6 +29,7 @@
     "posthog-js": "^1.154.5",
     "posthog-node": "^4.0.1",
     "react": "^18",
+    "react-countdown-circle-timer": "^3.2.1",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
     "react-hook-form": "^7.52.2",
