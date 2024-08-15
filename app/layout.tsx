@@ -1,3 +1,10 @@
+import {
+  ClerkProvider,
+  SignInButton,
+  SignedIn,
+  SignedOut,
+  UserButton,
+} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter as FontSans } from "next/font/google";
 
@@ -23,17 +30,25 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <PostHogProvider>
-        <body
-          suppressHydrationWarning={true}
-          className={cn(
-            "min-h-screen bg-background font-sans antialiased",
-            fontSans.variable,
-          )}>
-          {children}
-        </body>
-      </PostHogProvider>
-    </html>
+    <ClerkProvider>
+      <html lang="en">
+        <PostHogProvider>
+          <SignedOut>
+            <SignInButton />
+          </SignedOut>
+          <SignedIn>
+            <UserButton />
+          </SignedIn>
+          <body
+            suppressHydrationWarning={true}
+            className={cn(
+              "min-h-screen bg-background font-sans antialiased",
+              fontSans.variable,
+            )}>
+            {children}
+          </body>
+        </PostHogProvider>
+      </html>
+    </ClerkProvider>
   );
 }
