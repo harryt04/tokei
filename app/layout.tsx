@@ -6,6 +6,7 @@ import "./globals.css";
 
 import { cn } from "@/lib/utils";
 import { PostHogProvider } from "@/providers/posthogProvider";
+import { ThemeProvider } from "@/providers/themeProvider";
 
 const fontSans = FontSans({
   subsets: ["latin"],
@@ -33,7 +34,13 @@ export default function RootLayout({
               "min-h-screen bg-background font-sans antialiased",
               fontSans.variable,
             )}>
-            {children}
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              enableSystem
+              disableTransitionOnChange>
+              {children}
+            </ThemeProvider>
           </body>
         </PostHogProvider>
       </ClerkProvider>

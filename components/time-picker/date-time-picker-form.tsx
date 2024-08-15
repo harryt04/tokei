@@ -8,6 +8,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { toast } from "@/components/ui/use-toast";
+import { ThemeSwitcher } from "../custom/themeSwitcher";
 
 const formSchema = z.object({
   dateTime: z.date(),
@@ -41,6 +42,7 @@ export function DateTimePickerForm() {
           name="dateTime"
           render={({ field }) => (
             <FormItem className="flex flex-col">
+              <ThemeSwitcher />
               <FormLabel className="text-left">DateTime</FormLabel>
               <TimePickerHMS setDate={field.onChange} date={field.value} />
             </FormItem>
