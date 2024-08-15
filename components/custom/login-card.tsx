@@ -28,7 +28,7 @@ async function LoginCard() {
           <h1 className="text-2xl font-bold">
             Signed in as: <UserButton /> {user?.firstName} {user?.lastName}
           </h1>
-          <SignOutButton mode="modal">
+          <SignOutButton>
             <Button>
               <ExitIcon className="mr-2 h-4 w-4" />
               Sign out
