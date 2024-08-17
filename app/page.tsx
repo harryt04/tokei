@@ -5,19 +5,19 @@ import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 export default async function Home() {
   return (
     <>
-      <SignedOut>
+      {/* <SignedOut>
         <RedirectToSignIn />
-      </SignedOut>
+      </SignedOut> */}
 
-      <SignedIn>
-        <div
-          className={cn(
-            'flex flex-col items-center justify-center gap-4 py-20 px-10 min-h-screen',
-          )}
-        >
-          <DateTimePickerForm />
-        </div>
-      </SignedIn>
+      {/* <SignedIn> */}
+      <div
+        className={cn(
+          'flex flex-col items-center justify-center gap-4 py-20 px-10 min-h-screen',
+        )}
+      >
+        <DateTimePickerForm />
+      </div>
+      {/* </SignedIn> */}
     </>
   )
 }
