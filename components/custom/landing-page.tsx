@@ -17,16 +17,20 @@ function LandingPage() {
             to set precise, sequential routines to keep everything on track.
           </p>
           <br />
+          <p className="text-l"></p>
+          Coming soon.
           <br />
-
-          <p className="text-l">
-            Coming soon.{' '}
-            <Button variant={'link'}>
-              <Link href="https://forms.gle/zgnPSaAiiLh7AuCz5">
-                Join the waitlist here.
-              </Link>
-            </Button>
-          </p>
+          <br />
+          <Button variant={'default'}>
+            <Link href="https://forms.gle/zgnPSaAiiLh7AuCz5">
+              Join the waitlist here.
+            </Link>
+          </Button>
+          <br />
+          <br />
+          <Button variant={'link'}>
+            <Link href="/login">Sign in to the free and open beta</Link>
+          </Button>
         </div>
       </div>
     </div>
