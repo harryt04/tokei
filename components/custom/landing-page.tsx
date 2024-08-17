@@ -23,7 +23,7 @@ function LandingPage() {
           <br />
           <Button variant={'default'}>
             <Link href="https://forms.gle/zgnPSaAiiLh7AuCz5">
-              Join the waitlist here.
+              Join the waitlist here
             </Link>
           </Button>
           <br />
