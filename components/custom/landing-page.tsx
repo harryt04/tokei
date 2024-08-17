@@ -5,16 +5,16 @@ import { Button } from '../ui/button'
 function LandingPage() {
   return (
     <div>
-      <ThemeSwitcher />
-      {/* vertical and horizontal center */}
       <div className="flex flex-col items-center justify-center h-screen">
         <div className="flex flex-col items-center justify-center max-w-2xl">
           <h1 className="text-4xl font-bold"> Tokei </h1>
           <br />
+          <ThemeSwitcher />
+          <br />
           <p className="text-l">
-            Tokei is the ultimate timer app for power users, designed for chefs
-            in the kitchen, fitness instructors, and project managers who need
-            to set precise, sequential routines to keep everything on track.
+            Tokei is the ultimate timer app for power users. It's designed for
+            chefs in the kitchen, fitness instructors, and project managers who
+            need precise, sequential routines to keep everything on track.
           </p>
           <br />
           <p className="text-l"></p>
