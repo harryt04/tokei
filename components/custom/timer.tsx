@@ -61,7 +61,6 @@ const getColorTimes = (duration: number): ColorTimes => {
 function Timer(props: TimerProps) {
   const { duration } = props
   const colorsTime = getColorTimes(duration)
-  console.log('colorsTime: ', colorsTime)
   return (
     <>
       <CountdownCircleTimer

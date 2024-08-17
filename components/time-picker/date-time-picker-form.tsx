@@ -46,7 +46,7 @@ export function DateTimePickerForm() {
             <FormItem className="flex flex-col">
               <ThemeSwitcher />
               <FormLabel className="text-left">DateTime</FormLabel>
-              <Timer duration={20} />
+              <Timer duration={60} />
               <TimePickerHMS setDate={field.onChange} date={field.value} />
             </FormItem>
           )}
