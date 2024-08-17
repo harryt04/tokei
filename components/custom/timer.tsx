@@ -52,8 +52,8 @@ const getColorTimes = (duration: number): ColorTimes => {
   const scaleFactor = duration / (colors.length - 1)
   if (scaleFactor < 0) return colorsTime as unknown as ColorTimes
   for (let i = duration; i > 0; i = i - scaleFactor) {
-    const twoDecimalPlaces = Math.round(i * 100) / 100
-    colorsTime.push(twoDecimalPlaces)
+    const timeStepCode = Math.round(i * 100) / 100
+    colorsTime.push(timeStepCode)
   }
   return colorsTime as unknown as ColorTimes
 }
