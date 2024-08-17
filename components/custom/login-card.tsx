@@ -1,25 +1,26 @@
-import { Card } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { Card } from '@/components/ui/card'
+import { cn } from '@/lib/utils'
 import {
   RedirectToSignIn,
   SignedIn,
   SignedOut,
   SignOutButton,
   UserButton,
-} from "@clerk/nextjs";
-import { currentUser, User } from "@clerk/nextjs/server";
-import { Button } from "../ui/button";
-import { ExitIcon } from "@radix-ui/react-icons";
+} from '@clerk/nextjs'
+import { currentUser, User } from '@clerk/nextjs/server'
+import { Button } from '../ui/button'
+import { ExitIcon } from '@radix-ui/react-icons'
 
 async function LoginCard() {
-  const user: User | null = await currentUser();
+  const user: User | null = await currentUser()
 
   return (
     <div>
       <Card
         className={cn(
-          "flex flex-col items-center justify-center gap-4 p-8 text-center",
-        )}>
+          'flex flex-col items-center justify-center gap-4 p-8 text-center',
+        )}
+      >
         <SignedOut>
           <RedirectToSignIn />
         </SignedOut>
@@ -37,7 +38,7 @@ async function LoginCard() {
         </SignedIn>
       </Card>
     </div>
-  );
+  )
 }
 
-export { LoginCard };
+export { LoginCard }
