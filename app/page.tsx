@@ -13,7 +13,7 @@ export default async function Home() {
       <SignedIn>
         <div
           className={cn(
-            'flex flex-col items-center justify-center gap-4 py-20 px-10 min-h-screen',
+            'flex min-h-screen flex-col items-center justify-center gap-4 px-10 py-20',
           )}
         >
           <DateTimePickerForm />

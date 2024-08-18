@@ -36,7 +36,7 @@ export function DateTimePickerForm() {
   return (
     <Form {...form}>
       <form
-        className="flex items-end gap-4 justify-center"
+        className="flex items-end justify-center gap-4"
         onSubmit={form.handleSubmit(onSubmit)}
       >
         <FormField

@@ -5,7 +5,7 @@ export default function Login() {
   return (
     <div
       className={cn(
-        'flex items-center justify-center align-center h-screen bg-background',
+        'align-center flex h-screen items-center justify-center bg-background',
       )}
     >
       <LoginCard />

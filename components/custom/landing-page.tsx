@@ -5,8 +5,8 @@ import { Button } from '../ui/button'
 function LandingPage() {
   return (
     <div>
-      <div className="flex flex-col items-center justify-center h-screen">
-        <div className="flex flex-col items-center justify-center max-w-2xl">
+      <div className="flex h-screen flex-col items-center justify-center">
+        <div className="flex max-w-2xl flex-col items-center justify-center">
           <h1 className="text-4xl font-bold"> Tokei </h1>
           <br />
           <ThemeSwitcher />
