@@ -12,9 +12,9 @@ function LandingPage() {
           <ThemeSwitcher />
           <br />
           <p className="text-l">
-            Tokei is the ultimate timer app for power users. It's designed for
-            chefs in the kitchen, fitness instructors, and project managers who
-            need precise, sequential routines to keep everything on track.
+            Tokei is the ultimate timer app for power users. It&apos;s designed
+            for chefs in the kitchen, fitness instructors, and project managers
+            who need precise, sequential routines to keep everything on track.
           </p>
           <br />
           <p className="text-l"></p>
