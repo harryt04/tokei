@@ -1,9 +1,9 @@
 import { LandingPage } from '@/components/custom/landing-page'
-import { Sidebar } from '@/components/custom/nav-drawer'
-import { cn } from '@/lib/utils'
+import { SideNav } from '@/components/custom/side-nav'
 import { SignedIn, SignedOut } from '@clerk/nextjs'
 
-export default async function Home() {
+export default function Home() {
+  // Remove 'use server' since Home should be a client component
   return (
     <>
       <SignedOut>
@@ -11,13 +11,7 @@ export default async function Home() {
       </SignedOut>
 
       <SignedIn>
-        <div
-          className={cn(
-            'flex flex-col items-center justify-center gap-4 px-10 py-20',
-          )}
-        >
-          <Sidebar playlists={['playlist1', 'playlist2', 'playlist3']} />
-        </div>
+        <SideNav />
         {/* <div
           className={cn(
             'flex min-h-screen flex-col items-center justify-center gap-4 px-10 py-20',
