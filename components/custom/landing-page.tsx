@@ -11,18 +11,14 @@ function LandingPage() {
           <br />
           <ThemeSwitcher />
           <br />
-          <p className="text-l">
-            Tokei is the ultimate timer app for power users. It&apos;s designed
-            for chefs in the kitchen, fitness instructors, and project managers
-            who need precise, sequential routines to keep everything on track.
-          </p>
+          <p className="text-l">Description</p>
           <br />
           <p className="text-l"></p>
           Coming soon.
           <br />
           <br />
           <Button variant={'default'}>
-            <Link href="https://forms.gle/zgnPSaAiiLh7AuCz5">
+            <Link href="https://forms.gle/grPSfC6ZdT7c2UNi8">
               Join the waitlist here
             </Link>
           </Button>
