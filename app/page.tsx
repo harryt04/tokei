@@ -1,25 +1,21 @@
+'use client'
 import { LandingPage } from '@/components/custom/landing-page'
 import { SideNav } from '@/components/custom/side-nav'
-import { SignedIn, SignedOut } from '@clerk/nextjs'
+import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs'
+import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  // Remove 'use server' since Home should be a client component
+  const { user } = useClerk()
+  const router = useRouter()
+
+  if (user) {
+    router.push('/routines')
+  }
   return (
     <>
       <SignedOut>
         <LandingPage />
       </SignedOut>
-
-      <SignedIn>
-        <SideNav />
-        {/* <div
-          className={cn(
-            'flex min-h-screen flex-col items-center justify-center gap-4 px-10 py-20',
-          )}
-        >
-          <DateTimePickerForm />
-        </div> */}
-      </SignedIn>
     </>
   )
 }
