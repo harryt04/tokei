@@ -17,7 +17,7 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: '時計 Tokei',
-  description: `Tokei is the ultimate timer app for power users. It's designed for chefs in the kitchen, fitness instructors, and project managers who need precise, sequential routines to keep everything on track.`,
+  description: `Tokei is a free and open source, timer app for power users. It's designed for chefs in the kitchen, fitness instructors, and project managers who need precise, sequential routines to keep everything on track.`,
 }
 
 export default function RootLayout({

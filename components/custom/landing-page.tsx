@@ -12,10 +12,10 @@ function LandingPage() {
           <ThemeSwitcher />
           <br />
           <p className="text-l max-w-md text-center">
-            Tokei (時計, &quot;clock&quot; in Japanese) is the ultimate timer
-            app for power users. It&apos;s designed for chefs in the kitchen,
-            fitness instructors, and project managers who need precise,
-            sequential routines to keep everything on track.
+            Tokei (時計, &quot;clock&quot; in Japanese) is a free and open
+            source, timer app for power users. It&apos;s designed for chefs in
+            the kitchen, fitness instructors, and project managers who need
+            precise, sequential routines to keep everything on track.
           </p>
           <br />
           <br />
