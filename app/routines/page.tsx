@@ -1,42 +1,112 @@
 'use client'
-import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
-import { RedirectToSignIn, SignedOut } from '@clerk/nextjs'
-import { useEffect } from 'react'
+
+import { useEffect, useState } from 'react'
+import { Routine } from '@/models'
+import { RoutineComponent } from '@/components/custom/routine-component'
+import { Button } from '@/components/ui/button'
+import { PlusIcon } from 'lucide-react'
+import { RoutineForm } from '@/components/custom/routine-form'
+import { Switch } from '@/components/ui/switch'
+import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 
 export default function Routines() {
-  const { open, isMobile } = useSidebar()
+  const [routines, setRoutines] = useState<Routine[]>([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isFormOpen, setIsFormOpen] = useState(false)
+  const [editMode, setEditMode] = useState(false)
+
   useEffect(() => {
-    const fetchPlaces = async () => {
+    const fetchRoutines = async () => {
       setLoading(true)
       setError(null)
 
       try {
-        const response = await fetch(
-          `/api/places?speakerId=${selectedSpeaker?._id}`,
-        )
+        const response = await fetch(`/api/routines`)
         if (!response.ok) {
           throw new Error(`Error: ${response.status} ${response.statusText}`)
         }
 
         const data = await response.json()
-        setPlaces(data)
+        setRoutines(data)
       } catch (err: any) {
-        setError(err.message || 'Failed to fetch places')
+        setError(err.message || 'Failed to fetch routines')
       } finally {
         setLoading(false)
       }
     }
 
-    if (selectedSpeaker) {
-      fetchPlaces()
+    fetchRoutines()
+  }, [])
+
+  const handleAddRoutine = async (newRoutine: Partial<Routine>) => {
+    try {
+      const response = await fetch('/api/routine', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newRoutine),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status} ${response.statusText}`)
+      }
+
+      const responseBody = await response.json()
+      setRoutines((prev) => [...prev, responseBody.updatedRoutine])
+    } catch (err) {
+      console.error('Error adding routine:', err)
     }
-  }, [selectedSpeaker])
+  }
+
+  const handleDeleteRoutine = async (routine: Routine) => {
+    setRoutines(routines.filter((r) => r._id !== routine._id))
+  }
+
   return (
     <>
       <SignedOut>
         <RedirectToSignIn />
       </SignedOut>
-      {(!open || isMobile) && <SidebarTrigger className="ml-2 mt-5 p-5" />}
+      <SignedIn>
+        <div className="flex flex-col">
+          <div className="ml-0 mt-8 flex w-10/12 flex-col items-center gap-4 md:ml-8 md:flex-row">
+            <Button variant="default" onClick={() => setIsFormOpen(true)}>
+              <PlusIcon /> Add Routine
+            </Button>
+            {routines.length > 0 && (
+              <div
+                className="flex cursor-pointer items-center gap-2 px-8 py-2 md:absolute md:right-0 md:pr-8"
+                onClick={() => setEditMode(!editMode)}
+              >
+                <Switch checked={editMode} />
+                Edit mode
+              </div>
+            )}
+          </div>
+          <div className="flex flex-wrap justify-center gap-8 p-4">
+            {loading ? (
+              <p>Loading routines...</p>
+            ) : error ? (
+              <p className="text-red-500">{error}</p>
+            ) : (
+              routines.map((routine) => (
+                <RoutineComponent
+                  key={routine._id}
+                  routine={routine}
+                  editMode={editMode}
+                  onDelete={handleDeleteRoutine}
+                />
+              ))
+            )}
+          </div>
+        </div>
+        {isFormOpen && (
+          <RoutineForm
+            onClose={() => setIsFormOpen(false)}
+            onSubmit={handleAddRoutine}
+          />
+        )}
+      </SignedIn>
     </>
   )
 }
