@@ -1,7 +1,6 @@
 'use client'
 import { LandingPage } from '@/components/custom/landing-page'
-import { SideNav } from '@/components/custom/side-nav'
-import { SignedIn, SignedOut, useClerk } from '@clerk/nextjs'
+import { SignedOut, useClerk } from '@clerk/nextjs'
 import { useRouter } from 'next/navigation'
 
 export default function Home() {
