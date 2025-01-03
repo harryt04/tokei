@@ -27,6 +27,7 @@ const items = [
     title: `Routines`,
     url: '/routines',
     icon: Repeat2Icon,
+    childrenRoutes: ['/routine/'],
   },
   // {
   //   title: `Food`,
@@ -62,7 +63,11 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu className="space-y-2 px-2">
               {items.map((item) => {
-                const isActive = pathname === item.url // Check if the current route matches the item's URL.
+                const isActive =
+                  pathname === item.url ||
+                  item.childrenRoutes?.some((childRoute) =>
+                    pathname.startsWith(childRoute),
+                  )
 
                 return (
                   <SidebarMenuItem key={item.title}>

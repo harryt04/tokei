@@ -12,6 +12,7 @@ import {
 import { Button } from '../ui/button'
 import { Pencil1Icon, TrashIcon } from '@radix-ui/react-icons'
 import { RoutineForm } from './routine-form'
+import { useRouter } from 'next/navigation'
 
 export const RoutineComponent = ({
   routine,
@@ -24,6 +25,7 @@ export const RoutineComponent = ({
 }) => {
   const [isEditing, setIsEditing] = useState(false)
   const [updatedRoutine, setUpdatedRoutine] = useState<Routine>(routine)
+  const router = useRouter()
 
   const handleEditClick = () => {
     setIsEditing(true)
@@ -51,12 +53,15 @@ export const RoutineComponent = ({
   }
 
   return (
-    <Card className="min-h-full">
+    <Card
+      className="min-h-full cursor-pointer"
+      onClick={() => router.push(`/routine/${updatedRoutine._id}`)}
+    >
       <CardHeader>
         <CardTitle>{updatedRoutine.name}</CardTitle>
         <CardDescription>
-          {updatedRoutine.steps?.length} Steps,{' '}
-          {updatedRoutine.swimLanes?.length} Swimlanes
+          {updatedRoutine.steps?.length || 0} Steps,{' '}
+          {updatedRoutine.swimLanes?.length || 0} Swimlanes
         </CardDescription>
       </CardHeader>
       <CardContent>
