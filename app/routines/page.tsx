@@ -8,6 +8,7 @@ import { PlusIcon } from 'lucide-react'
 import { RoutineForm } from '@/components/custom/routine-form'
 import { Switch } from '@/components/ui/switch'
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
+import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
 
 export default function Routines() {
   const [routines, setRoutines] = useState<Routine[]>([])
@@ -15,6 +16,7 @@ export default function Routines() {
   const [error, setError] = useState<string | null>(null)
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
+  const { open, isMobile } = useSidebar()
 
   useEffect(() => {
     const fetchRoutines = async () => {
@@ -68,6 +70,7 @@ export default function Routines() {
         <RedirectToSignIn />
       </SignedOut>
       <SignedIn>
+        {(!open || isMobile) && <SidebarTrigger className="ml-2 mt-5 p-5" />}
         <div className="flex flex-col">
           <div className="ml-0 mt-8 flex w-10/12 flex-col items-center gap-4 md:ml-8 md:flex-row">
             <Button variant="default" onClick={() => setIsFormOpen(true)}>

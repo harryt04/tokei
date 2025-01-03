@@ -1,4 +1,4 @@
-import { ClerkProvider } from '@clerk/nextjs'
+import { ClerkProvider, SignedIn } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 
@@ -17,7 +17,7 @@ const fontSans = FontSans({
 
 export const metadata: Metadata = {
   title: 'Tokei',
-  description: 'Tokei',
+  description: `Tokei is the ultimate timer app for power users. It's designed for chefs in the kitchen, fitness instructors, and project managers who need precise, sequential routines to keep everything on track.`,
 }
 
 export default function RootLayout({
@@ -43,7 +43,9 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <SidebarProvider>
-                <AppSidebar />
+                <SignedIn>
+                  <AppSidebar />
+                </SignedIn>
                 {children}
               </SidebarProvider>
             </ThemeProvider>
