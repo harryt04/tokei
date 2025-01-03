@@ -45,7 +45,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className="my-4">
             <SidebarTrigger className="-ml-2 mr-4 p-5" />
-            Tokei
+            <span className="w-full">時計 Tokei</span>
             <div className={cn('flex w-full flex-row justify-end gap-4')}>
               <div className="h-full w-fit pt-1.5">
                 <UserButton

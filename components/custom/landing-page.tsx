@@ -7,25 +7,16 @@ function LandingPage() {
     <div>
       <div className="flex h-screen w-screen flex-col items-center justify-center">
         <div className="flex max-w-2xl flex-col items-center justify-center">
-          <h1 className="text-4xl font-bold"> Tokei </h1>
+          <h1 className="text-4xl font-bold">時計 Tokei </h1>
           <br />
           <ThemeSwitcher />
           <br />
-          <p className="text-l">
-            Tokei is the ultimate timer app for power users. It's designed for
-            chefs in the kitchen, fitness instructors, and project managers who
-            need precise, sequential routines to keep everything on track.
+          <p className="text-l max-w-md text-center">
+            Tokei (時計, &quot;clock&quot; in Japanese) is the ultimate timer
+            app for power users. It&apos;s designed for chefs in the kitchen,
+            fitness instructors, and project managers who need precise,
+            sequential routines to keep everything on track.
           </p>
-          <br />
-          <p className="text-l"></p>
-          Coming soon.
-          <br />
-          <br />
-          <Button variant={'default'}>
-            <Link href="https://forms.gle/grPSfC6ZdT7c2UNi8">
-              Join the waitlist here
-            </Link>
-          </Button>
           <br />
           <br />
           <Button variant={'link'}>
