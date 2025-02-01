@@ -1,8 +1,12 @@
+import { getRoutine } from '@/actions/routine'
+import { currentUser } from '@clerk/nextjs/server'
+
 export default async function RoutinePage(props: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await props.params
-  const response = await fetch(`/api/routine?id=${id}`)
+  const user = await currentUser()
+  const response = await getRoutine(id, user as any)
   console.log('response: ', response)
   console.log('id: ', id)
   return (

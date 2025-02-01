@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { Repeat2Icon } from 'lucide-react'
+import { Repeat2Icon, TimerIcon } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -29,11 +29,11 @@ const items = [
     icon: Repeat2Icon,
     childrenRoutes: ['/routine/'],
   },
-  // {
-  //   title: `Food`,
-  //   url: '/food',
-  //   icon: Apple,
-  // },
+  {
+    title: `Dynamic`,
+    url: '/dynamic',
+    icon: TimerIcon,
+  },
 ]
 
 export function AppSidebar() {

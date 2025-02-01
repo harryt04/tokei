@@ -6,6 +6,7 @@ module.exports = {
     'plugin:@typescript-eslint/recommended',
   ],
   rules: {
+    'no-extra-boolean-cast': 'off',
     'no-undef': 'off',
     'react/react-in-jsx-scope': 'off',
     'react/prop-types': 'off',
