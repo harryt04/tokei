@@ -1,6 +1,9 @@
 import { MongoClient } from 'mongodb'
+const defaultConnectionString =
+  'mongodb://root:1fcjnTP3OyVsBHssEycs1NjUuYLk9nvSU0Qv2ZN49xhOdSNoli7WIYyTRU89EP0O@192.168.86.32:6000/?directConnection=true' // put your MONGO_CONNECTION_STRING here when running npm run create-indexes
 
-const MONGO_CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING as string
+const MONGO_CONNECTION_STRING =
+  process.env.MONGO_CONNECTION_STRING ?? defaultConnectionString
 
 if (!MONGO_CONNECTION_STRING) {
   throw new Error('MONGO_CONNECTION_STRING environment variable is not set.')
@@ -22,7 +25,7 @@ export async function getMongoClient(): Promise<MongoClient> {
 }
 
 export const mongoDBConfig = {
-  dbName: 'tokei',
+  dbName: `tokei-${process.env.NODE_ENV}`,
   collections: {
     routines: 'routines',
   },

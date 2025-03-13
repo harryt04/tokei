@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "create-indexes": "npx gulp create-indexes",
     "lint": "next lint",
     "prettify": "prettier --write ."
   },
@@ -50,6 +51,7 @@
     "@typescript-eslint/eslint-plugin": "^8.19.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "^14.2.5",
+    "gulp": "^5.0.0",
     "postcss": "^8",
     "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.6.6",
