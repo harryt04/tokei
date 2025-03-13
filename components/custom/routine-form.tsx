@@ -67,7 +67,7 @@ export function RoutineForm({
               value={formState.name}
               onChange={handleChange}
               placeholder="Enter routine name"
-              className="w-full"
+              className="mt-4 w-full"
             />
           </div>
           <DialogFooter className="mt-6 flex justify-end gap-4">

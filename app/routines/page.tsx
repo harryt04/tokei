@@ -4,11 +4,12 @@ import { useEffect, useState } from 'react'
 import { Routine } from '@/models'
 import { RoutineComponent } from '@/components/custom/routine-component'
 import { Button } from '@/components/ui/button'
-import { PlusIcon } from 'lucide-react'
+import { PlusIcon, Repeat2Icon } from 'lucide-react'
 import { RoutineForm } from '@/components/custom/routine-form'
 import { Switch } from '@/components/ui/switch'
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import { SidebarTrigger, useSidebar } from '@/components/ui/sidebar'
+import { NoResultsComponent } from '@/components/custom/no-results-component'
 
 export default function Routines() {
   const [routines, setRoutines] = useState<Routine[]>([])
@@ -64,6 +65,27 @@ export default function Routines() {
     setRoutines(routines.filter((r) => r._id !== routine._id))
   }
 
+  const routinesList =
+    routines?.length > 0 ? (
+      routines.map((routine) => (
+        <RoutineComponent
+          key={routine._id}
+          routine={routine}
+          editMode={editMode}
+          onDelete={handleDeleteRoutine}
+        />
+      ))
+    ) : (
+      <NoResultsComponent
+        icon={<Repeat2Icon />}
+        title="No routines added yet"
+        body={[
+          'Routines are repeatable tasks that you do regularly.',
+          'For example, you may have a recipe in the kitchen that requires 6 total times, some that run in parallel, and some that run in sequence.',
+        ]}
+      />
+    )
+
   return (
     <>
       <SignedOut>
@@ -92,14 +114,7 @@ export default function Routines() {
             ) : error ? (
               <p className="text-red-500">{error}</p>
             ) : (
-              routines.map((routine) => (
-                <RoutineComponent
-                  key={routine._id}
-                  routine={routine}
-                  editMode={editMode}
-                  onDelete={handleDeleteRoutine}
-                />
-              ))
+              routinesList
             )}
           </div>
         </div>
