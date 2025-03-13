@@ -83,6 +83,7 @@ export default function Routines() {
           'Routines are repeatable tasks that you do regularly.',
           'For example, you may have a recipe in the kitchen that requires 6 total times, some that run in parallel, and some that run in sequence.',
         ]}
+        className="ml-4"
       />
     )
 
