@@ -12,6 +12,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { PlayIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
+import { getDateNMinutesFromNow } from '@/lib/utils'
 
 export type FreestyleComponentProps = {
   timer: Timer
@@ -23,8 +24,12 @@ function FreestyleComponent(props: FreestyleComponentProps) {
   const [duration, setDuration] = useState(props.timer?.duration.toString()) // Track duration input
 
   const handleStart = () => {
-    console.log(`Starting "${title}" with duration: ${duration} minutes`)
-    // Add additional logic here if needed
+    const now = new Date()
+    props.timerUpdated({
+      ...props.timer,
+      startedAt: now,
+      willEndAt: getDateNMinutesFromNow(Number(duration)),
+    })
   }
 
   return (

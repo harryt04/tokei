@@ -6,7 +6,7 @@ export type Timer = {
   duration: number
   name: string
   startedAt?: Date
-  completionTime?: Date
+  willEndAt?: Date
 }
 
 function FreestyleList() {

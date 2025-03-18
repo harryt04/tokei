@@ -13,3 +13,10 @@ export function extractParamFromUrl(
   const url = new URL(req.url)
   return url.searchParams.get(paramName)
 }
+
+export function getDateNMinutesFromNow(minutesFromNow: number): Date {
+  const MINS_FROM_MILLI = 60 * 1000 // converts minutes to milliseconds when multiplied by this factor
+  return new Date(
+    new Date().getTime() + Number(minutesFromNow) * MINS_FROM_MILLI,
+  )
+}
