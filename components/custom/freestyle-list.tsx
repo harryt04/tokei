@@ -14,24 +14,30 @@ function FreestyleList() {
 
   // Load timers from localStorage on component mount
   useEffect(() => {
-    const storedTimers = JSON.parse(
-      localStorage.getItem('freestyleTimers') as string,
-    )
-    if (!storedTimers || storedTimers?.length === 0) {
+    const localstorageitems = localStorage.getItem('freestyleTimers')
+    const storedTimers = JSON.parse(localstorageitems ?? '[]')
+
+    if (storedTimers?.length > 0) {
+      setTimers(storedTimers)
+    } else {
       setTimers([
         {
           name: 'Timer 1',
           duration: 0,
         },
       ])
-    } else {
-      setTimers(storedTimers)
     }
   }, [])
 
   // Update localStorage whenever timers change
   useEffect(() => {
+    if (timers.length === 0) return
+    localStorage.removeItem('freestyleTimers')
+    let storedTimers = JSON.parse(
+      localStorage.getItem('freestyleTimers') as string,
+    )
     localStorage.setItem('freestyleTimers', JSON.stringify(timers))
+    storedTimers = JSON.parse(localStorage.getItem('freestyleTimers') as string)
   }, [timers])
 
   return (
@@ -40,9 +46,12 @@ function FreestyleList() {
         <FreestyleComponent
           key={index}
           timer={timer}
-          nameUpdated={(newName) => {
-            // update timer at index with newname
-            timer.name = newName
+          timerUpdated={(newTimer) => {
+            setTimers((prevTimers) => {
+              const updatedTimers = [...prevTimers]
+              updatedTimers[index] = { ...newTimer }
+              return updatedTimers
+            })
           }}
         />
       ))}

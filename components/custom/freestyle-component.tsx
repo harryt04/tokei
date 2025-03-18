@@ -15,7 +15,7 @@ import { Timer } from './freestyle-list'
 
 export type FreestyleComponentProps = {
   timer: Timer
-  nameUpdated: (newName: string) => void
+  timerUpdated: (newTimer: Timer) => void
 }
 
 function FreestyleComponent(props: FreestyleComponentProps) {
@@ -37,7 +37,7 @@ function FreestyleComponent(props: FreestyleComponentProps) {
               value={title}
               onChange={(e) => {
                 setTitle(e.target.value)
-                props.nameUpdated(e.target.value)
+                props.timerUpdated({ ...props.timer, name: e.target.value })
               }}
               className="w-full border-none bg-transparent outline-none"
             />
@@ -48,8 +48,15 @@ function FreestyleComponent(props: FreestyleComponentProps) {
           <Input
             id="duration"
             placeholder="0"
+            type="number"
             value={duration}
-            onChange={(e) => setDuration(e.target.value)}
+            onChange={(e) => {
+              setDuration(e.target.value)
+              props.timerUpdated({
+                ...props.timer,
+                duration: Number(e.target.value),
+              })
+            }}
           />
         </CardContent>
         <CardFooter>
