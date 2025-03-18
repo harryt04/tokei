@@ -8,7 +8,7 @@ function LoginCard() {
   const router = useRouter()
 
   if (user) {
-    router.push('/routines')
+    router.push('/freestyle')
   }
 
   return (

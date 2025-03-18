@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { Repeat2Icon, TimerIcon } from 'lucide-react'
+import { BirdIcon, Repeat2Icon, TimerIcon } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -24,15 +24,15 @@ import { ThemeSwitcher } from './custom/themeSwitcher'
 // Menu items.
 const items = [
   {
+    title: `Freestyle`,
+    url: '/freestyle',
+    icon: BirdIcon,
+  },
+  {
     title: `Routines`,
     url: '/routines',
     icon: Repeat2Icon,
     childrenRoutes: ['/routine/'],
-  },
-  {
-    title: `Dynamic`,
-    url: '/dynamic',
-    icon: TimerIcon,
   },
 ]
 
@@ -46,7 +46,7 @@ export function AppSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel className="my-4">
             <SidebarTrigger className="-ml-2 mr-4 p-5" />
-            <span className="w-full">時計 Tokei</span>
+            <span className="w-full">Tokei 時計</span>
             <div className={cn('flex w-full flex-row justify-end gap-4')}>
               <div className="h-full w-fit pt-1.5">
                 <UserButton
