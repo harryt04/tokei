@@ -1,6 +1,6 @@
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
-import FreestyleComponent from '@/components/custom/freestyle-component'
 import MySidebarTrigger from '@/components/custom/sidebar-trigger'
+import FreestyleList from '@/components/custom/freestyle-list'
 
 export default function Freestyle() {
   return (
@@ -10,7 +10,7 @@ export default function Freestyle() {
       </SignedOut>
       <SignedIn>
         <MySidebarTrigger />
-        <FreestyleComponent />
+        <FreestyleList />
       </SignedIn>
     </>
   )
