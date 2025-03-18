@@ -11,13 +11,21 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { PlayIcon } from 'lucide-react'
+import { Timer } from './freestyle-list'
 
 export type FreestyleComponentProps = {
-  startingTitle?: string
+  timer: Timer
+  nameUpdated: (newName: string) => void
 }
 
 function FreestyleComponent(props: FreestyleComponentProps) {
-  const [title, setTitle] = useState(props.startingTitle ?? 'Timer 1')
+  const [title, setTitle] = useState(props.timer?.name ?? 'Timer 1')
+  const [duration, setDuration] = useState(props.timer?.duration.toString()) // Track duration input
+
+  const handleStart = () => {
+    console.log(`Starting "${title}" with duration: ${duration} minutes`)
+    // Add additional logic here if needed
+  }
 
   return (
     <div className="p-4">
@@ -27,17 +35,25 @@ function FreestyleComponent(props: FreestyleComponentProps) {
             <input
               type="text"
               value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={(e) => {
+                setTitle(e.target.value)
+                props.nameUpdated(e.target.value)
+              }}
               className="w-full border-none bg-transparent outline-none"
             />
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Label htmlFor="duration">Duration (minutes)</Label>
-          <Input id="duration" placeholder="0" />
+          <Input
+            id="duration"
+            placeholder="0"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+          />
         </CardContent>
         <CardFooter>
-          <Button>
+          <Button onClick={handleStart}>
             <PlayIcon />
             Start
           </Button>
