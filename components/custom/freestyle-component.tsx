@@ -25,19 +25,29 @@ export type FreestyleComponentProps = {
 
 type RunningState = 'stopped' | 'running' | 'completed'
 
-const MINUTES = 60
 const MILISECONDS = 1000
 
 const FreestyleComponent = (props: FreestyleComponentProps) => {
   const [timer, setTimer] = useState<Timer>(props.timer)
-  const [duration, setDuration] = useState(props.timer?.duration.toString())
+  const [hours, setHours] = useState(
+    Math.floor(props.timer?.duration / 3600).toString(),
+  )
+  const [minutes, setMinutes] = useState(
+    Math.floor((props.timer?.duration % 3600) / 60).toString(),
+  )
+  const [seconds, setSeconds] = useState(
+    (props.timer?.duration % 60).toString(),
+  )
   const [timerProgress, setTimerProgress] = useState(0)
-
   const [runningState, setRunningState] = useState<RunningState>('stopped')
   const runningStateRef = useRef(runningState)
 
+  const calculateTotalDuration = () => {
+    return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
+  }
+
   const runTimer = () => {
-    const step = (Number(duration) * MINUTES) / 100
+    const step = calculateTotalDuration() / 100
     setTimeout(() => {
       if (
         runningStateRef.current === 'stopped' ||
@@ -58,11 +68,13 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   }
 
   const handleStart = () => {
+    const totalDuration = calculateTotalDuration()
     const now = new Date()
     const timerInput = {
       ...props.timer,
+      duration: totalDuration,
       startedAt: now,
-      willEndAt: getDateNMinutesFromNow(Number(duration)),
+      willEndAt: getDateNMinutesFromNow(totalDuration / 60),
     }
     props.timerUpdated(timerInput)
     setTimer(timerInput)
@@ -82,12 +94,10 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
       return <span>{timer?.name} is finished!</span>
     } else {
       // Render a countdown
-      return (
-        <span>
-          {hours && `${hours}`}
-          {minutes && `${minutes}`}:{seconds} remaining
-        </span>
-      )
+      const h = hours > 0 ? `${hours} hours, ` : ''
+      const m = minutes > 0 ? `${minutes} minutes, ` : ''
+      const s = seconds > 0 ? `${seconds} seconds ` : ''
+      return <span>{`${h}${m}${s} remaining...`}</span>
     }
   }
 
@@ -127,20 +137,56 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {(runningState === 'stopped' || runningState === 'completed') && (
           <>
-            <Label htmlFor="duration">Duration (minutes)</Label>
-            <Input
-              id="duration"
-              placeholder="0"
-              type="number"
-              value={duration}
-              onChange={(e) => {
-                setDuration(e.target.value)
-                props.timerUpdated({
-                  ...props.timer,
-                  duration: Number(e.target.value),
-                })
-              }}
-            />
+            <div className="flex gap-2">
+              <div>
+                <Label htmlFor="hours-input">Hours</Label>
+                <Input
+                  id="hours-input"
+                  type="number"
+                  placeholder="Hours"
+                  value={hours}
+                  onChange={(e) => {
+                    setHours(Number(e.target.value).toString())
+                    props.timerUpdated({
+                      ...props.timer,
+                      duration: calculateTotalDuration(),
+                    })
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="min-input">Minutes</Label>
+                <Input
+                  id="min-input"
+                  type="number"
+                  placeholder="Minutes"
+                  value={minutes}
+                  onChange={(e) => {
+                    setMinutes(Number(e.target.value).toString())
+                    props.timerUpdated({
+                      ...props.timer,
+                      duration: calculateTotalDuration(),
+                    })
+                  }}
+                />
+              </div>
+              <div>
+                <Label htmlFor="sec-input">Seconds</Label>
+                <Input
+                  id="sec-input"
+                  type="number"
+                  placeholder="Seconds"
+                  value={seconds}
+                  onChange={(e) => {
+                    setSeconds(Number(e.target.value).toString())
+                    props.timerUpdated({
+                      ...props.timer,
+                      duration: calculateTotalDuration(),
+                    })
+                  }}
+                />
+              </div>
+            </div>
           </>
         )}
 
@@ -171,11 +217,9 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         )}
 
         <Button
-          onClick={handleStop}
           variant="destructive"
           className="ml-4"
           onClickCapture={() => {
-            console.log('timer: ', timer)
             props.removeTimer(timer.id)
           }}
         >
