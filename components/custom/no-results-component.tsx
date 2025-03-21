@@ -1,5 +1,5 @@
 import { FC } from 'react'
-import { Card, CardDescription, CardHeader, CardTitle } from '../ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
 export interface NoResultsProps {
   icon: JSX.Element
@@ -18,17 +18,15 @@ export const NoResultsComponent: FC<NoResultsProps> = ({
     <Card className={`${className} p-6 text-center`}>
       <CardHeader className="flex flex-col items-center justify-center self-center justify-self-center">
         <div className="mb-4 text-4xl">{icon}</div>
-        <CardTitle>
-          <h2 className="mb-2 text-xl font-semibold">{title}</h2>
-        </CardTitle>
+        <CardTitle className="mb-2 text-xl font-semibold">{title}</CardTitle>
       </CardHeader>
-      <CardDescription className="text-center text-sm">
+      <CardContent className="text-center text-sm">
         {body.map((line, index) => (
           <p className="pb-2" key={index}>
             {line}
           </p>
         ))}
-      </CardDescription>
+      </CardContent>
     </Card>
   )
 }
