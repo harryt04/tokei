@@ -41,7 +41,7 @@ function FreestyleList() {
   }, [timers])
 
   return (
-    <div>
+    <div className="w-full p-4">
       {timers.map((timer, index) => (
         <FreestyleComponent
           key={index}

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import {
   Card,
   CardContent,
@@ -14,107 +14,162 @@ import { PlayIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow } from '@/lib/utils'
 import { Progress } from '../ui/progress'
+import { StopIcon } from '@radix-ui/react-icons'
+import Countdown from 'react-countdown'
 
 export type FreestyleComponentProps = {
   timer: Timer
   timerUpdated: (newTimer: Timer) => void
 }
 
-type RunningState = 'stopped' | 'running'
+type RunningState = 'stopped' | 'running' | 'completed'
 
 const MINUTES = 60
+const MILISECONDS = 1000
 
-function FreestyleComponent(props: FreestyleComponentProps) {
+const FreestyleComponent = (props: FreestyleComponentProps) => {
   const [timer, setTimer] = useState<Timer>(props.timer)
-  const [duration, setDuration] = useState(props.timer?.duration.toString()) // Track duration input
-  const [timerProgress, setTimerProgress] = useState(0) // Track duration input
+  const [duration, setDuration] = useState(props.timer?.duration.toString())
+  const [timerProgress, setTimerProgress] = useState(0)
 
   const [runningState, setRunningState] = useState<RunningState>('stopped')
+  const runningStateRef = useRef(runningState)
 
   const runTimer = () => {
-    console.log('runningState: ', runningState)
     const step = (Number(duration) * MINUTES) / 100
-    console.log('step: ', step)
     setTimeout(() => {
-      console.log('runningState: ', runningState)
-      if (runningState === 'stopped') return
-      setTimerProgress((previousProgress) => previousProgress + 1)
+      if (
+        runningStateRef.current === 'stopped' ||
+        runningStateRef.current === 'completed'
+      ) {
+        return
+      }
+      setTimerProgress((previousProgress) => {
+        if (previousProgress === 100) {
+          setRunningState('completed')
+          runningStateRef.current = 'completed'
+          return 0
+        }
+        return previousProgress + 1
+      })
       runTimer()
-    }, step)
+    }, step * MILISECONDS)
   }
 
   const handleStart = () => {
     const now = new Date()
-    props.timerUpdated({
+    const timerInput = {
       ...props.timer,
       startedAt: now,
       willEndAt: getDateNMinutesFromNow(Number(duration)),
-    })
+    }
+    props.timerUpdated(timerInput)
+    setTimer(timerInput)
     setRunningState('running')
+    runningStateRef.current = 'running'
     setTimerProgress(0)
     runTimer()
   }
 
+  const handleStop = () => {
+    setRunningState('stopped')
+    runningStateRef.current = 'stopped'
+  }
+
+  const clockRenderer = ({ hours, minutes, seconds, completed }) => {
+    if (completed) {
+      return <span>{timer?.name} is finished!</span>
+    } else {
+      // Render a countdown
+      return (
+        <span>
+          {hours && `${hours}`}
+          {minutes && `${minutes}`}:{seconds} remaining
+        </span>
+      )
+    }
+  }
+
   return (
-    <div className="p-4">
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <input
-              type="text"
-              value={timer?.name ?? ''}
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <input
+            type="text"
+            value={timer?.name ?? ''}
+            onChange={(e) => {
+              setTimer({
+                ...timer,
+                name: e.target.value,
+              })
+              props.timerUpdated({ ...props.timer, name: e.target.value })
+            }}
+            className="w-full border-none bg-transparent outline-none"
+          />
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {runningState === 'running' && (
+          <div className="pb-4">
+            <Countdown
+              date={timer?.willEndAt}
+              renderer={clockRenderer}
+            ></Countdown>
+          </div>
+        )}
+
+        {runningState === 'completed' && (
+          <>
+            <div className="pb-4">{timer?.name} is finished!</div>
+          </>
+        )}
+
+        {(runningState === 'stopped' || runningState === 'completed') && (
+          <>
+            <Label htmlFor="duration">Duration (minutes)</Label>
+            <Input
+              id="duration"
+              placeholder="0"
+              type="number"
+              value={duration}
               onChange={(e) => {
-                setTimer({
-                  ...timer,
-                  name: e.target.value,
+                setDuration(e.target.value)
+                props.timerUpdated({
+                  ...props.timer,
+                  duration: Number(e.target.value),
                 })
-                props.timerUpdated({ ...props.timer, name: e.target.value })
               }}
-              className="w-full border-none bg-transparent outline-none"
             />
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          {runningState === 'stopped' && (
-            <>
-              <Label htmlFor="duration">Duration (minutes)</Label>
-              <Input
-                id="duration"
-                placeholder="0"
-                type="number"
-                value={duration}
-                onChange={(e) => {
-                  setDuration(e.target.value)
-                  props.timerUpdated({
-                    ...props.timer,
-                    duration: Number(e.target.value),
-                  })
-                }}
-              />
-            </>
-          )}
+          </>
+        )}
 
-          {runningState === 'running' && (
-            <>
-              <Progress value={timerProgress}></Progress>
-            </>
-          )}
-        </CardContent>
+        {runningState === 'running' && (
+          <>
+            <Progress value={timerProgress}></Progress>
+          </>
+        )}
+      </CardContent>
 
-        <CardFooter>
-          {runningState === 'stopped' && (
-            <>
-              <Button onClick={handleStart}>
-                <PlayIcon />
-                Start
-              </Button>
-            </>
-          )}
+      <CardFooter>
+        {(runningState === 'stopped' || runningState === 'completed') && (
+          <>
+            <Button onClick={handleStart}>
+              <PlayIcon />
+              {runningState === 'completed' ? 'Start again' : 'Start'}
+            </Button>
+          </>
+        )}
 
-          {runningState === 'running' && <></>}
-        </CardFooter>
-      </Card>
-    </div>
+        {runningState === 'running' && (
+          <>
+            <Button onClick={handleStop}>
+              <StopIcon />
+              Stop
+            </Button>
+          </>
+        )}
+      </CardFooter>
+    </Card>
   )
 }
 
