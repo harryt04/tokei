@@ -13,15 +13,35 @@ import { Button } from '../ui/button'
 import { PlayIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow } from '@/lib/utils'
+import { Progress } from '../ui/progress'
 
 export type FreestyleComponentProps = {
   timer: Timer
   timerUpdated: (newTimer: Timer) => void
 }
 
+type RunningState = 'stopped' | 'running'
+
+const MINUTES = 60
+
 function FreestyleComponent(props: FreestyleComponentProps) {
-  const [title, setTitle] = useState(props.timer?.name ?? 'Timer 1')
+  const [timer, setTimer] = useState<Timer>(props.timer)
   const [duration, setDuration] = useState(props.timer?.duration.toString()) // Track duration input
+  const [timerProgress, setTimerProgress] = useState(0) // Track duration input
+
+  const [runningState, setRunningState] = useState<RunningState>('stopped')
+
+  const runTimer = () => {
+    console.log('runningState: ', runningState)
+    const step = (Number(duration) * MINUTES) / 100
+    console.log('step: ', step)
+    setTimeout(() => {
+      console.log('runningState: ', runningState)
+      if (runningState === 'stopped') return
+      setTimerProgress((previousProgress) => previousProgress + 1)
+      runTimer()
+    }, step)
+  }
 
   const handleStart = () => {
     const now = new Date()
@@ -30,6 +50,9 @@ function FreestyleComponent(props: FreestyleComponentProps) {
       startedAt: now,
       willEndAt: getDateNMinutesFromNow(Number(duration)),
     })
+    setRunningState('running')
+    setTimerProgress(0)
+    runTimer()
   }
 
   return (
@@ -39,9 +62,12 @@ function FreestyleComponent(props: FreestyleComponentProps) {
           <CardTitle>
             <input
               type="text"
-              value={title}
+              value={timer?.name ?? ''}
               onChange={(e) => {
-                setTitle(e.target.value)
+                setTimer({
+                  ...timer,
+                  name: e.target.value,
+                })
                 props.timerUpdated({ ...props.timer, name: e.target.value })
               }}
               className="w-full border-none bg-transparent outline-none"
@@ -49,26 +75,43 @@ function FreestyleComponent(props: FreestyleComponentProps) {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <Label htmlFor="duration">Duration (minutes)</Label>
-          <Input
-            id="duration"
-            placeholder="0"
-            type="number"
-            value={duration}
-            onChange={(e) => {
-              setDuration(e.target.value)
-              props.timerUpdated({
-                ...props.timer,
-                duration: Number(e.target.value),
-              })
-            }}
-          />
+          {runningState === 'stopped' && (
+            <>
+              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Input
+                id="duration"
+                placeholder="0"
+                type="number"
+                value={duration}
+                onChange={(e) => {
+                  setDuration(e.target.value)
+                  props.timerUpdated({
+                    ...props.timer,
+                    duration: Number(e.target.value),
+                  })
+                }}
+              />
+            </>
+          )}
+
+          {runningState === 'running' && (
+            <>
+              <Progress value={timerProgress}></Progress>
+            </>
+          )}
         </CardContent>
+
         <CardFooter>
-          <Button onClick={handleStart}>
-            <PlayIcon />
-            Start
-          </Button>
+          {runningState === 'stopped' && (
+            <>
+              <Button onClick={handleStart}>
+                <PlayIcon />
+                Start
+              </Button>
+            </>
+          )}
+
+          {runningState === 'running' && <></>}
         </CardFooter>
       </Card>
     </div>
