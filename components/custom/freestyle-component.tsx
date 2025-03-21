@@ -10,7 +10,7 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { PlayIcon } from 'lucide-react'
+import { PlayIcon, TrashIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow } from '@/lib/utils'
 import { Progress } from '../ui/progress'
@@ -20,6 +20,7 @@ import Countdown from 'react-countdown'
 export type FreestyleComponentProps = {
   timer: Timer
   timerUpdated: (newTimer: Timer) => void
+  removeTimer: (id: string) => void
 }
 
 type RunningState = 'stopped' | 'running' | 'completed'
@@ -162,12 +163,25 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {runningState === 'running' && (
           <>
-            <Button onClick={handleStop}>
+            <Button onClick={handleStop} variant="destructive">
               <StopIcon />
               Stop
             </Button>
           </>
         )}
+
+        <Button
+          onClick={handleStop}
+          variant="destructive"
+          className="ml-4"
+          onClickCapture={() => {
+            console.log('timer: ', timer)
+            props.removeTimer(timer.id)
+          }}
+        >
+          <TrashIcon />
+          Remove
+        </Button>
       </CardFooter>
     </Card>
   )
