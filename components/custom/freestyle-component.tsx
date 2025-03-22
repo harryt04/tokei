@@ -12,7 +12,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { PlayIcon, TrashIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
-import { getDateNMinutesFromNow, speakTextWithAlarm } from '@/lib/utils'
+import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
 import { StopIcon } from '@radix-ui/react-icons'
 import Countdown from 'react-countdown'
@@ -41,6 +41,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   const [timerProgress, setTimerProgress] = useState(0)
   const [runningState, setRunningState] = useState<RunningState>('stopped')
   const runningStateRef = useRef(runningState)
+  const alarmRef = useRef<Howl | null>(null)
 
   const calculateTotalDuration = () => {
     return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
@@ -57,9 +58,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
       }
       setTimerProgress((previousProgress) => {
         if (previousProgress === 100) {
-          speakTextWithAlarm(`${timer?.name} is finished!`)
-          setRunningState('completed')
-          runningStateRef.current = 'completed'
+          handleCompleted()
           return 0
         }
         return previousProgress + 1
@@ -68,7 +67,20 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
     }, step * MILISECONDS)
   }
 
+  const handleCompleted = () => {
+    alarmRef.current = playCustomAlarm()
+    setRunningState('completed')
+    runningStateRef.current = 'completed'
+  }
+
+  const handleStopAlarm = () => {
+    const alarm = alarmRef.current as Howl
+    alarm?.stop()
+    alarmRef.current = null
+  }
+
   const handleStart = () => {
+    handleStopAlarm()
     const totalDuration = calculateTotalDuration()
     const now = new Date()
     const timerInput = {
@@ -199,20 +211,34 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
       </CardContent>
 
       <CardFooter>
-        {(runningState === 'stopped' || runningState === 'completed') && (
-          <>
-            <Button onClick={handleStart}>
-              <PlayIcon />
-              {runningState === 'completed' ? 'Start again' : 'Start'}
-            </Button>
-          </>
-        )}
+        {(runningState === 'stopped' || runningState === 'completed') &&
+          alarmRef?.current === null && (
+            <>
+              <Button
+                onClick={() => {
+                  handleStart()
+                }}
+              >
+                <PlayIcon />
+                {runningState === 'completed' ? 'Start again' : 'Start'}
+              </Button>
+            </>
+          )}
 
         {runningState === 'running' && (
           <>
             <Button onClick={handleStop} variant="destructive">
               <StopIcon />
               Stop
+            </Button>
+          </>
+        )}
+
+        {alarmRef?.current !== null && (
+          <>
+            <Button className="ml-4" onClick={handleStopAlarm}>
+              <StopIcon />
+              Stop alarm
             </Button>
           </>
         )}
