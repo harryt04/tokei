@@ -150,7 +150,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         {(runningState === 'stopped' || runningState === 'completed') &&
           !alarm && (
             <>
-              <div className="flex gap-2">
+              <div className="flex gap-6">
                 <div>
                   <Label htmlFor="hours-input">Hours</Label>
                   <Input
@@ -199,16 +199,6 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                     }}
                   />
                 </div>
-                <Button
-                  variant="destructive"
-                  className="ml-8 mt-6"
-                  onClickCapture={() => {
-                    props.removeTimer(timer.id)
-                  }}
-                >
-                  <TrashIcon />
-                  Remove
-                </Button>
               </div>
             </>
           )}
@@ -220,7 +210,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         )}
       </CardContent>
 
-      <CardFooter>
+      <CardFooter className="flex gap-6">
         {(runningState === 'stopped' || runningState === 'completed') &&
           !alarm && (
             <>
@@ -249,6 +239,20 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
             <Button onClick={handleStopAlarm} variant="secondary">
               <StopIcon />
               Stop alarm
+            </Button>
+          </>
+        )}
+
+        {!alarm && runningState !== 'running' && (
+          <>
+            <Button
+              variant="destructive"
+              onClickCapture={() => {
+                props.removeTimer(timer.id)
+              }}
+            >
+              <TrashIcon />
+              Remove
             </Button>
           </>
         )}

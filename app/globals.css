@@ -48,7 +48,7 @@
     --popover-foreground: 40 30% 96%;
     --primary: 190 100% 60%; /* Brighter cyan for dark mode */
     --primary-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
-    --secondary: 45 100% 60%; /* Brighter golden yellow for dark mode */
+    --secondary: 45 80% 50%; /* Softer golden yellow for dark mode */
     --secondary-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
     --muted: 70 5% 25%; /* Keep muted background for dark mode */
     --muted-foreground: 40 20% 70%; /* Maintain contrast */
