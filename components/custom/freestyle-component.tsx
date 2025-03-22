@@ -147,60 +147,61 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
           </>
         )}
 
-        {(runningState === 'stopped' || runningState === 'completed') && (
-          <>
-            <div className="flex gap-2">
-              <div>
-                <Label htmlFor="hours-input">Hours</Label>
-                <Input
-                  id="hours-input"
-                  type="number"
-                  placeholder="Hours"
-                  value={hours}
-                  onChange={(e) => {
-                    setHours(Number(e.target.value).toString())
-                    props.timerUpdated({
-                      ...props.timer,
-                      duration: calculateTotalDuration(),
-                    })
-                  }}
-                />
+        {(runningState === 'stopped' || runningState === 'completed') &&
+          !alarm && (
+            <>
+              <div className="flex gap-2">
+                <div>
+                  <Label htmlFor="hours-input">Hours</Label>
+                  <Input
+                    id="hours-input"
+                    type="number"
+                    placeholder="Hours"
+                    value={hours}
+                    onChange={(e) => {
+                      setHours(Number(e.target.value).toString())
+                      props.timerUpdated({
+                        ...props.timer,
+                        duration: calculateTotalDuration(),
+                      })
+                    }}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="min-input">Minutes</Label>
+                  <Input
+                    id="min-input"
+                    type="number"
+                    placeholder="Minutes"
+                    value={minutes}
+                    onChange={(e) => {
+                      setMinutes(Number(e.target.value).toString())
+                      props.timerUpdated({
+                        ...props.timer,
+                        duration: calculateTotalDuration(),
+                      })
+                    }}
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="sec-input">Seconds</Label>
+                  <Input
+                    id="sec-input"
+                    type="number"
+                    placeholder="Seconds"
+                    value={seconds}
+                    onChange={(e) => {
+                      setSeconds(Number(e.target.value).toString())
+                      props.timerUpdated({
+                        ...props.timer,
+                        duration: calculateTotalDuration(),
+                      })
+                    }}
+                  />
+                </div>
               </div>
-              <div>
-                <Label htmlFor="min-input">Minutes</Label>
-                <Input
-                  id="min-input"
-                  type="number"
-                  placeholder="Minutes"
-                  value={minutes}
-                  onChange={(e) => {
-                    setMinutes(Number(e.target.value).toString())
-                    props.timerUpdated({
-                      ...props.timer,
-                      duration: calculateTotalDuration(),
-                    })
-                  }}
-                />
-              </div>
-              <div>
-                <Label htmlFor="sec-input">Seconds</Label>
-                <Input
-                  id="sec-input"
-                  type="number"
-                  placeholder="Seconds"
-                  value={seconds}
-                  onChange={(e) => {
-                    setSeconds(Number(e.target.value).toString())
-                    props.timerUpdated({
-                      ...props.timer,
-                      duration: calculateTotalDuration(),
-                    })
-                  }}
-                />
-              </div>
-            </div>
-          </>
-        )}
+            </>
+          )}
 
         {runningState === 'running' && (
           <>
@@ -217,7 +218,6 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                 onClick={() => {
                   handleStart()
                 }}
-                variant="default"
               >
                 <PlayIcon />
                 {runningState === 'completed' ? 'Start again' : 'Start'}
@@ -227,7 +227,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {runningState === 'running' && (
           <>
-            <Button onClick={handleStop} variant="destructive">
+            <Button onClick={handleStop} variant="secondary">
               <StopIcon />
               Stop
             </Button>
@@ -236,7 +236,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {alarm && (
           <>
-            <Button onClick={handleStopAlarm} variant="default">
+            <Button onClick={handleStopAlarm} variant="secondary">
               <StopIcon />
               Stop alarm
             </Button>
@@ -245,7 +245,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {!alarm && runningState !== 'running' && (
           <Button
-            variant="secondary"
+            variant="destructive"
             className="ml-4"
             onClickCapture={() => {
               props.removeTimer(timer.id)

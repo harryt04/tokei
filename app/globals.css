@@ -5,30 +5,30 @@
 @layer base {
   :root {
     --background: 40 20% 98%; /* Light warm gray */
-    --foreground: 0 0% 20%; /* Dark text */
+    --foreground: 0 0% 10%; /* Darker text for better readability */
     --card: 0 0% 100%; /* White for cards */
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%; /* White popovers */
     --popover-foreground: 0 0% 20%;
     --primary: 190 100% 50%; /* Cyan */
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 10%; /* Almost black for better contrast */
     --secondary: 45 100% 50%; /* Golden yellow */
-    --secondary-foreground: 0 0% 20%; /* Dark text for contrast */
-    --muted: 60 20% 92%;
-    --muted-foreground: 0 0% 50%;
-    --accent: 210 50% 50%; /* Medium blue */
-    --accent-foreground: 0 0% 100%;
+    --secondary-foreground: 0 0% 10%; /* Almost black for better contrast */
+    --muted: 60 10% 85%; /* Slightly darker muted background */
+    --muted-foreground: 0 0% 30%; /* Darker text for better contrast */
+    --accent: 270 50% 50%; /* Distinct purple */
+    --accent-foreground: 0 0% 10%; /* Almost black for better contrast */
     --destructive: 0 100% 60%; /* Standard red */
     --destructive-foreground: 0 0% 100%;
     --radius: 1rem;
     --border: 40 30% 85%;
     --input: 40 30% 85%;
     --ring: 180 50% 45%;
-    --chart-1: 180 50% 45%;
-    --chart-2: 90 60% 60%;
-    --chart-3: 40 100% 50%;
-    --chart-4: 340 100% 50%;
-    --chart-5: 200 100% 50%;
+    --chart-1: 190 100% 50%; /* Cyan */
+    --chart-2: 45 100% 50%; /* Golden yellow */
+    --chart-3: 270 50% 50%; /* Purple */
+    --chart-4: 0 100% 60%; /* Red */
+    --chart-5: 210 50% 50%; /* Blue */
     --sidebar-background: 40 20% 98%;
     --sidebar-foreground: 0 0% 20%;
     --sidebar-primary: 180 50% 45%;
@@ -41,30 +41,30 @@
 
   .dark {
     --background: 220 15% 12%; /* Dark grayish blue (VS Code dark background) */
-    --foreground: 40 30% 96%; /* Light gray for text */
+    --foreground: 40 30% 90%; /* Lighter text for better readability in dark mode */
     --card: 220 15% 15%; /* Slightly lighter background for cards */
     --card-foreground: 40 30% 96%;
     --popover: 220 15% 15%; /* Same as card background */
     --popover-foreground: 40 30% 96%;
     --primary: 190 100% 60%; /* Brighter cyan for dark mode */
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
     --secondary: 45 100% 60%; /* Brighter golden yellow for dark mode */
-    --secondary-foreground: 0 0% 100%; /* Light text for contrast */
-    --muted: 70 5% 22%;
-    --muted-foreground: 40 20% 70%;
-    --accent: 210 50% 50%; /* Medium blue for accents */
-    --accent-foreground: 0 0% 100%;
+    --secondary-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
+    --muted: 70 5% 25%; /* Keep muted background for dark mode */
+    --muted-foreground: 40 20% 70%; /* Maintain contrast */
+    --accent: 270 50% 60%; /* Brighter purple for dark mode */
+    --accent-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
     --destructive: 0 100% 50%; /* Slightly darker red for dark mode */
     --destructive-foreground: 0 0% 100%;
     --border: 70 5% 25%;
     --input: 70 5% 25%;
     --radius: 1rem;
     --ring: 180 50% 60%;
-    --chart-1: 180 50% 60%;
-    --chart-2: 90 60% 50%;
-    --chart-3: 40 100% 60%;
-    --chart-4: 340 100% 60%;
-    --chart-5: 200 100% 60%;
+    --chart-1: 190 100% 60%; /* Brighter cyan */
+    --chart-2: 45 100% 60%; /* Brighter golden yellow */
+    --chart-3: 270 50% 60%; /* Brighter purple */
+    --chart-4: 0 100% 50%; /* Slightly darker red */
+    --chart-5: 210 50% 60%; /* Brighter blue */
     --sidebar-background: 220 15% 12%; /* Same as background for sidebar */
     --sidebar-foreground: 40 30% 96%;
     --sidebar-primary: 180 50% 60%;
