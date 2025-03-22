@@ -199,6 +199,16 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                     }}
                   />
                 </div>
+                <Button
+                  variant="destructive"
+                  className="ml-8 mt-6"
+                  onClickCapture={() => {
+                    props.removeTimer(timer.id)
+                  }}
+                >
+                  <TrashIcon />
+                  Remove
+                </Button>
               </div>
             </>
           )}
@@ -241,19 +251,6 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
               Stop alarm
             </Button>
           </>
-        )}
-
-        {!alarm && runningState !== 'running' && (
-          <Button
-            variant="destructive"
-            className="ml-4"
-            onClickCapture={() => {
-              props.removeTimer(timer.id)
-            }}
-          >
-            <TrashIcon />
-            Remove
-          </Button>
         )}
       </CardFooter>
     </Card>
