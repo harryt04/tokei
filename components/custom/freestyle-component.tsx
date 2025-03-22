@@ -10,7 +10,7 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { PlayIcon, TrashIcon } from 'lucide-react'
+import { PlayIcon, RefreshCwIcon, TrashIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
@@ -222,7 +222,11 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   handleStart()
                 }}
               >
-                <PlayIcon />
+                {runningState === 'completed' ? (
+                  <RefreshCwIcon />
+                ) : (
+                  <PlayIcon />
+                )}
                 {runningState === 'completed' ? 'Start again' : 'Start'}
               </Button>
             </>
