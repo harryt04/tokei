@@ -12,7 +12,7 @@ import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { PlayIcon, TrashIcon } from 'lucide-react'
 import { Timer } from './freestyle-list'
-import { getDateNMinutesFromNow } from '@/lib/utils'
+import { getDateNMinutesFromNow, speakTextWithAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
 import { StopIcon } from '@radix-ui/react-icons'
 import Countdown from 'react-countdown'
@@ -57,6 +57,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
       }
       setTimerProgress((previousProgress) => {
         if (previousProgress === 100) {
+          speakTextWithAlarm(`${timer?.name} is finished!`)
           setRunningState('completed')
           runningStateRef.current = 'completed'
           return 0
