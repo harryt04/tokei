@@ -87,7 +87,7 @@ function FreestyleList() {
       )}
 
       <Button
-        variant="outline"
+        variant="secondary"
         onClick={() => {
           setTimers((previousTimers) => [
             ...previousTimers,
