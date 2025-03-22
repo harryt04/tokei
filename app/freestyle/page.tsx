@@ -9,8 +9,10 @@ export default function Freestyle() {
         <RedirectToSignIn />
       </SignedOut>
       <SignedIn>
-        <MySidebarTrigger />
-        <FreestyleList />
+        <div className="w-full">
+          <MySidebarTrigger />
+          <FreestyleList />
+        </div>
       </SignedIn>
     </>
   )
