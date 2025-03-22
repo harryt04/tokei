@@ -38,6 +38,7 @@
     "posthog-js": "^1.232.4",
     "posthog-node": "^4.10.1",
     "react": "^18",
+    "react-beautiful-dnd": "^13.1.1",
     "react-countdown": "^2.3.6",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18",
