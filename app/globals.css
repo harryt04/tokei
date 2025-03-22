@@ -10,10 +10,10 @@
     --card-foreground: 0 0% 20%;
     --popover: 0 0% 100%; /* White popovers */
     --popover-foreground: 0 0% 20%;
-    --primary: 180 50% 45%; /* Deep teal */
+    --primary: 190 100% 50%; /* Cyan */
     --primary-foreground: 0 0% 100%;
-    --secondary: 90 60% 60%; /* Yellow-green */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 45 100% 50%; /* Golden yellow */
+    --secondary-foreground: 0 0% 20%; /* Dark text for contrast */
     --muted: 60 20% 92%;
     --muted-foreground: 0 0% 50%;
     --accent: 210 50% 50%; /* Medium blue */
@@ -46,10 +46,10 @@
     --card-foreground: 40 30% 96%;
     --popover: 220 15% 15%; /* Same as card background */
     --popover-foreground: 40 30% 96%;
-    --primary: 180 50% 60%; /* Lighter teal for primary */
+    --primary: 190 100% 60%; /* Brighter cyan for dark mode */
     --primary-foreground: 0 0% 100%;
-    --secondary: 90 60% 45%; /* Darker yellow-green for secondary */
-    --secondary-foreground: 0 0% 100%;
+    --secondary: 45 100% 60%; /* Brighter golden yellow for dark mode */
+    --secondary-foreground: 0 0% 100%; /* Light text for contrast */
     --muted: 70 5% 22%;
     --muted-foreground: 40 20% 70%;
     --accent: 210 50% 50%; /* Medium blue for accents */

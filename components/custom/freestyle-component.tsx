@@ -217,6 +217,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                 onClick={() => {
                   handleStart()
                 }}
+                variant="default"
               >
                 <PlayIcon />
                 {runningState === 'completed' ? 'Start again' : 'Start'}
@@ -235,7 +236,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {alarm && (
           <>
-            <Button onClick={handleStopAlarm}>
+            <Button onClick={handleStopAlarm} variant="default">
               <StopIcon />
               Stop alarm
             </Button>
@@ -244,7 +245,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {!alarm && runningState !== 'running' && (
           <Button
-            variant="destructive"
+            variant="secondary"
             className="ml-4"
             onClickCapture={() => {
               props.removeTimer(timer.id)
