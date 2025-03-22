@@ -41,8 +41,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   const [timerProgress, setTimerProgress] = useState(0)
   const [runningState, setRunningState] = useState<RunningState>('stopped')
   const runningStateRef = useRef(runningState)
-  const alarmRef = useRef<Howl | null>(null)
-
+  const [alarm, setAlarm] = useState<Howl | null>(null)
   const calculateTotalDuration = () => {
     return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
   }
@@ -68,15 +67,15 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   }
 
   const handleCompleted = () => {
-    alarmRef.current = playCustomAlarm()
+    const newAlarm = playCustomAlarm()
+    setAlarm(newAlarm)
     setRunningState('completed')
     runningStateRef.current = 'completed'
   }
 
   const handleStopAlarm = () => {
-    const alarm = alarmRef.current as Howl
     alarm?.stop()
-    alarmRef.current = null
+    setAlarm(null)
   }
 
   const handleStart = () => {
@@ -212,7 +211,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
       <CardFooter>
         {(runningState === 'stopped' || runningState === 'completed') &&
-          alarmRef?.current === null && (
+          !alarm && (
             <>
               <Button
                 onClick={() => {
@@ -234,9 +233,9 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
           </>
         )}
 
-        {alarmRef?.current !== null && (
+        {alarm && (
           <>
-            <Button className="ml-4" onClick={handleStopAlarm}>
+            <Button onClick={handleStopAlarm}>
               <StopIcon />
               Stop alarm
             </Button>
