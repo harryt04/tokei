@@ -156,6 +156,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   <Input
                     id="hours-input"
                     type="number"
+                    inputMode="numeric"
                     placeholder="Hours"
                     value={hours}
                     onChange={(e) => {
@@ -172,6 +173,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   <Input
                     id="min-input"
                     type="number"
+                    inputMode="numeric"
                     placeholder="Minutes"
                     value={minutes}
                     onChange={(e) => {
@@ -188,6 +190,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   <Input
                     id="sec-input"
                     type="number"
+                    inputMode="numeric"
                     placeholder="Seconds"
                     value={seconds}
                     onChange={(e) => {
