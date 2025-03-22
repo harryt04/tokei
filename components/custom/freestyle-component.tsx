@@ -242,16 +242,18 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
           </>
         )}
 
-        <Button
-          variant="destructive"
-          className="ml-4"
-          onClickCapture={() => {
-            props.removeTimer(timer.id)
-          }}
-        >
-          <TrashIcon />
-          Remove
-        </Button>
+        {!alarm && runningState !== 'running' && (
+          <Button
+            variant="destructive"
+            className="ml-4"
+            onClickCapture={() => {
+              props.removeTimer(timer.id)
+            }}
+          >
+            <TrashIcon />
+            Remove
+          </Button>
+        )}
       </CardFooter>
     </Card>
   )

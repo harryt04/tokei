@@ -18,7 +18,7 @@
     --muted-foreground: 0 0% 50%;
     --accent: 210 50% 50%; /* Medium blue */
     --accent-foreground: 0 0% 100%;
-    --destructive: 30 100% 60%; /* Bright orange */
+    --destructive: 0 100% 60%; /* Standard red */
     --destructive-foreground: 0 0% 100%;
     --radius: 1rem;
     --border: 40 30% 85%;
@@ -54,7 +54,7 @@
     --muted-foreground: 40 20% 70%;
     --accent: 210 50% 50%; /* Medium blue for accents */
     --accent-foreground: 0 0% 100%;
-    --destructive: 30 100% 60%; /* Bright orange */
+    --destructive: 0 100% 50%; /* Slightly darker red for dark mode */
     --destructive-foreground: 0 0% 100%;
     --border: 70 5% 25%;
     --input: 70 5% 25%;
