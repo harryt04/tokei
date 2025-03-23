@@ -16,7 +16,7 @@
     --secondary-foreground: 0 0% 10%; /* Almost black for better contrast */
     --muted: 60 10% 85%; /* Slightly darker muted background */
     --muted-foreground: 0 0% 30%; /* Darker text for better contrast */
-    --accent: 270 50% 50%; /* Distinct purple */
+    --accent: 45 100% 50%;
     --accent-foreground: 0 0% 10%; /* Almost black for better contrast */
     --destructive: 0 100% 60%; /* Standard red */
     --destructive-foreground: 0 0% 100%;
@@ -33,8 +33,8 @@
     --sidebar-foreground: 0 0% 20%;
     --sidebar-primary: 180 50% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 90 60% 60%;
-    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 50%;
+    --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 40 30% 85%;
     --sidebar-ring: 180 50% 45%;
   }
@@ -52,7 +52,7 @@
     --secondary-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
     --muted: 70 5% 25%; /* Keep muted background for dark mode */
     --muted-foreground: 40 20% 70%; /* Maintain contrast */
-    --accent: 270 50% 60%; /* Brighter purple for dark mode */
+    --accent: 45 100% 60%;
     --accent-foreground: 0 0% 10%; /* Almost black for better contrast in dark mode */
     --destructive: 0 100% 50%; /* Slightly darker red for dark mode */
     --destructive-foreground: 0 0% 100%;
@@ -69,8 +69,8 @@
     --sidebar-foreground: 40 30% 96%;
     --sidebar-primary: 180 50% 60%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 90 60% 45%;
-    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-accent: 45 100% 60%;
+    --sidebar-accent-foreground: 0 0% 10%;
     --sidebar-border: 70 5% 25%;
     --sidebar-ring: 180 50% 60%;
   }

@@ -16,6 +16,7 @@ import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
 import { StopIcon } from '@radix-ui/react-icons'
 import Countdown from 'react-countdown'
+import '../styles/freestyle.css'
 
 export type FreestyleComponentProps = {
   timer: Timer
@@ -116,7 +117,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>
+        <CardTitle className="freestyle-header">
           <input
             type="text"
             value={timer?.name ?? ''}
@@ -129,6 +130,19 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
             }}
             className="w-full border-none bg-transparent outline-none"
           />
+          {!alarm && runningState !== 'running' && (
+            <>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClickCapture={() => {
+                  props.removeTimer(timer.id)
+                }}
+              >
+                <TrashIcon />
+              </Button>
+            </>
+          )}
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -227,7 +241,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                 ) : (
                   <PlayIcon />
                 )}
-                {runningState === 'completed' ? 'Start again' : 'Start'}
+                {runningState === 'completed' ? 'Restart' : 'Start'}
               </Button>
             </>
           )}
@@ -246,20 +260,6 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
             <Button onClick={handleStopAlarm} variant="secondary">
               <StopIcon />
               Stop alarm
-            </Button>
-          </>
-        )}
-
-        {!alarm && runningState !== 'running' && (
-          <>
-            <Button
-              variant="destructive"
-              onClickCapture={() => {
-                props.removeTimer(timer.id)
-              }}
-            >
-              <TrashIcon />
-              Remove
             </Button>
           </>
         )}
