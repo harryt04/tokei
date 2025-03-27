@@ -1,11 +1,26 @@
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import RoutinesList from '@/components/custom/routines-list'
-import { fetchRoutines } from '@/lib/api'
+import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
+import { currentUser } from '@clerk/nextjs/server'
+import { Routine } from '@/models'
 
 export default async function Routines() {
-  // Pre-fetch routines at the server level
-  const initialRoutines = await fetchRoutines().catch(() => [])
-  console.log('initialRoutines: ', initialRoutines)
+  const user = await currentUser()
+
+  let initialRoutines: Routine[] = []
+
+  if (user) {
+    const client = await getMongoClient()
+    const db = client.db(mongoDBConfig.dbName)
+    const routinesCollection = db.collection(mongoDBConfig.collections.routines)
+
+    const documents = await routinesCollection.find({ userId: user.id }).toArray()
+
+    initialRoutines = documents.map((doc) => ({
+      ...doc,
+      _id: doc._id.toString(),
+    })) as Routine[]
+  }
 
   return (
     <>

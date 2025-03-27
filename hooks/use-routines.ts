@@ -8,12 +8,14 @@ import {
 
 export function useRoutines(initialRoutines: Routine[] = []) {
   const [routines, setRoutines] = useState<Routine[]>(initialRoutines)
-  const [loading, setLoading] = useState(!initialRoutines.length)
+  const [loading, setLoading] = useState(false) // Changed to false since we have initial data
   const [error, setError] = useState<string | null>(null)
 
-  // Only fetch if we didn't get initial data
+  // Skip initial fetch if we have initialRoutines
+  const shouldFetch = initialRoutines.length === 0
+
   useEffect(() => {
-    if (initialRoutines.length === 0) {
+    if (shouldFetch) {
       const loadRoutines = async () => {
         setLoading(true)
         setError(null)
@@ -30,7 +32,7 @@ export function useRoutines(initialRoutines: Routine[] = []) {
 
       loadRoutines()
     }
-  }, [initialRoutines])
+  }, [shouldFetch]) // Changed dependency to clarify intent
 
   const addRoutine = useCallback(async (newRoutine: Partial<Routine>) => {
     try {
