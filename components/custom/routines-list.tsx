@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import MySidebarTrigger from './sidebar-trigger'
 import { Routine } from '@/models'
 import { RoutineComponent } from './routine-component'
@@ -9,81 +9,53 @@ import { Button } from '../ui/button'
 import { PlusIcon } from '@radix-ui/react-icons'
 import { Switch } from '../ui/switch'
 import { RoutineForm } from './routine-form'
+import { useRoutines } from '@/hooks/use-routines'
 
-function RoutinesList() {
-  const [routines, setRoutines] = useState<Routine[]>([])
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+type RoutinesListProps = {
+  initialRoutines: Routine[]
+}
+
+function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
   const [editMode, setEditMode] = useState(false)
 
-  useEffect(() => {
-    const fetchRoutines = async () => {
-      setLoading(true)
-      setError(null)
-
-      try {
-        const response = await fetch(`/api/routines`)
-        if (!response.ok) {
-          throw new Error(`Error: ${response.status} ${response.statusText}`)
-        }
-
-        const data = await response.json()
-        setRoutines(data)
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch routines')
-      } finally {
-        setLoading(false)
-      }
-    }
-
-    fetchRoutines()
-  }, [])
+  const { routines, loading, error, addRoutine, deleteRoutine } =
+    useRoutines(initialRoutines)
 
   const handleAddRoutine = async (newRoutine: Partial<Routine>) => {
-    try {
-      const response = await fetch('/api/routine', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newRoutine),
-      })
-
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status} ${response.statusText}`)
-      }
-
-      const responseBody = await response.json()
-      setRoutines((prev) => [...prev, responseBody.updatedRoutine])
-    } catch (err) {
-      console.error('Error adding routine:', err)
-    }
+    await addRoutine(newRoutine)
+    setIsFormOpen(false)
   }
 
-  const handleDeleteRoutine = async (routine: Routine) => {
-    setRoutines(routines.filter((r) => r._id !== routine._id))
-  }
+  const renderContent = () => {
+    if (loading) return <p className="py-8 text-center">Loading routines...</p>
 
-  const routinesList =
-    routines?.length > 0 ? (
-      routines.map((routine) => (
-        <RoutineComponent
-          key={routine._id}
-          routine={routine}
-          editMode={editMode}
-          onDelete={handleDeleteRoutine}
+    if (error) return <p className="py-8 text-center text-red-500">{error}</p>
+
+    if (routines.length === 0) {
+      return (
+        <NoResultsComponent
+          icon={<Repeat2Icon />}
+          title="No routines added yet"
+          body={[
+            'Routines are repeatable tasks that you do regularly.',
+            'For example, you may have a recipe in the kitchen that requires 6 total times, some that run in parallel, and some that run in sequence.',
+          ]}
+          className="ml-4"
         />
-      ))
-    ) : (
-      <NoResultsComponent
-        icon={<Repeat2Icon />}
-        title="No routines added yet"
-        body={[
-          'Routines are repeatable tasks that you do regularly.',
-          'For example, you may have a recipe in the kitchen that requires 6 total times, some that run in parallel, and some that run in sequence.',
-        ]}
-        className="ml-4"
+      )
+    }
+
+    return routines.map((routine) => (
+      <RoutineComponent
+        key={routine._id}
+        routine={routine}
+        editMode={editMode}
+        onDelete={() => deleteRoutine(routine)}
       />
-    )
+    ))
+  }
+
   return (
     <>
       <MySidebarTrigger />
@@ -103,13 +75,7 @@ function RoutinesList() {
           )}
         </div>
         <div className="flex flex-wrap justify-center gap-8 p-4">
-          {loading ? (
-            <p>Loading routines...</p>
-          ) : error ? (
-            <p className="text-red-500">{error}</p>
-          ) : (
-            routinesList
-          )}
+          {renderContent()}
         </div>
       </div>
       {isFormOpen && (
