@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import FreestyleComponent from './freestyle-component'
 import { ClockIcon, PlusIcon } from 'lucide-react'
 import { Button } from '../ui/button'
