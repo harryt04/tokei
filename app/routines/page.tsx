@@ -14,7 +14,9 @@ export default async function Routines() {
     const db = client.db(mongoDBConfig.dbName)
     const routinesCollection = db.collection(mongoDBConfig.collections.routines)
 
-    const documents = await routinesCollection.find({ userId: user.id }).toArray()
+    const documents = await routinesCollection
+      .find({ userId: user.id })
+      .toArray()
 
     initialRoutines = documents.map((doc) => ({
       ...doc,

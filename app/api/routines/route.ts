@@ -15,12 +15,17 @@ export async function GET(req: NextRequest) {
     const routinesCollection = db.collection(mongoDBConfig.collections.routines)
 
     // Query the "routines" collection for documents created by the user
-    const routines = await routinesCollection.find({ userId: user.userId }).toArray()
+    const routines = await routinesCollection
+      .find({ userId: user.userId })
+      .toArray()
 
     // Return the routines as JSON
     return NextResponse.json(routines, { status: 200 })
   } catch (error) {
     console.error('Error:', error)
-    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 })
+    return NextResponse.json(
+      { error: 'Internal Server Error' },
+      { status: 500 },
+    )
   }
 }
