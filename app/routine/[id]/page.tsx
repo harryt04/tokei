@@ -1,6 +1,7 @@
 'use server'
 import { getRoutine } from '@/actions/routine'
 import { currentUser } from '@clerk/nextjs/server'
+import { notFound } from 'next/navigation'
 
 export default async function RoutinePage(props: {
   params: Promise<{ id: string }>
@@ -8,8 +9,8 @@ export default async function RoutinePage(props: {
   const { id } = await props.params
   const user = await currentUser()
   const response = await getRoutine(id, user as any)
-  console.log('response: ', response)
-  console.log('id: ', id)
+  if (response.notFound) notFound()
+
   return (
     <div>
       <h1>Routine ID: {id}</h1>
