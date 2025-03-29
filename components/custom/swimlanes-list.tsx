@@ -7,6 +7,7 @@ import { PlusIcon, WavesIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
 import { Input } from '../ui/input'
+import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -80,7 +81,7 @@ export function SwimlanesList(props: SwimlanesListProps) {
     <>
       {swimLanes?.map((swimLane) => {
         return (
-          <div key={swimLane.id} className="mb-2">
+          <div key={swimLane.id} className="mb-4">
             {editingId === swimLane.id ? (
               <Input
                 value={editValue}
@@ -98,6 +99,67 @@ export function SwimlanesList(props: SwimlanesListProps) {
                 {swimLane.name}
               </H4>
             )}
+
+            <ScrollArea className="mt-2 h-36 w-full rounded-md border border-dashed border-muted-foreground">
+              <div className="flex w-full gap-4 p-4">
+                {/* Placeholder items that will be replaced with actual timers */}
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 1
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 2
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 3
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 4
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 5
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 6
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 1
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 2
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 3
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 4
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 5
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 6
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 1
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 2
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 3
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 4
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 5
+                </div>
+                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                  Timer 6
+                </div>
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
           </div>
         )
       })}

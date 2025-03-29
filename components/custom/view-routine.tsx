@@ -77,7 +77,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   }, [])
 
   return (
-    <div className="w-full p-4">
+    <div className="mx-auto w-full max-w-7xl overflow-x-hidden p-4">
       <div className="flex w-full flex-row place-items-center md:gap-4">
         <Link href="/routines">
           <Button size="icon" variant="ghost">
