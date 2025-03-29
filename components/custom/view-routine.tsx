@@ -2,11 +2,12 @@
 import { Routine } from '@/models'
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '../ui/button'
-import { ArrowLeftIcon } from 'lucide-react'
+import { ArrowLeftIcon, Trash2Icon } from 'lucide-react'
 import { useRoutines } from '@/hooks/use-routines'
 import { useRouter } from 'next/navigation'
 import { Separator } from '../ui/separator'
 import Link from 'next/link'
+import ConfirmationDialog from './confirmation-dialog'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -19,11 +20,12 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   )
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
 
   // Initialize useRoutines with the current routine
-  const { updateRoutine } = useRoutines([routine])
+  const { updateRoutine, deleteRoutine } = useRoutines([routine])
 
   const handleNameChange = (newName: string) => {
     setName(newName)
@@ -55,6 +57,16 @@ export default function ViewRoutine(props: ViewRoutineProps) {
     setIsEditing(false)
   }
 
+  const handleDelete = async () => {
+    try {
+      await deleteRoutine(routine)
+      router.push('/routines') // Navigate back to routines list after deletion
+    } catch (err: any) {
+      console.error('Error deleting routine:', err)
+      setUpdateError(err.message || 'Failed to delete routine')
+    }
+  }
+
   // Clean up timeout on unmount
   useEffect(() => {
     return () => {
@@ -71,26 +83,36 @@ export default function ViewRoutine(props: ViewRoutineProps) {
           </Button>
         </Link>
 
-        {isEditing ? (
-          <input
-            type="text"
-            value={name}
-            onChange={(e) => handleNameChange(e.target.value)}
-            onBlur={handleBlur}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') handleBlur()
-            }}
-            autoFocus
-            className="text-md w-full p-8 md:text-3xl"
-          />
-        ) : (
-          <p
-            className="text-md w-full p-8 md:text-3xl"
-            onClick={() => setIsEditing(true)}
+        <div className="flex w-full items-center justify-between">
+          {isEditing ? (
+            <input
+              type="text"
+              value={name}
+              onChange={(e) => handleNameChange(e.target.value)}
+              onBlur={handleBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') handleBlur()
+              }}
+              autoFocus
+              className="text-md w-full p-8 md:text-3xl"
+            />
+          ) : (
+            <p
+              className="text-md w-full p-8 md:text-3xl"
+              onClick={() => setIsEditing(true)}
+            >
+              {name}
+            </p>
+          )}
+
+          <Button
+            variant="destructive"
+            size="icon"
+            onClick={() => setDeleteDialogOpen(true)}
           >
-            {name}
-          </p>
-        )}
+            <Trash2Icon className="h-5 w-5" />
+          </Button>
+        </div>
 
         {updateError && <p className="text-sm text-red-500">{updateError}</p>}
       </div>
@@ -100,6 +122,16 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       <div>
         <p></p>
       </div>
+
+      <ConfirmationDialog
+        isOpen={deleteDialogOpen}
+        onCancel={() => setDeleteDialogOpen(false)}
+        onConfirm={handleDelete}
+        title="Delete Routine"
+        description={`Are you sure you want to delete "${name}"? This action cannot be undone.`}
+        onConfirmLabel="Delete"
+        onCancelLabel="Cancel"
+      />
     </div>
   )
 }
