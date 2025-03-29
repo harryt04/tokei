@@ -1,4 +1,4 @@
-import { Routine } from '@/models'
+import { Routine, getTotalSteps } from '@/models'
 import React from 'react'
 import {
   Card,
@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 
 export const RoutineComponent = ({ routine }: { routine: Routine }) => {
   const router = useRouter()
+  const totalSteps = getTotalSteps(routine)
 
   return (
     <Card
@@ -20,8 +21,7 @@ export const RoutineComponent = ({ routine }: { routine: Routine }) => {
       <CardHeader>
         <CardTitle>{routine.name}</CardTitle>
         <CardDescription>
-          {routine.steps?.length || 0} Steps, {routine.swimLanes?.length || 0}{' '}
-          Swimlanes
+          {routine.swimLanes?.length || 0} Swimlanes, {totalSteps} Steps
         </CardDescription>
       </CardHeader>
       <CardContent></CardContent>
