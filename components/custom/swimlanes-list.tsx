@@ -6,7 +6,7 @@ import {
   RoutineSwimLane,
 } from '@/models'
 import React, { useState, useEffect } from 'react'
-import { H4 } from '../ui/typography'
+import { H4, Muted } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
 import {
   PlusIcon,
@@ -201,13 +201,17 @@ export function SwimlanesList(props: SwimlanesListProps) {
                           className="font-semibold"
                         />
                       ) : (
-                        <H4
-                          onClick={() => handleEdit(swimLane)}
-                          className="cursor-pointer transition-colors hover:text-primary"
-                        >
-                          {swimLane.name} {swimLane.steps?.length ?? 0} total
-                          steps
-                        </H4>
+                        <>
+                          <H4
+                            onClick={() => handleEdit(swimLane)}
+                            className="cursor-pointer transition-colors hover:text-primary"
+                          >
+                            {swimLane.name}
+                          </H4>
+                          <Muted>
+                            {swimLane.steps?.length ?? 0} total steps
+                          </Muted>
+                        </>
                       )}
                     </div>
 
