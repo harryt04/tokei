@@ -61,8 +61,8 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   }, [])
 
   return (
-    <div className="w-full">
-      <div className="flex w-full flex-row place-items-center p-4 md:gap-4">
+    <div className="w-full p-4">
+      <div className="flex w-full flex-row place-items-center md:gap-4">
         <Button size="icon" variant="ghost">
           <ArrowLeftIcon />
         </Button>
