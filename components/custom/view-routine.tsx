@@ -81,7 +81,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
           />
         ) : (
           <p
-            className="text-md p-8 md:text-3xl"
+            className="text-md w-full p-8 md:text-3xl"
             onClick={() => setIsEditing(true)}
           >
             {name}
