@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import {
   Card,
   CardContent,
@@ -120,6 +120,11 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
     props.stepUpdated(updatedStep)
   }
 
+  useEffect(() => {
+    handleDurationChange()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [minutes, seconds])
+
   const handleStartTypeChange = (startType: 'automatic' | 'manual') => {
     const updatedStep = { ...step, startType }
     setStep(updatedStep)
@@ -165,8 +170,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               inputMode="numeric"
               value={minutes}
               onChange={(e) => {
-                setMinutes(e.target.value)
-                setTimeout(handleDurationChange, 0)
+                setMinutes(Number(e.target.value).toString())
               }}
               className="h-7 text-sm"
             />
@@ -181,8 +185,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               inputMode="numeric"
               value={seconds}
               onChange={(e) => {
-                setSeconds(e.target.value)
-                setTimeout(handleDurationChange, 0)
+                setSeconds(Number(e.target.value).toString())
               }}
               className="h-7 text-sm"
             />

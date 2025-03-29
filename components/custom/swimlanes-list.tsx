@@ -1,5 +1,10 @@
 'use client'
-import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
+import {
+  getRoutineTotalSteps,
+  Routine,
+  RoutineStep,
+  RoutineSwimLane,
+} from '@/models'
 import React, { useState, useEffect } from 'react'
 import { H4 } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
@@ -200,7 +205,8 @@ export function SwimlanesList(props: SwimlanesListProps) {
                           onClick={() => handleEdit(swimLane)}
                           className="cursor-pointer transition-colors hover:text-primary"
                         >
-                          {swimLane.name}
+                          {swimLane.name} {swimLane.steps?.length ?? 0} total
+                          steps
                         </H4>
                       )}
                     </div>

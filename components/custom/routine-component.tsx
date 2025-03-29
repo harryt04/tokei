@@ -1,4 +1,4 @@
-import { Routine, getTotalSteps } from '@/models'
+import { Routine, getRoutineTotalSteps } from '@/models'
 import React from 'react'
 import {
   Card,
@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation'
 
 export const RoutineComponent = ({ routine }: { routine: Routine }) => {
   const router = useRouter()
-  const totalSteps = getTotalSteps(routine)
+  const totalSteps = getRoutineTotalSteps(routine)
 
   return (
     <Card

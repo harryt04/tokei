@@ -38,7 +38,7 @@ export type SyncGroup = {
   swimLaneIds: string[] // IDs of swimlanes in this group
 }
 
-export const getTotalSteps = (routine: Routine): number => {
+export const getRoutineTotalSteps = (routine: Routine): number => {
   return (
     routine.swimLanes?.reduce(
       (total, swimLane) => total + swimLane.steps.length,
