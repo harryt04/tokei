@@ -5,6 +5,8 @@ import { Button } from '../ui/button'
 import { ArrowLeftIcon } from 'lucide-react'
 import { useRoutines } from '@/hooks/use-routines'
 import { useRouter } from 'next/navigation'
+import { Separator } from '../ui/separator'
+import Link from 'next/link'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -63,9 +65,11 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   return (
     <div className="w-full p-4">
       <div className="flex w-full flex-row place-items-center md:gap-4">
-        <Button size="icon" variant="ghost">
-          <ArrowLeftIcon />
-        </Button>
+        <Link href="/routines">
+          <Button size="icon" variant="ghost">
+            <ArrowLeftIcon />
+          </Button>
+        </Link>
 
         {isEditing ? (
           <input
@@ -89,6 +93,12 @@ export default function ViewRoutine(props: ViewRoutineProps) {
         )}
 
         {updateError && <p className="text-sm text-red-500">{updateError}</p>}
+      </div>
+      <Separator className="mt-2" />
+      {/* end header */}
+
+      <div>
+        <p></p>
       </div>
     </div>
   )

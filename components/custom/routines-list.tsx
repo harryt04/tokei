@@ -17,7 +17,6 @@ type RoutinesListProps = {
 
 function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
   const [isFormOpen, setIsFormOpen] = useState(false)
-  const [editMode, setEditMode] = useState(false)
 
   const { routines, loading, error, addRoutine, deleteRoutine } =
     useRoutines(initialRoutines)
@@ -47,12 +46,7 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
     }
 
     return routines.map((routine) => (
-      <RoutineComponent
-        key={routine._id}
-        routine={routine}
-        editMode={editMode}
-        onDelete={() => deleteRoutine(routine)}
-      />
+      <RoutineComponent key={routine._id} routine={routine} />
     ))
   }
 
@@ -60,19 +54,10 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
     <>
       <MySidebarTrigger />
       <div className="flex flex-col">
-        <div className="ml-0 mt-8 flex w-10/12 flex-col items-center gap-4 md:ml-8 md:flex-row">
+        <div className="ml-0 mt-8 flex w-10/12 flex-col items-center gap-4 md:ml-4 md:flex-row">
           <Button variant="default" onClick={() => setIsFormOpen(true)}>
             <PlusIcon /> Add Routine
           </Button>
-          {routines.length > 0 && (
-            <div
-              className="flex cursor-pointer items-center gap-2 px-8 py-2 md:absolute md:right-0 md:pr-8"
-              onClick={() => setEditMode(!editMode)}
-            >
-              <Switch checked={editMode} />
-              Edit mode
-            </div>
-          )}
         </div>
         <div className="flex flex-wrap justify-center gap-8 p-4">
           {renderContent()}
