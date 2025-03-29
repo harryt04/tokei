@@ -5,7 +5,6 @@ export type RoutineInput = {
 export type Routine = RoutineInput & {
   _id: string
   userId: string
-  steps?: RoutineStep[]
   swimLanes?: RoutineSwimLane[]
   syncConfig?: SwimLaneSyncConfig // Configuration for swimlane synchronization
 }
@@ -25,6 +24,7 @@ export type RoutineStep = {
 export type RoutineSwimLane = {
   id: string
   name: string
+  steps: RoutineStep[]
 }
 
 export type SwimLaneSyncConfig = {
