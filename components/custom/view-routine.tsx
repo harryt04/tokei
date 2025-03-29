@@ -12,7 +12,9 @@ export type ViewRoutineProps = {
 
 export default function ViewRoutine(props: ViewRoutineProps) {
   const { routine } = props
-  const [name, setName] = useState(routine.name)
+  const [name, setName] = useState(
+    !!routine.name ? routine.name : `Routine ${routine._id}`,
+  )
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -59,8 +61,8 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   }, [])
 
   return (
-    <div>
-      <div className="flex flex-row place-items-center p-4 md:gap-4">
+    <div className="w-full">
+      <div className="flex w-full flex-row place-items-center p-4 md:gap-4">
         <Button size="icon" variant="ghost">
           <ArrowLeftIcon />
         </Button>
@@ -75,7 +77,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
               if (e.key === 'Enter') handleBlur()
             }}
             autoFocus
-            className="text-md p-8 md:text-3xl"
+            className="text-md w-full p-8 md:text-3xl"
           />
         ) : (
           <p
