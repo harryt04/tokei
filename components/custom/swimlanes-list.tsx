@@ -3,13 +3,20 @@ import { Routine, RoutineSwimLane } from '@/models'
 import React, { useState, useEffect } from 'react'
 import { H4 } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
-import { PlusIcon, WavesIcon, SaveIcon, CheckIcon } from 'lucide-react'
+import {
+  PlusIcon,
+  WavesIcon,
+  SaveIcon,
+  CheckIcon,
+  GripVerticalIcon,
+} from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
 import { Input } from '../ui/input'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -79,6 +86,16 @@ export function SwimlanesList(props: SwimlanesListProps) {
     }
   }
 
+  const onDragEnd = (result: any) => {
+    if (!result.destination) return
+
+    const reorderedLanes = Array.from(swimLanes)
+    const [removed] = reorderedLanes.splice(result.source.index, 1)
+    reorderedLanes.splice(result.destination.index, 0, removed)
+
+    setSwimLanes(reorderedLanes)
+  }
+
   const AddSwimlaneButton = () => (
     <Button
       variant="outline"
@@ -140,95 +157,125 @@ export function SwimlanesList(props: SwimlanesListProps) {
     )
 
   return (
-    <>
-      {swimLanes?.map((swimLane) => {
-        return (
-          <div key={swimLane.id} className="mb-4">
-            {editingId === swimLane.id ? (
-              <Input
-                value={editValue}
-                onChange={(e) => setEditValue(e.target.value)}
-                onBlur={() => handleSave(swimLane.id)}
-                onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
-                autoFocus
-                className="font-semibold"
-              />
-            ) : (
-              <H4
-                onClick={() => handleEdit(swimLane)}
-                className="cursor-pointer transition-colors hover:text-primary"
+    <DragDropContext onDragEnd={onDragEnd}>
+      <Droppable droppableId="swimlanes">
+        {(provided) => (
+          <div
+            {...provided.droppableProps}
+            ref={provided.innerRef}
+            className="mt-4 flex flex-col gap-4"
+          >
+            {swimLanes.map((swimLane, index) => (
+              <Draggable
+                key={swimLane.id}
+                draggableId={swimLane.id}
+                index={index}
               >
-                {swimLane.name}
-              </H4>
-            )}
+                {(provided, snapshot) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.draggableProps}
+                    className={`rounded-md ${snapshot.isDragging ? 'border border-primary bg-background shadow-lg' : ''}`}
+                  >
+                    <div className="flex items-center gap-2">
+                      <div
+                        {...provided.dragHandleProps}
+                        className="cursor-grab rounded p-1 hover:bg-muted"
+                      >
+                        <GripVerticalIcon className="h-5 w-5 text-muted-foreground" />
+                      </div>
+                      {editingId === swimLane.id ? (
+                        <Input
+                          value={editValue}
+                          onChange={(e) => setEditValue(e.target.value)}
+                          onBlur={() => handleSave(swimLane.id)}
+                          onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
+                          autoFocus
+                          className="font-semibold"
+                        />
+                      ) : (
+                        <H4
+                          onClick={() => handleEdit(swimLane)}
+                          className="cursor-pointer transition-colors hover:text-primary"
+                        >
+                          {swimLane.name}
+                        </H4>
+                      )}
+                    </div>
 
-            <ScrollArea className="mt-2 h-36 w-full rounded-md border border-dashed border-muted-foreground">
-              <div className="flex w-full gap-4 p-4">
-                {/* Placeholder items that will be replaced with actual timers */}
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 1
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 2
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 3
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 4
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 5
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 6
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 1
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 2
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 3
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 4
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 5
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 6
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 1
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 2
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 3
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 4
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 5
-                </div>
-                <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                  Timer 6
-                </div>
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
+                    <ScrollArea className="mt-2 h-36 w-full rounded-md border border-dashed border-muted-foreground">
+                      <div className="flex w-full gap-4 p-4">
+                        {/* Placeholder items that will be replaced with actual timers */}
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 1
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 2
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 3
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 4
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 5
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 6
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 1
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 2
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 3
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 4
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 5
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 6
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 1
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 2
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 3
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 4
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 5
+                        </div>
+                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
+                          Timer 6
+                        </div>
+                      </div>
+                      <ScrollBar orientation="horizontal" />
+                    </ScrollArea>
+                  </div>
+                )}
+              </Draggable>
+            ))}
+            {provided.placeholder}
           </div>
-        )
-      })}
+        )}
+      </Droppable>
+
       <div className="flex">
         <AddSwimlaneButton />
         <SaveButton />
       </div>
-    </>
+    </DragDropContext>
   )
 }
