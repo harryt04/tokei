@@ -8,11 +8,11 @@ export type ViewRoutineProps = {
 export default function ViewRoutine(props: ViewRoutineProps) {
   const { routine } = props
   return (
-    <>
+    <div>
       <p className="p-8 text-5xl">ViewRoutine component</p>
       <p>{routine._id}</p>
       <p>{routine.name}</p>
       <p>owner: {routine.userId}</p>
-    </>
+    </div>
   )
 }

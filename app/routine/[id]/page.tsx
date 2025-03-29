@@ -24,9 +24,9 @@ export default async function RoutinePage(props: {
     const routine = JSON.parse(JSON.stringify(routineDocument)) as Routine
 
     return (
-      <div>
+      <>
         <ViewRoutine routine={routine}></ViewRoutine>
-      </div>
+      </>
     )
   }
   return null
