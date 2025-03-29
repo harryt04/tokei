@@ -9,6 +9,7 @@ import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
+import { H1, H2, H3, H4 } from '../ui/typography'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -119,8 +120,9 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       <Separator className="mt-2" />
       {/* end header */}
 
-      <div>
-        <p>Swimlanes</p>
+      <div className="p-4">
+        <H4>Swimlanes</H4>
+        <Separator className="mt-2" />
       </div>
 
       <ConfirmationDialog
