@@ -215,18 +215,6 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
       </CardContent>
 
       <CardFooter className="p-3 pt-0">
-        {runningState === 'stopped' && (
-          <Button
-            onClick={handleStart}
-            variant="outline"
-            size="sm"
-            className="h-7 w-full text-xs"
-          >
-            <PlayIcon className="mr-1 h-3 w-3" />
-            Test
-          </Button>
-        )}
-
         {runningState === 'running' && (
           <Button
             onClick={handleStop}
