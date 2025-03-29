@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation'
 import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import ConfirmationDialog from './confirmation-dialog'
+import { Input } from '../ui/input'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -15,9 +16,8 @@ export type ViewRoutineProps = {
 
 export default function ViewRoutine(props: ViewRoutineProps) {
   const { routine } = props
-  const [name, setName] = useState(
-    !!routine.name ? routine.name : `Routine ${routine._id}`,
-  )
+  const defaultName = `Unnamed Routine`
+  const [name, setName] = useState(!!routine.name ? routine.name : defaultName)
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -40,7 +40,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const updateRoutineName = async (newName: string) => {
     try {
       setUpdateError(null)
-      await updateRoutine(routine._id!, { name: newName })
+      await updateRoutine(routine._id!, { name: newName ?? defaultName })
       // Optionally refresh the page data to ensure consistency
       router.refresh()
     } catch (err: any) {
@@ -85,7 +85,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
         <div className="flex w-full items-center justify-between">
           {isEditing ? (
-            <input
+            <Input
               type="text"
               value={name}
               onChange={(e) => handleNameChange(e.target.value)}
@@ -94,15 +94,15 @@ export default function ViewRoutine(props: ViewRoutineProps) {
                 if (e.key === 'Enter') handleBlur()
               }}
               autoFocus
-              className="text-md w-full p-8 md:text-3xl"
+              className="text-md mx-8 w-full md:text-xl"
             />
           ) : (
-            <p
-              className="text-md w-full p-8 md:text-3xl"
+            <div
+              className="text-md mx-8 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-3 py-2 md:text-xl"
               onClick={() => setIsEditing(true)}
             >
               {name}
-            </p>
+            </div>
           )}
 
           <Button
@@ -120,7 +120,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       {/* end header */}
 
       <div>
-        <p></p>
+        <p>Swimlanes</p>
       </div>
 
       <ConfirmationDialog
