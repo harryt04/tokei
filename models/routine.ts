@@ -7,6 +7,7 @@ export type Routine = RoutineInput & {
   userId: string
   steps?: RoutineStep[]
   swimLanes?: RoutineSwimLane[]
+  syncConfig?: SwimLaneSyncConfig // Configuration for swimlane synchronization
 }
 
 export type RoutineStep = {
@@ -15,10 +16,24 @@ export type RoutineStep = {
   name: string
   sequence: number
   durationInSeconds: number
-  startType: 'cascading' | 'manual' // cascading: start when the previous step ends, manual: start immediately
+
+  // automatic: start immediately when the previous step ends
+  // manual: wait for user to click a button to begin step
+  startType: 'automatic' | 'manual'
 }
 
 export type RoutineSwimLane = {
   id: string
   name: string
+}
+
+export type SwimLaneSyncConfig = {
+  syncAll: boolean // If true, all swimlanes must synchronize their completion
+  syncGroups?: SyncGroup[] // Optional groups of swimlanes to synchronize
+}
+
+export type SyncGroup = {
+  id: string
+  name?: string
+  swimLaneIds: string[] // IDs of swimlanes in this group
 }
