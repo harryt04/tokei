@@ -1,11 +1,12 @@
 'use client'
 import { Routine, RoutineSwimLane } from '@/models'
 import React, { useState } from 'react'
-import { P } from '../ui/typography'
+import { H4 } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
 import { PlusIcon, WavesIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
+import { Input } from '../ui/input'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -14,6 +15,30 @@ export function SwimlanesList(props: SwimlanesListProps) {
   const [swimLanes, setSwimLanes] = useState<RoutineSwimLane[]>(
     props.routine.swimLanes ?? [],
   )
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState<string>('')
+
+  const handleEdit = (swimLane: RoutineSwimLane) => {
+    setEditingId(swimLane.id)
+    setEditValue(swimLane.name)
+  }
+
+  const handleSave = (id: string) => {
+    setSwimLanes((prevLanes) =>
+      prevLanes.map((lane) =>
+        lane.id === id ? { ...lane, name: editValue } : lane,
+      ),
+    )
+    setEditingId(null)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent, id: string) => {
+    if (e.key === 'Enter') {
+      handleSave(id)
+    } else if (e.key === 'Escape') {
+      setEditingId(null)
+    }
+  }
 
   const AddSwimlaneButton = () => (
     <Button
@@ -55,8 +80,24 @@ export function SwimlanesList(props: SwimlanesListProps) {
     <>
       {swimLanes?.map((swimLane) => {
         return (
-          <div key={swimLane.id}>
-            <P>{swimLane.name}</P>
+          <div key={swimLane.id} className="mb-2">
+            {editingId === swimLane.id ? (
+              <Input
+                value={editValue}
+                onChange={(e) => setEditValue(e.target.value)}
+                onBlur={() => handleSave(swimLane.id)}
+                onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
+                autoFocus
+                className="font-semibold"
+              />
+            ) : (
+              <H4
+                onClick={() => handleEdit(swimLane)}
+                className="cursor-pointer transition-colors hover:text-primary"
+              >
+                {swimLane.name}
+              </H4>
+            )}
           </div>
         )
       })}
