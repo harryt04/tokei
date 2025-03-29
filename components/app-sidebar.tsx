@@ -28,12 +28,12 @@ const items = [
     url: '/freestyle',
     icon: BirdIcon,
   },
-  {
-    title: `Routines`,
-    url: '/routines',
-    icon: Repeat2Icon,
-    childrenRoutes: ['/routine/'],
-  },
+  // {
+  //   title: `Routines`,
+  //   url: '/routines',
+  //   icon: Repeat2Icon,
+  //   childrenRoutes: ['/routine/'],
+  // },
 ]
 
 export function AppSidebar() {
