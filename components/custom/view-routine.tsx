@@ -10,6 +10,7 @@ import Link from 'next/link'
 import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
 import { H1, H2, H3, H4 } from '../ui/typography'
+import { SwimlanesList } from './swimlanes-list'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -123,6 +124,8 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       <div className="p-4">
         <H4>Swimlanes</H4>
         <Separator className="mt-2" />
+
+        <SwimlanesList routine={routine} />
       </div>
 
       <ConfirmationDialog
