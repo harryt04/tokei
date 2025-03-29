@@ -3,7 +3,6 @@
 import { User } from '@clerk/nextjs/server'
 
 export const getRoutine = async (routineId: string, user?: User) => {
-  console.log('user: ', user)
   if (!user?.id) {
     return {
       notFound: true,
