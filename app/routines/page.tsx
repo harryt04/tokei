@@ -1,3 +1,4 @@
+'use server'
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import RoutinesList from '@/components/custom/routines-list'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'

@@ -1,3 +1,4 @@
+'use server'
 import { getRoutine } from '@/actions/routine'
 import { currentUser } from '@clerk/nextjs/server'
 
