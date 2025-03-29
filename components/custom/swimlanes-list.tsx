@@ -1,5 +1,5 @@
 'use client'
-import { Routine, RoutineSwimLane } from '@/models'
+import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
 import React, { useState, useEffect } from 'react'
 import { H4 } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
@@ -9,6 +9,7 @@ import {
   SaveIcon,
   CheckIcon,
   GripVerticalIcon,
+  ClockIcon,
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
@@ -17,6 +18,7 @@ import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import RoutineTimerComponent from './routine-timer-component'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -203,63 +205,112 @@ export function SwimlanesList(props: SwimlanesListProps) {
                       )}
                     </div>
 
-                    <ScrollArea className="mt-2 h-36 w-full rounded-md border border-dashed border-muted-foreground">
+                    <ScrollArea className="mt-2 h-auto w-full rounded-md border border-dashed border-muted-foreground">
                       <div className="flex w-full gap-4 p-4">
-                        {/* Placeholder items that will be replaced with actual timers */}
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 1
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 2
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 3
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 4
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 5
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 6
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 1
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 2
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 3
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 4
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 5
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 6
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 1
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 2
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 3
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 4
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 5
-                        </div>
-                        <div className="flex h-16 w-24 items-center justify-center rounded-md bg-muted text-sm">
-                          Timer 6
-                        </div>
+                        <Droppable
+                          droppableId={`steps-${swimLane.id}`}
+                          direction="horizontal"
+                          type="swimlaneSteps"
+                        >
+                          {(provided) => (
+                            <div
+                              ref={provided.innerRef}
+                              {...provided.droppableProps}
+                              className="flex gap-4"
+                            >
+                              {swimLane.steps &&
+                                swimLane.steps.map((step, stepIndex) => (
+                                  <Draggable
+                                    key={step.id}
+                                    draggableId={`step-${step.id}`}
+                                    index={stepIndex}
+                                  >
+                                    {(provided, snapshot) => (
+                                      <div
+                                        ref={provided.innerRef}
+                                        {...provided.draggableProps}
+                                      >
+                                        <RoutineTimerComponent
+                                          step={step}
+                                          isDragging={snapshot.isDragging}
+                                          dragHandleProps={
+                                            provided.dragHandleProps
+                                          }
+                                          stepUpdated={(updatedStep) => {
+                                            const updatedSwimLanes =
+                                              swimLanes.map((lane) => {
+                                                if (lane.id === swimLane.id) {
+                                                  const updatedSteps = [
+                                                    ...lane.steps,
+                                                  ]
+                                                  updatedSteps[stepIndex] =
+                                                    updatedStep
+                                                  return {
+                                                    ...lane,
+                                                    steps: updatedSteps,
+                                                  }
+                                                }
+                                                return lane
+                                              })
+                                            setSwimLanes(updatedSwimLanes)
+                                            setHasChanges(true)
+                                          }}
+                                          removeStep={(stepId) => {
+                                            const updatedSwimLanes =
+                                              swimLanes.map((lane) => {
+                                                if (lane.id === swimLane.id) {
+                                                  return {
+                                                    ...lane,
+                                                    steps: lane.steps.filter(
+                                                      (s) => s.id !== stepId,
+                                                    ),
+                                                  }
+                                                }
+                                                return lane
+                                              })
+                                            setSwimLanes(updatedSwimLanes)
+                                            setHasChanges(true)
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+                                  </Draggable>
+                                ))}
+                              {provided.placeholder}
+                            </div>
+                          )}
+                        </Droppable>
+
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="h-auto min-h-48"
+                          onClick={() => {
+                            const newStep: RoutineStep = {
+                              id: uuidv4(),
+                              swimLaneId: swimLane.id,
+                              name: `Step ${(swimLane.steps?.length || 0) + 1}`,
+                              sequence: (swimLane.steps?.length || 0) + 1,
+                              durationInSeconds: 60,
+                              startType: 'automatic',
+                            }
+
+                            const updatedSwimLanes = swimLanes.map((lane) => {
+                              if (lane.id === swimLane.id) {
+                                return {
+                                  ...lane,
+                                  steps: [...(lane.steps || []), newStep],
+                                }
+                              }
+                              return lane
+                            })
+
+                            setSwimLanes(updatedSwimLanes)
+                            setHasChanges(true)
+                          }}
+                        >
+                          <PlusIcon />
+                        </Button>
                       </div>
                       <ScrollBar orientation="horizontal" />
                     </ScrollArea>
