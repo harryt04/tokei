@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
           _id: new ObjectId(id),
         })
       : false
+    console.log('existingRoutine: ', existingRoutine)
 
     const routineToUpsert = {
       ...body,

@@ -4,6 +4,7 @@ import {
   fetchRoutines,
   createRoutine,
   deleteRoutine as apiDeleteRoutine,
+  updateRoutine as apiUpdateRoutine,
 } from '@/lib/api'
 
 export function useRoutines(initialRoutines: Routine[] = []) {
@@ -57,11 +58,30 @@ export function useRoutines(initialRoutines: Routine[] = []) {
     }
   }, [])
 
+  const updateRoutine = useCallback(
+    async (routineId: string, updates: Partial<Routine>) => {
+      try {
+        const updated = await apiUpdateRoutine(routineId, updates)
+        setRoutines((prev) =>
+          prev.map((routine) =>
+            routine._id === routineId ? { ...routine, ...updated } : routine,
+          ),
+        )
+        return updated
+      } catch (err: any) {
+        setError(err.message || 'Failed to update routine')
+        throw err
+      }
+    },
+    [],
+  )
+
   return {
     routines,
     loading,
     error,
     addRoutine,
     deleteRoutine,
+    updateRoutine,
   }
 }
