@@ -1,13 +1,15 @@
 'use client'
 import { Routine, RoutineSwimLane } from '@/models'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { H4 } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
-import { PlusIcon, WavesIcon } from 'lucide-react'
+import { PlusIcon, WavesIcon, SaveIcon, CheckIcon } from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'
 import { Input } from '../ui/input'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
+import { useRoutines } from '@/hooks/use-routines'
+import { toast } from '../ui/use-toast'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -18,6 +20,18 @@ export function SwimlanesList(props: SwimlanesListProps) {
   )
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState<string>('')
+  const [hasChanges, setHasChanges] = useState(false)
+  const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
+
+  const { updateRoutine } = useRoutines([props.routine])
+
+  // Track changes to swimLanes
+  useEffect(() => {
+    setHasChanges(
+      JSON.stringify(swimLanes) !== JSON.stringify(props.routine.swimLanes),
+    )
+  }, [swimLanes, props.routine.swimLanes])
 
   const handleEdit = (swimLane: RoutineSwimLane) => {
     setEditingId(swimLane.id)
@@ -41,6 +55,30 @@ export function SwimlanesList(props: SwimlanesListProps) {
     }
   }
 
+  const handleSaveToDatabase = async () => {
+    setIsSaving(true)
+    try {
+      await updateRoutine(props.routine._id, {
+        swimLanes: swimLanes,
+      })
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2000)
+      toast({
+        title: 'Success',
+        description: 'Swimlanes saved successfully',
+      })
+      setHasChanges(false)
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: 'Failed to save swimlanes',
+        variant: 'destructive',
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
   const AddSwimlaneButton = () => (
     <Button
       variant="outline"
@@ -54,12 +92,36 @@ export function SwimlanesList(props: SwimlanesListProps) {
           },
         ])
       }}
-      className="mt-4"
+      className="mr-2 mt-4"
     >
-      <PlusIcon />
+      <PlusIcon className="mr-1" />
       Add swimlane
     </Button>
   )
+
+  const SaveButton = () => (
+    <Button
+      variant="default"
+      onClick={handleSaveToDatabase}
+      className="mt-4"
+      disabled={!hasChanges || isSaving}
+    >
+      {isSaving ? (
+        <span className="animate-pulse">Saving...</span>
+      ) : saveSuccess ? (
+        <>
+          <CheckIcon className="mr-1" />
+          Saved
+        </>
+      ) : (
+        <>
+          <SaveIcon className="mr-1" />
+          Save changes
+        </>
+      )}
+    </Button>
+  )
+
   if (!swimLanes || swimLanes.length === 0)
     return (
       <>
@@ -163,7 +225,10 @@ export function SwimlanesList(props: SwimlanesListProps) {
           </div>
         )
       })}
-      <AddSwimlaneButton />
+      <div className="flex">
+        <AddSwimlaneButton />
+        <SaveButton />
+      </div>
     </>
   )
 }
