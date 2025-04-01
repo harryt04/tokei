@@ -54,12 +54,12 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
     <>
       <MySidebarTrigger />
       <div className="flex flex-col">
-        <div className="ml-0 mt-8 flex w-10/12 flex-col items-center gap-4 md:ml-4 md:flex-row">
+        <div className="ml-0 mt-8 flex w-full flex-col items-center gap-4 md:ml-4 md:flex-row">
           <Button variant="default" onClick={() => setIsFormOpen(true)}>
             <PlusIcon /> Add Routine
           </Button>
         </div>
-        <div className="flex flex-wrap justify-center gap-8 p-4">
+        <div className="grid grid-flow-row justify-center gap-8 p-4">
           {renderContent()}
         </div>
       </div>

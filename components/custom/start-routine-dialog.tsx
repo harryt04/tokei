@@ -85,27 +85,15 @@ export default function StartRoutineDialog({
                 End at specific time
               </Label>
 
-              {startMode === 'timed' && (
-                <div className="ml-2">
-                  <Input
-                    type="time"
-                    value={endTime}
-                    onChange={(e) => setEndTime(e.target.value)}
-                    className="w-24"
-                  />
-                </div>
-              )}
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="view" id="view" />
-              <Label
-                htmlFor="view"
-                className="flex cursor-pointer items-center gap-2"
-              >
-                <Eye size={18} />
-                Just view swimlanes
-              </Label>
+              <div className="ml-2">
+                <Input
+                  type="time"
+                  disabled={startMode !== 'timed'}
+                  value={endTime}
+                  onChange={(e) => setEndTime(e.target.value)}
+                  className="w-32"
+                />
+              </div>
             </div>
           </RadioGroup>
         </div>

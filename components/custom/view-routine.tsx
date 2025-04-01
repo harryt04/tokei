@@ -102,7 +102,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             />
           ) : (
             <div
-              className="text-md mx-8 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-3 py-2 md:text-xl"
+              className="text-md m-0 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-2 md:mx-8 md:px-3 md:py-2 md:text-xl"
               onClick={() => setIsEditing(true)}
             >
               {name}
