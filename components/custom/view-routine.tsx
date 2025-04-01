@@ -2,7 +2,7 @@
 import { Routine } from '@/models'
 import React, { useState, useRef, useEffect } from 'react'
 import { Button } from '../ui/button'
-import { ArrowLeftIcon, Trash2Icon } from 'lucide-react'
+import { ArrowLeftIcon, Trash2Icon, PlayIcon } from 'lucide-react'
 import { useRoutines } from '@/hooks/use-routines'
 import { useRouter } from 'next/navigation'
 import { Separator } from '../ui/separator'
@@ -11,6 +11,7 @@ import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
 import { H1, H2, H3, H4 } from '../ui/typography'
 import { SwimlanesList } from './swimlanes-list'
+import StartRoutineDialog from './start-routine-dialog'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -23,6 +24,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [startDialogOpen, setStartDialogOpen] = useState(false)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const router = useRouter()
 
@@ -107,13 +109,23 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             </div>
           )}
 
-          <Button
-            variant="destructive"
-            size="icon"
-            onClick={() => setDeleteDialogOpen(true)}
-          >
-            <Trash2Icon className="h-5 w-5" />
-          </Button>
+          <div className="flex gap-2">
+            <Button
+              variant="default"
+              onClick={() => setStartDialogOpen(true)}
+              className="flex items-center gap-1"
+            >
+              <PlayIcon className="h-4 w-4" />
+              Start
+            </Button>
+            <Button
+              variant="destructive"
+              size="icon"
+              onClick={() => setDeleteDialogOpen(true)}
+            >
+              <Trash2Icon className="h-5 w-5" />
+            </Button>
+          </div>
         </div>
 
         {updateError && <p className="text-sm text-red-500">{updateError}</p>}
@@ -136,6 +148,12 @@ export default function ViewRoutine(props: ViewRoutineProps) {
         description={`Are you sure you want to delete "${name}"? This action cannot be undone.`}
         onConfirmLabel="Delete"
         onCancelLabel="Cancel"
+      />
+
+      <StartRoutineDialog
+        isOpen={startDialogOpen}
+        onClose={() => setStartDialogOpen(false)}
+        routine={routine}
       />
     </div>
   )
