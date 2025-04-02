@@ -3,12 +3,10 @@ import { Routine, RoutineStep } from '@/models'
 import React, { useState, useEffect, useRef } from 'react'
 import { H4, Muted } from '../ui/typography'
 import { Button } from '../ui/button'
-import { Progress } from '../ui/progress'
-import { ScrollArea, ScrollBar } from '../ui/scroll-area'
-import { BanIcon, PauseIcon, PlayIcon, TimerIcon } from 'lucide-react'
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
+import { calculateSwimLaneRunTimes } from '@/lib/utils'
 import { toast } from '../ui/use-toast'
+import RoutineControls from './routine/RoutineControls'
+import SwimlaneComponent from './routine/SwimlaneComponent'
 
 export type RunRoutineComponentProps = {
   routine: Routine
@@ -383,160 +381,26 @@ export default function RunRoutineComponent({
 
   return (
     <div className="space-y-6 p-2">
-      <div className="flex items-center justify-between">
-        <H4>Running: {routine.name}</H4>
+      <RoutineControls
+        routineName={routine.name}
+        status={status}
+        endTime={endTime}
+        onPlayPause={handlePlayPause}
+        onStop={handleStop}
+      />
 
-        {endTime && (
-          <Muted>Estimated completion: {endTime.toLocaleTimeString()}</Muted>
-        )}
-
-        <div className="flex gap-2">
-          <Button
-            variant={status === 'running' ? 'outline' : 'default'}
-            onClick={handlePlayPause}
-          >
-            {status === 'running' ? (
-              <>
-                <PauseIcon className="mr-2 h-4 w-4" /> Pause
-              </>
-            ) : (
-              <>
-                <PlayIcon className="mr-2 h-4 w-4" /> Resume
-              </>
-            )}
-          </Button>
-
-          <Button variant="destructive" onClick={handleStop}>
-            <BanIcon className="mr-2 h-4 w-4" />
-            Stop
-          </Button>
-        </div>
-      </div>
-
-      {routine.swimLanes?.map((swimlane) => {
-        const swimlaneStatus = swimlanesStatus[swimlane.id]
-        const isWaiting = swimlaneStatus?.isWaiting
-        const waitTime = waitTimeRemaining[swimlane.id] || 0
-
-        return (
-          <div key={swimlane.id} className="mt-4">
-            <H4>{swimlane.name}</H4>
-
-            <ScrollArea className="mt-2 h-auto w-full">
-              <div className="flex w-full gap-4 p-4">
-                {isWaiting && (
-                  <Card className="min-w-[250px] border-amber-400 bg-amber-50 dark:bg-amber-900/20">
-                    <CardHeader className="p-3">
-                      <CardTitle className="flex items-center justify-between text-sm">
-                        Waiting
-                        <TimerIcon className="h-4 w-4 text-amber-500" />
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-3 p-3">
-                      <Muted className="text-xs">
-                        This swimlane will start in:
-                      </Muted>
-                      <Progress
-                        value={
-                          (1 - waitTime / swimlaneStatus.waitTimeInSeconds) *
-                          100
-                        }
-                        className="h-2"
-                      />
-                      <Muted className="text-center text-sm font-semibold">
-                        {formatSecondsToHHMMSS(Math.round(waitTime))}
-                      </Muted>
-                    </CardContent>
-                  </Card>
-                )}
-
-                {/* Show all steps regardless of waiting status */}
-                {swimlane.steps.map((step, index) => {
-                  const currentStepIndex = swimlaneStatus?.currentStepIndex || 0
-                  const isActive = !isWaiting && currentStepIndex === index
-                  const isCompleted = !isWaiting && index < currentStepIndex
-                  const isPending = isWaiting || index > currentStepIndex
-                  const progress = isActive ? stepProgress[step.id] || 0 : 0
-                  const remainingTime = isActive
-                    ? remainingTimeInSeconds[step.id] || step.durationInSeconds
-                    : 0
-
-                  return (
-                    <Card
-                      key={step.id}
-                      className={`min-w-[250px] transition-shadow ${
-                        isActive
-                          ? 'border-primary shadow-lg'
-                          : isCompleted
-                            ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                            : isWaiting
-                              ? 'border-dashed border-amber-300 opacity-75'
-                              : isPending
-                                ? 'opacity-60'
-                                : ''
-                      }`}
-                    >
-                      <CardHeader className="p-3">
-                        <CardTitle className="flex items-center justify-between text-sm">
-                          {step.name}
-                          {isWaiting && index === 0 && (
-                            <span className="text-xs text-amber-500">
-                              Up first
-                            </span>
-                          )}
-                          {isCompleted && (
-                            <span className="text-xs text-green-500">
-                              Completed
-                            </span>
-                          )}
-                        </CardTitle>
-                      </CardHeader>
-
-                      <CardContent className="space-y-3 p-3">
-                        <Muted className="text-xs">
-                          {isActive ? `Original duration: ` : `Duration: `}
-                          {formatSecondsToHHMMSS(step.durationInSeconds)}
-                        </Muted>
-
-                        {isWaiting && (
-                          <Muted className="text-xs italic">
-                            Start type:{' '}
-                            {step.startType === 'manual'
-                              ? 'Manual start'
-                              : 'Automatic'}
-                          </Muted>
-                        )}
-
-                        {isActive && progress > 0 && (
-                          <>
-                            <Progress value={progress} className="h-2" />
-                            <Muted className="text-xs">
-                              Remaining:{' '}
-                              {formatSecondsToHHMMSS(Math.round(remainingTime))}
-                            </Muted>
-                          </>
-                        )}
-
-                        {!isWaiting && shouldShowStartButton(step) && (
-                          <Button
-                            size="sm"
-                            className="mt-2 w-full"
-                            onClick={() => handleManualStart(step.id)}
-                          >
-                            <PlayIcon className="mr-2 h-3 w-3" />
-                            Start
-                          </Button>
-                        )}
-                      </CardContent>
-                    </Card>
-                  )
-                })}
-              </div>
-              <ScrollBar orientation="horizontal" />
-            </ScrollArea>
-          </div>
-        )
-      })}
+      {routine.swimLanes?.map((swimlane) => (
+        <SwimlaneComponent
+          key={swimlane.id}
+          swimlane={swimlane}
+          status={swimlanesStatus[swimlane.id]}
+          waitTimeRemaining={waitTimeRemaining[swimlane.id] || 0}
+          stepProgress={stepProgress}
+          remainingTimeInSeconds={remainingTimeInSeconds}
+          shouldShowStartButton={shouldShowStartButton}
+          onManualStart={handleManualStart}
+        />
+      ))}
     </div>
   )
 }
