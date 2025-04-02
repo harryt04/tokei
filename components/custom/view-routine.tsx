@@ -9,12 +9,18 @@ import { Separator } from '../ui/separator'
 import Link from 'next/link'
 import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
-import { H1, H2, H3, H4 } from '../ui/typography'
+import { H4 } from '../ui/typography'
 import { SwimlanesList } from './swimlanes-list'
-import StartRoutineDialog from './start-routine-dialog'
+import StartRoutineDialog, { StartMode } from './start-routine-dialog'
+import { getDateGivenTimeOfDay } from '@/lib/utils'
 
 export type ViewRoutineProps = {
   routine: Routine
+}
+
+type RoutineRunningState = {
+  status: 'running' | 'paused' | ''
+  endTime?: Date
 }
 
 export default function ViewRoutine(props: ViewRoutineProps) {
@@ -23,6 +29,8 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const [name, setName] = useState(!!routine.name ? routine.name : defaultName)
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
+  const [routineRunningState, setRoutineRunningState] =
+    useState<RoutineRunningState>({ status: '' })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [startDialogOpen, setStartDialogOpen] = useState(false)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
@@ -69,6 +77,22 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       console.error('Error deleting routine:', err)
       setUpdateError(err.message || 'Failed to delete routine')
     }
+  }
+
+  const handleStartRoutine = (startMode: StartMode, endTime: string) => {
+    switch (startMode) {
+      case 'now':
+        break
+      case 'timed':
+        const endTimeDate = getDateGivenTimeOfDay(endTime)
+        console.log('Parsed endTimeDate: ', endTimeDate)
+        break
+
+      default:
+        break
+    }
+
+    // Parse endTime (e.g., "21:00") into a Date object for today
   }
 
   // Clean up timeout on unmount
@@ -152,7 +176,10 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
       <StartRoutineDialog
         isOpen={startDialogOpen}
-        onClose={() => setStartDialogOpen(false)}
+        onClose={(startMode: StartMode, endTime: string) => {
+          handleStartRoutine(startMode, endTime)
+          setStartDialogOpen(false)
+        }}
         routine={routine}
       />
     </div>

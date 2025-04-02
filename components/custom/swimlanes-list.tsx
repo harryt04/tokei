@@ -1,10 +1,5 @@
 'use client'
-import {
-  getRoutineTotalSteps,
-  Routine,
-  RoutineStep,
-  RoutineSwimLane,
-} from '@/models'
+import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
 import React, { useState, useEffect } from 'react'
 import { H4, Muted } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
@@ -14,7 +9,6 @@ import {
   SaveIcon,
   CheckIcon,
   GripVerticalIcon,
-  ClockIcon,
 } from 'lucide-react'
 import { Button } from '../ui/button'
 import { v4 as uuidv4 } from 'uuid'

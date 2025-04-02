@@ -16,13 +16,13 @@ import { Clock, PlayCircle, Eye } from 'lucide-react'
 import { Routine } from '@/models'
 import { format } from 'date-fns'
 
-type StartRoutineDialogProps = {
+export type StartRoutineDialogProps = {
   isOpen: boolean
-  onClose: () => void
+  onClose: (startMode: StartMode, endTime: string) => void
   routine: Routine
 }
 
-type StartMode = 'now' | 'timed' | 'view'
+export type StartMode = 'now' | 'timed'
 
 export default function StartRoutineDialog({
   isOpen,
@@ -35,20 +35,7 @@ export default function StartRoutineDialog({
   )
 
   const handleStartRoutine = () => {
-    if (startMode === 'now') {
-      // Logic to start routine immediately
-      console.log('Starting routine now:', routine.name)
-    } else if (startMode === 'timed') {
-      // Logic to start routine with countdown to end at specific time
-      console.log('Starting routine to end at:', endTime)
-      // Calculate the countdown to first action here
-    } else {
-      // Just view the swimlanes as is
-      console.log('Viewing routine swimlanes:', routine.name)
-    }
-
-    // Close the dialog after handling the action
-    onClose()
+    onClose(startMode, endTime)
   }
 
   return (

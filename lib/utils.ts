@@ -22,6 +22,18 @@ export function getDateNMinutesFromNow(minutesFromNow: number): Date {
   )
 }
 
+export function getDateGivenTimeOfDay(timeOfDay: string): Date {
+  const [hours, minutes] = timeOfDay.split(':').map(Number)
+  const now = new Date()
+  return new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    hours,
+    minutes,
+  )
+}
+
 export const speakText = (text: string): void => {
   speechSynthesis.cancel()
 
