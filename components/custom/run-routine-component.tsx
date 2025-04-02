@@ -5,7 +5,7 @@ import { H4, Muted } from '../ui/typography'
 import { Button } from '../ui/button'
 import { Progress } from '../ui/progress'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
-import { PauseIcon, PlayIcon, StopCircleIcon } from 'lucide-react'
+import { BanIcon, PauseIcon, PlayIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 import { toast } from '../ui/use-toast'
@@ -279,7 +279,7 @@ export default function RunRoutineComponent({
           </Button>
 
           <Button variant="destructive" onClick={handleStop}>
-            <StopCircleIcon className="mr-2 h-4 w-4" />
+            <BanIcon className="mr-2 h-4 w-4" />
             Stop
           </Button>
         </div>
@@ -328,7 +328,7 @@ export default function RunRoutineComponent({
 
                     <CardContent className="space-y-3 p-3">
                       <Muted className="text-xs">
-                        Duration:{' '}
+                        {isActive ? `Original duration: ` : `Duration: `}
                         {formatSecondsToHHMMSS(step.durationInSeconds)}
                       </Muted>
 
@@ -336,7 +336,8 @@ export default function RunRoutineComponent({
                         <>
                           <Progress value={progress} className="h-2" />
                           <Muted className="text-xs">
-                            Remaining: {formatSecondsToHHMMSS(remainingTime)}
+                            Remaining:{' '}
+                            {formatSecondsToHHMMSS(Math.round(remainingTime))}
                           </Muted>
                         </>
                       )}

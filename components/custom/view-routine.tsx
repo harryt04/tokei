@@ -141,17 +141,16 @@ export default function ViewRoutine(props: ViewRoutineProps) {
               <Button
                 variant="default"
                 onClick={() => setStartDialogOpen(true)}
-                className="flex items-center gap-1"
               >
-                <PlayIcon className="h-4 w-4" />
+                <PlayIcon />
                 Start
               </Button>
               <Button
                 variant="destructive"
-                size="icon"
                 onClick={() => setDeleteDialogOpen(true)}
               >
-                <Trash2Icon className="h-5 w-5" />
+                <Trash2Icon />
+                Delete
               </Button>
             </div>
           )}
