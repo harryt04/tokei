@@ -19,7 +19,7 @@ import { getCompletionTime } from '@/lib/utils'
 
 export type StartRoutineDialogProps = {
   isOpen: boolean
-  onClose: (startMode: StartMode, endTime: string) => void
+  onClose: (startMode?: StartMode, endTime?: string) => void
   routine: Routine
 }
 
@@ -110,11 +110,16 @@ export default function StartRoutineDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button
+            variant="outline"
+            onClick={() => {
+              onClose()
+            }}
+          >
             Cancel
           </Button>
           <Button onClick={handleStartRoutine}>
-            {startMode === 'view' ? 'View' : 'Start'} Routine
+            {startMode === 'now' ? 'View' : 'Start'} Routine
           </Button>
         </DialogFooter>
       </DialogContent>

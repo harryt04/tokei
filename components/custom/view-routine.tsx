@@ -13,6 +13,8 @@ import { H4 } from '../ui/typography'
 import { SwimlanesList } from './swimlanes-list'
 import StartRoutineDialog, { StartMode } from './start-routine-dialog'
 import { getDateGivenTimeOfDay, getCompletionTime } from '@/lib/utils'
+import RunRoutineComponent from './run-routine-component'
+import { toast } from '../ui/use-toast'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -127,7 +129,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             />
           ) : (
             <div
-              className="text-md m-0 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-2 md:mx-8 md:px-3 md:py-2 md:text-xl"
+              className="text-md m-0 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-2 lg:mx-8 lg:px-3 lg:py-2 lg:text-xl"
               onClick={() => setIsEditing(true)}
             >
               {name}
@@ -169,6 +171,31 @@ export default function ViewRoutine(props: ViewRoutineProps) {
         </div>
       )}
 
+      {(routineRunningState.status === 'running' ||
+        routineRunningState.status === 'paused') && (
+        <div className="p-4">
+          <RunRoutineComponent
+            routine={routine}
+            initialStatus={routineRunningState.status}
+            endTime={routineRunningState.endTime}
+            onStatusChange={(newStatus) => {
+              if (newStatus === 'stopped') {
+                setRoutineRunningState({ status: '' })
+                toast({
+                  title: 'Routine stopped',
+                  description: 'Your routine has been stopped.',
+                })
+              } else {
+                setRoutineRunningState({
+                  ...routineRunningState,
+                  status: newStatus,
+                })
+              }
+            }}
+          />
+        </div>
+      )}
+
       <ConfirmationDialog
         isOpen={deleteDialogOpen}
         onCancel={() => setDeleteDialogOpen(false)}
@@ -181,9 +208,10 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
       <StartRoutineDialog
         isOpen={startDialogOpen}
-        onClose={(startMode: StartMode, endTime: string) => {
-          handleStartRoutine(startMode, endTime)
+        onClose={(startMode?: StartMode, endTime?: string) => {
           setStartDialogOpen(false)
+          if (!startMode || !endTime) return
+          handleStartRoutine(startMode, endTime)
         }}
         routine={routine}
       />
