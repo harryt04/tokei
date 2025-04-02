@@ -15,6 +15,7 @@ import { Input } from '../ui/input'
 import { Clock, PlayCircle, Eye } from 'lucide-react'
 import { Routine } from '@/models'
 import { format } from 'date-fns'
+import { getCompletionTime } from '@/lib/utils'
 
 export type StartRoutineDialogProps = {
   isOpen: boolean
@@ -33,8 +34,30 @@ export default function StartRoutineDialog({
   const [endTime, setEndTime] = useState<string>(
     format(new Date(Date.now() + 60 * 60 * 1000), 'HH:mm'), // Default to 1 hour from now
   )
+  const [error, setError] = useState<string | null>(null)
 
   const handleStartRoutine = () => {
+    if (startMode === 'timed') {
+      const completionTime = getCompletionTime(routine)
+      const selectedEndTime = new Date()
+      const [hours, minutes] = endTime.split(':').map(Number)
+      selectedEndTime.setHours(hours, minutes, 0, 0)
+
+      if (selectedEndTime <= completionTime) {
+        setError(
+          `The earliest this routine can finish is ${completionTime.toLocaleTimeString(
+            [],
+            {
+              hour: '2-digit',
+              minute: '2-digit',
+            },
+          )}.`,
+        )
+        return
+      }
+    }
+
+    setError(null)
     onClose(startMode, endTime)
   }
 
@@ -83,6 +106,7 @@ export default function StartRoutineDialog({
               </div>
             </div>
           </RadioGroup>
+          {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
         </div>
 
         <DialogFooter>
