@@ -1,6 +1,6 @@
 'use client'
 import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
 import { H4, Muted } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
 import {
@@ -32,6 +32,8 @@ export function SwimlanesList(props: SwimlanesListProps) {
   const [hasChanges, setHasChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
+  const scrollContainerRefs = useRef<Record<string, HTMLDivElement | null>>({})
+  const addButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
   const { updateRoutine } = useRoutines([props.routine])
 
@@ -96,6 +98,18 @@ export function SwimlanesList(props: SwimlanesListProps) {
     reorderedLanes.splice(result.destination.index, 0, removed)
 
     setSwimLanes(reorderedLanes)
+  }
+
+  const scrollToEnd = (swimLaneId: string) => {
+    // Set a slight delay to ensure the DOM has updated with the new step
+    setTimeout(() => {
+      const scrollArea = document.querySelector(
+        `[data-swimlane-id="${swimLaneId}"] [data-radix-scroll-area-viewport]`,
+      )
+      if (scrollArea) {
+        scrollArea.scrollLeft = scrollArea.scrollWidth
+      }
+    }, 50)
   }
 
   const AddSwimlaneButton = () => (
@@ -179,6 +193,7 @@ export function SwimlanesList(props: SwimlanesListProps) {
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                     className={`rounded-md ${snapshot.isDragging ? 'border border-primary bg-background shadow-lg' : ''}`}
+                    data-swimlane-id={swimLane.id}
                   >
                     <div className="flex items-center gap-2">
                       <div
@@ -212,86 +227,94 @@ export function SwimlanesList(props: SwimlanesListProps) {
                       )}
                     </div>
 
-                    <ScrollArea className="mt-2 h-auto w-full rounded-md border border-dashed border-muted-foreground">
-                      <div className="flex w-full gap-4 p-4">
-                        <Droppable
-                          droppableId={`steps-${swimLane.id}`}
-                          direction="horizontal"
-                          type="swimlaneSteps"
-                        >
-                          {(provided) => (
-                            <div
-                              ref={provided.innerRef}
-                              {...provided.droppableProps}
-                              className="flex gap-4"
-                            >
-                              {swimLane.steps &&
-                                swimLane.steps.map((step, stepIndex) => (
-                                  <Draggable
-                                    key={step.id}
-                                    draggableId={`step-${step.id}`}
-                                    index={stepIndex}
-                                  >
-                                    {(provided, snapshot) => (
-                                      <div
-                                        ref={provided.innerRef}
-                                        {...provided.draggableProps}
-                                      >
-                                        <RoutineTimerComponent
-                                          step={step}
-                                          isDragging={snapshot.isDragging}
-                                          dragHandleProps={
-                                            provided.dragHandleProps
-                                          }
-                                          stepUpdated={(updatedStep) => {
-                                            const updatedSwimLanes =
-                                              swimLanes.map((lane) => {
-                                                if (lane.id === swimLane.id) {
-                                                  const updatedSteps = [
-                                                    ...lane.steps,
-                                                  ]
-                                                  updatedSteps[stepIndex] =
-                                                    updatedStep
-                                                  return {
-                                                    ...lane,
-                                                    steps: updatedSteps,
+                    <div className="relative mt-2">
+                      <ScrollArea className="h-auto w-full rounded-md border border-dashed border-muted-foreground">
+                        <div className="flex w-full gap-4 p-4 pr-16">
+                          {' '}
+                          {/* Added padding-right to make space for the fixed button */}
+                          <Droppable
+                            droppableId={`steps-${swimLane.id}`}
+                            direction="horizontal"
+                            type="swimlaneSteps"
+                          >
+                            {(provided) => (
+                              <div
+                                ref={provided.innerRef}
+                                {...provided.droppableProps}
+                                className="flex gap-4"
+                              >
+                                {swimLane.steps &&
+                                  swimLane.steps.map((step, stepIndex) => (
+                                    <Draggable
+                                      key={step.id}
+                                      draggableId={`step-${step.id}`}
+                                      index={stepIndex}
+                                    >
+                                      {(provided, snapshot) => (
+                                        <div
+                                          ref={provided.innerRef}
+                                          {...provided.draggableProps}
+                                        >
+                                          <RoutineTimerComponent
+                                            step={step}
+                                            isDragging={snapshot.isDragging}
+                                            dragHandleProps={
+                                              provided.dragHandleProps
+                                            }
+                                            stepUpdated={(updatedStep) => {
+                                              const updatedSwimLanes =
+                                                swimLanes.map((lane) => {
+                                                  if (lane.id === swimLane.id) {
+                                                    const updatedSteps = [
+                                                      ...lane.steps,
+                                                    ]
+                                                    updatedSteps[stepIndex] =
+                                                      updatedStep
+                                                    return {
+                                                      ...lane,
+                                                      steps: updatedSteps,
+                                                    }
                                                   }
-                                                }
-                                                return lane
-                                              })
-                                            setSwimLanes(updatedSwimLanes)
-                                            setHasChanges(true)
-                                          }}
-                                          removeStep={(stepId) => {
-                                            const updatedSwimLanes =
-                                              swimLanes.map((lane) => {
-                                                if (lane.id === swimLane.id) {
-                                                  return {
-                                                    ...lane,
-                                                    steps: lane.steps.filter(
-                                                      (s) => s.id !== stepId,
-                                                    ),
+                                                  return lane
+                                                })
+                                              setSwimLanes(updatedSwimLanes)
+                                              setHasChanges(true)
+                                            }}
+                                            removeStep={(stepId) => {
+                                              const updatedSwimLanes =
+                                                swimLanes.map((lane) => {
+                                                  if (lane.id === swimLane.id) {
+                                                    return {
+                                                      ...lane,
+                                                      steps: lane.steps.filter(
+                                                        (s) => s.id !== stepId,
+                                                      ),
+                                                    }
                                                   }
-                                                }
-                                                return lane
-                                              })
-                                            setSwimLanes(updatedSwimLanes)
-                                            setHasChanges(true)
-                                          }}
-                                        />
-                                      </div>
-                                    )}
-                                  </Draggable>
-                                ))}
-                              {provided.placeholder}
-                            </div>
-                          )}
-                        </Droppable>
+                                                  return lane
+                                                })
+                                              setSwimLanes(updatedSwimLanes)
+                                              setHasChanges(true)
+                                            }}
+                                          />
+                                        </div>
+                                      )}
+                                    </Draggable>
+                                  ))}
+                                {provided.placeholder}
+                              </div>
+                            )}
+                          </Droppable>
+                        </div>
+                        <ScrollBar orientation="horizontal" />
+                      </ScrollArea>
 
+                      {/* Fixed position add button that's always visible */}
+                      <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
                         <Button
                           variant="secondary"
                           size="icon"
-                          className="h-auto min-h-48"
+                          className="h-auto min-h-48 shadow-md"
                           onClick={() => {
                             const newStep: RoutineStep = {
                               id: uuidv4(),
@@ -314,13 +337,16 @@ export function SwimlanesList(props: SwimlanesListProps) {
 
                             setSwimLanes(updatedSwimLanes)
                             setHasChanges(true)
+                            scrollToEnd(swimLane.id)
                           }}
+                          ref={(el) =>
+                            (addButtonRefs.current[swimLane.id] = el)
+                          }
                         >
                           <PlusIcon />
                         </Button>
                       </div>
-                      <ScrollBar orientation="horizontal" />
-                    </ScrollArea>
+                    </div>
                   </div>
                 )}
               </Draggable>
