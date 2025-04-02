@@ -193,7 +193,6 @@ export function SwimlanesList(props: SwimlanesListProps) {
                           onChange={(e) => setEditValue(e.target.value)}
                           onBlur={() => handleSave(swimLane.id)}
                           onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
-                          autoFocus
                           className="font-semibold"
                         />
                       ) : (

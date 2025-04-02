@@ -172,6 +172,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               onChange={(e) => {
                 setMinutes(Number(e.target.value).toString())
               }}
+              onWheel={(e) => e.currentTarget.blur()} // Prevent scroll from changing value
               className="h-7 text-sm"
             />
           </div>
@@ -187,6 +188,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               onChange={(e) => {
                 setSeconds(Number(e.target.value).toString())
               }}
+              onWheel={(e) => e.currentTarget.blur()} // Prevent scroll from changing value
               className="h-7 text-sm"
             />
           </div>
