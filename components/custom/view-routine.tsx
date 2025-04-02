@@ -12,7 +12,7 @@ import { Input } from '../ui/input'
 import { H4 } from '../ui/typography'
 import { SwimlanesList } from './swimlanes-list'
 import StartRoutineDialog, { StartMode } from './start-routine-dialog'
-import { getDateGivenTimeOfDay } from '@/lib/utils'
+import { getDateGivenTimeOfDay, getCompletionTime } from '@/lib/utils'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -81,18 +81,20 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
   const handleStartRoutine = (startMode: StartMode, endTime: string) => {
     switch (startMode) {
-      case 'now':
+      case 'now': {
+        const completionTime = getCompletionTime(routine)
+        console.log('completionTime: ', completionTime)
+        setRoutineRunningState({ status: 'running', endTime: completionTime })
         break
-      case 'timed':
+      }
+      case 'timed': {
         const endTimeDate = getDateGivenTimeOfDay(endTime)
-        console.log('Parsed endTimeDate: ', endTimeDate)
+        setRoutineRunningState({ status: 'paused', endTime: endTimeDate })
         break
-
+      }
       default:
         break
     }
-
-    // Parse endTime (e.g., "21:00") into a Date object for today
   }
 
   // Clean up timeout on unmount
@@ -101,7 +103,6 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
     }
   }, [])
-
   return (
     <div className="mx-auto w-full max-w-7xl overflow-x-hidden p-4">
       <div className="flex w-full flex-row place-items-center md:gap-4">
@@ -133,23 +134,25 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             </div>
           )}
 
-          <div className="flex gap-2">
-            <Button
-              variant="default"
-              onClick={() => setStartDialogOpen(true)}
-              className="flex items-center gap-1"
-            >
-              <PlayIcon className="h-4 w-4" />
-              Start
-            </Button>
-            <Button
-              variant="destructive"
-              size="icon"
-              onClick={() => setDeleteDialogOpen(true)}
-            >
-              <Trash2Icon className="h-5 w-5" />
-            </Button>
-          </div>
+          {routineRunningState.status !== 'running' && (
+            <div className="flex gap-2">
+              <Button
+                variant="default"
+                onClick={() => setStartDialogOpen(true)}
+                className="flex items-center gap-1"
+              >
+                <PlayIcon className="h-4 w-4" />
+                Start
+              </Button>
+              <Button
+                variant="destructive"
+                size="icon"
+                onClick={() => setDeleteDialogOpen(true)}
+              >
+                <Trash2Icon className="h-5 w-5" />
+              </Button>
+            </div>
+          )}
         </div>
 
         {updateError && <p className="text-sm text-red-500">{updateError}</p>}
@@ -157,12 +160,14 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       <Separator className="mt-2" />
       {/* end header */}
 
-      <div className="p-4">
-        <H4>Swimlanes</H4>
-        <Separator className="mt-2" />
+      {routineRunningState.status === '' && (
+        <div className="p-4">
+          <H4>Swimlanes</H4>
+          <Separator className="mt-2" />
 
-        <SwimlanesList routine={routine} />
-      </div>
+          <SwimlanesList routine={routine} />
+        </div>
+      )}
 
       <ConfirmationDialog
         isOpen={deleteDialogOpen}

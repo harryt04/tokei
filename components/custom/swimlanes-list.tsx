@@ -18,6 +18,7 @@ import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
 import RoutineTimerComponent from './routine-timer-component'
+import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 
 export type SwimlanesListProps = {
   routine: Routine
@@ -156,6 +157,7 @@ export function SwimlanesList(props: SwimlanesListProps) {
         <AddSwimlaneButton />
       </>
     )
+  const swimLanesRunTimes = calculateSwimLaneRunTimes(swimLanes)
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -203,7 +205,9 @@ export function SwimlanesList(props: SwimlanesListProps) {
                             {swimLane.name}
                           </H4>
                           <Muted>
-                            {swimLane.steps?.length ?? 0} total steps
+                            {`${swimLane.steps?.length ?? 0} total steps - total time: ${formatSecondsToHHMMSS(
+                              swimLanesRunTimes[swimLane.id],
+                            )}`}
                           </Muted>
                         </>
                       )}
