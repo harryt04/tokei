@@ -32,7 +32,7 @@ export default function RunRoutineComponent({
   const [status, setStatus] = useState<'running' | 'paused' | 'stopped'>(
     initialStatus,
   )
-  const statusRef = useRef(initialStatus)
+  const statusRef = useRef<'running' | 'paused' | 'stopped'>(initialStatus)
   const [swimlanesStatus, setSwimlanesStatus] = useState<
     Record<string, SwimlaneStatus>
   >({})
