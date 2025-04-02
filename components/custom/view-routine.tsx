@@ -21,7 +21,7 @@ export type ViewRoutineProps = {
 }
 
 type RoutineRunningState = {
-  status: 'running' | 'paused' | ''
+  status: 'running' | 'paused' | 'stopped' | ''
   endTime?: Date
 }
 

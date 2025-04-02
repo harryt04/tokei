@@ -5,9 +5,9 @@ import { H4, Muted } from '../ui/typography'
 import { Button } from '../ui/button'
 import { Progress } from '../ui/progress'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
-import { BanIcon, PauseIcon, PlayIcon } from 'lucide-react'
+import { BanIcon, PauseIcon, PlayIcon, TimerIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
-import { formatSecondsToHHMMSS } from '@/lib/utils'
+import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 import { toast } from '../ui/use-toast'
 
 export type RunRoutineComponentProps = {
@@ -15,6 +15,12 @@ export type RunRoutineComponentProps = {
   initialStatus: 'running' | 'paused'
   endTime?: Date
   onStatusChange?: (status: 'running' | 'paused' | 'stopped') => void
+}
+
+type SwimlaneStatus = {
+  currentStepIndex: number
+  waitTimeInSeconds: number
+  isWaiting: boolean
 }
 
 export default function RunRoutineComponent({
@@ -27,32 +33,61 @@ export default function RunRoutineComponent({
     initialStatus,
   )
   const statusRef = useRef(initialStatus)
-  const [activeSteps, setActiveSteps] = useState<Record<string, string>>({}) // swimlaneId -> stepId
+  const [swimlanesStatus, setSwimlanesStatus] = useState<
+    Record<string, SwimlaneStatus>
+  >({})
   const [stepProgress, setStepProgress] = useState<Record<string, number>>({}) // stepId -> progress (0-100)
   const [timers, setTimers] = useState<Record<string, NodeJS.Timeout>>({})
   const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState<
     Record<string, number>
   >({})
+  const [waitTimers, setWaitTimers] = useState<Record<string, NodeJS.Timeout>>(
+    {},
+  )
+  const [waitTimeRemaining, setWaitTimeRemaining] = useState<
+    Record<string, number>
+  >({})
 
-  // Initialize active steps
+  // Initialize swimlanes and calculate wait times
   useEffect(() => {
-    const initialActiveSteps: Record<string, string> = {}
+    if (!routine.swimLanes || routine.swimLanes.length === 0) return
+
+    // Calculate total duration for each swimlane
+    const swimlaneTimes = calculateSwimLaneRunTimes(routine.swimLanes)
+    const longestDuration = Math.max(...Object.values(swimlaneTimes))
+
+    // Initialize swimlane statuses with wait times
+    const initialSwimlaneStatus: Record<string, SwimlaneStatus> = {}
     const initialStepProgress: Record<string, number> = {}
+    const initialWaitTimeRemaining: Record<string, number> = {}
     const initialRemainingTime: Record<string, number> = {}
 
-    routine.swimLanes?.forEach((swimlane) => {
-      // Set the first step of each swimlane as active
-      if (swimlane.steps && swimlane.steps.length > 0) {
-        initialActiveSteps[swimlane.id] = swimlane.steps[0].id
+    routine.swimLanes.forEach((swimlane) => {
+      const totalDuration = swimlaneTimes[swimlane.id] || 0
+      const waitTime = Math.max(0, longestDuration - totalDuration)
+      const isWaiting = waitTime > 0
+
+      initialSwimlaneStatus[swimlane.id] = {
+        currentStepIndex: 0,
+        waitTimeInSeconds: waitTime,
+        isWaiting,
+      }
+
+      if (isWaiting) {
+        // If waiting, we track the wait time remaining
+        initialWaitTimeRemaining[swimlane.id] = waitTime
+      } else if (swimlane.steps.length > 0) {
+        // Otherwise set up the first step
         initialStepProgress[swimlane.steps[0].id] = 0
         initialRemainingTime[swimlane.steps[0].id] =
           swimlane.steps[0].durationInSeconds
       }
     })
 
-    setActiveSteps(initialActiveSteps)
+    setSwimlanesStatus(initialSwimlaneStatus)
     setStepProgress(initialStepProgress)
     setRemainingTimeInSeconds(initialRemainingTime)
+    setWaitTimeRemaining(initialWaitTimeRemaining)
   }, [routine])
 
   // Status change handler
@@ -63,41 +98,113 @@ export default function RunRoutineComponent({
     }
 
     if (status === 'running') {
-      startTimers()
+      // Start wait timers and step timers
+      startAllTimers()
     } else if (status === 'paused') {
-      pauseTimers()
+      pauseAllTimers()
     }
   }, [status])
 
-  // Timer control functions
-  const startTimers = () => {
-    // Clear any existing timers
-    Object.values(timers).forEach((timer) => clearTimeout(timer))
+  // Start all timers (both wait timers and step timers)
+  const startAllTimers = () => {
+    pauseAllTimers() // Clear existing timers
 
-    const newTimers: Record<string, NodeJS.Timeout> = {}
+    const newStepTimers: Record<string, NodeJS.Timeout> = {}
+    const newWaitTimers: Record<string, NodeJS.Timeout> = {}
 
+    // Start timers for swimlanes that are waiting
     routine.swimLanes?.forEach((swimlane) => {
-      const activeStepId = activeSteps[swimlane.id]
-      if (!activeStepId) return
-
-      const currentStep = swimlane.steps.find(
-        (step) => step.id === activeStepId,
-      )
-      if (!currentStep) return
-
-      // Start timer for this step
-      newTimers[currentStep.id] = startStepTimer(currentStep)
+      if (swimlanesStatus[swimlane.id]?.isWaiting) {
+        newWaitTimers[swimlane.id] = startWaitTimer(swimlane.id)
+      }
+      // Start timers for steps in swimlanes that are not waiting
+      else {
+        const currentStepIndex =
+          swimlanesStatus[swimlane.id]?.currentStepIndex || 0
+        if (currentStepIndex < swimlane.steps.length) {
+          const currentStep = swimlane.steps[currentStepIndex]
+          // Only auto start if automatic or has progress
+          const progress = stepProgress[currentStep.id] || 0
+          if (currentStep.startType === 'automatic' || progress > 0) {
+            newStepTimers[currentStep.id] = startStepTimer(currentStep)
+          }
+        }
+      }
     })
 
-    setTimers(newTimers)
+    setTimers(newStepTimers)
+    setWaitTimers(newWaitTimers)
   }
 
-  const pauseTimers = () => {
-    // Stop all running timers
-    Object.values(timers).forEach((timer) => clearTimeout(timer))
+  // Pause all timers
+  const pauseAllTimers = () => {
+    Object.values(timers).forEach((timer) => clearInterval(timer))
+    Object.values(waitTimers).forEach((timer) => clearInterval(timer))
     setTimers({})
+    setWaitTimers({})
   }
 
+  // Timer for swimlane wait periods
+  const startWaitTimer = (swimlaneId: string): NodeJS.Timeout => {
+    const waitTime = waitTimeRemaining[swimlaneId] || 0
+    if (waitTime <= 0) return setTimeout(() => {}, 0) // Empty timer if no wait needed
+
+    const updateInterval = 1000 // Update every second for wait timers
+    const swimlane = routine.swimLanes?.find((sl) => sl.id === swimlaneId)
+    if (!swimlane) return setTimeout(() => {}, 0)
+
+    return setInterval(() => {
+      if (statusRef.current !== 'running') return
+
+      setWaitTimeRemaining((prev) => {
+        const remaining = Math.max(
+          0,
+          (prev[swimlaneId] || 0) - updateInterval / 1000,
+        )
+
+        // Check if wait time completed
+        if (remaining <= 0) {
+          clearInterval(waitTimers[swimlaneId])
+
+          // Mark swimlane as no longer waiting and start its first step
+          setSwimlanesStatus((prev) => ({
+            ...prev,
+            [swimlaneId]: {
+              ...prev[swimlaneId],
+              isWaiting: false,
+            },
+          }))
+
+          // Start the first step if automatic
+          if (swimlane.steps.length > 0) {
+            const firstStep = swimlane.steps[0]
+            setStepProgress((prev) => ({ ...prev, [firstStep.id]: 0 }))
+            setRemainingTimeInSeconds((prev) => ({
+              ...prev,
+              [firstStep.id]: firstStep.durationInSeconds,
+            }))
+
+            if (firstStep.startType === 'automatic') {
+              setTimers((prev) => ({
+                ...prev,
+                [firstStep.id]: startStepTimer(firstStep),
+              }))
+            } else {
+              // Notify that manual step is ready
+              toast({
+                title: 'Manual step ready',
+                description: `"${firstStep.name}" in ${swimlane.name} is ready to start manually.`,
+              })
+            }
+          }
+        }
+
+        return { ...prev, [swimlaneId]: remaining }
+      })
+    }, updateInterval)
+  }
+
+  // Timer for steps
   const startStepTimer = (step: RoutineStep): NodeJS.Timeout => {
     const stepDuration = step.durationInSeconds
     const updateInterval = 100 // ms
@@ -127,41 +234,47 @@ export default function RunRoutineComponent({
     }, updateInterval)
   }
 
+  // Move to the next step in a swimlane
   const moveToNextStep = (completedStep: RoutineStep) => {
     const swimlane = routine.swimLanes?.find(
       (sl) => sl.id === completedStep.swimLaneId,
     )
     if (!swimlane) return
 
-    const currentIndex = swimlane.steps.findIndex(
-      (s) => s.id === completedStep.id,
-    )
-    const nextIndex = currentIndex + 1
+    const swimlaneStatus = swimlanesStatus[completedStep.swimLaneId]
+    if (!swimlaneStatus) return
 
-    // Check if there's another step
-    if (nextIndex < swimlane.steps.length) {
-      const nextStep = swimlane.steps[nextIndex]
+    const nextStepIndex = swimlaneStatus.currentStepIndex + 1
 
-      // Update active step
-      setActiveSteps((prev) => ({ ...prev, [swimlane.id]: nextStep.id }))
+    // Update the swimlane status
+    setSwimlanesStatus((prev) => ({
+      ...prev,
+      [completedStep.swimLaneId]: {
+        ...prev[completedStep.swimLaneId],
+        currentStepIndex: nextStepIndex,
+      },
+    }))
+
+    // Check if there's another step in this swimlane
+    if (nextStepIndex < swimlane.steps.length) {
+      const nextStep = swimlane.steps[nextStepIndex]
+
+      // Initialize the next step
       setStepProgress((prev) => ({ ...prev, [nextStep.id]: 0 }))
       setRemainingTimeInSeconds((prev) => ({
         ...prev,
         [nextStep.id]: nextStep.durationInSeconds,
       }))
 
-      // If automatic start, start the timer immediately
+      // Start the next step if it's automatic
       if (nextStep.startType === 'automatic') {
-        // Add a small delay to make the transition visible
         setTimeout(() => {
-          // Start timer for next step
           setTimers((prev) => ({
             ...prev,
             [nextStep.id]: startStepTimer(nextStep),
           }))
         }, 300)
       } else {
-        // Manual start - show notification
         toast({
           title: 'Manual step ready',
           description: `"${nextStep.name}" in ${swimlane.name} is ready to start manually.`,
@@ -176,13 +289,10 @@ export default function RunRoutineComponent({
 
       // Check if all swimlanes are complete
       const allComplete = routine.swimLanes?.every((sl) => {
-        const activeStep = activeSteps[sl.id]
-        if (!activeStep) return true // No steps
+        const status = swimlanesStatus[sl.id]
+        if (!status) return false
 
-        const stepIndex = sl.steps.findIndex((s) => s.id === activeStep)
-        return (
-          stepIndex === sl.steps.length - 1 && stepProgress[activeStep] >= 100
-        )
+        return !status.isWaiting && status.currentStepIndex >= sl.steps.length
       })
 
       if (allComplete) {
@@ -195,18 +305,18 @@ export default function RunRoutineComponent({
     }
   }
 
+  // Handle manual start for a step
   const handleManualStart = (stepId: string) => {
     // Find the step
     let targetStep: RoutineStep | undefined
-    let swimlaneId: string = ''
 
-    routine.swimLanes?.forEach((swimlane) => {
+    for (const swimlane of routine.swimLanes || []) {
       const step = swimlane.steps.find((s) => s.id === stepId)
       if (step) {
         targetStep = step
-        swimlaneId = swimlane.id
+        break
       }
-    })
+    }
 
     if (!targetStep) return
 
@@ -219,26 +329,44 @@ export default function RunRoutineComponent({
 
   // Main control handlers
   const handlePlayPause = () => {
-    if (status === 'running') {
-      setStatus('paused')
-    } else {
-      setStatus('running')
-    }
+    setStatus(status === 'running' ? 'paused' : 'running')
   }
 
   const handleStop = () => {
-    pauseTimers()
+    pauseAllTimers()
     setStatus('stopped')
   }
 
-  // Determine if step should be showing start button
-  const shouldShowStartButton = (swimlaneId: string, stepId: string) => {
-    const isActiveStep = activeSteps[swimlaneId] === stepId
-    const step = routine.swimLanes
-      ?.find((sl) => sl.id === swimlaneId)
-      ?.steps.find((s) => s.id === stepId)
+  // Helper to get the current active step for a swimlane
+  const getCurrentStep = (swimlaneId: string) => {
+    const swimlane = routine.swimLanes?.find((sl) => sl.id === swimlaneId)
+    if (!swimlane) return null
+
+    const status = swimlanesStatus[swimlaneId]
+    if (!status || status.isWaiting) return null
+
+    if (status.currentStepIndex < swimlane.steps.length) {
+      return swimlane.steps[status.currentStepIndex]
+    }
+
+    return null
+  }
+
+  // Determine if a step should show the start button
+  const shouldShowStartButton = (step: RoutineStep) => {
+    const swimlaneStatus = swimlanesStatus[step.swimLaneId]
+    if (!swimlaneStatus) return false
+
+    const currentStepIndex = swimlaneStatus.currentStepIndex
+    const swimlane = routine.swimLanes?.find((sl) => sl.id === step.swimLaneId)
+    if (!swimlane) return false
+
+    const isCurrentStep = swimlane.steps[currentStepIndex]?.id === step.id
+
     return (
-      isActiveStep && step?.startType === 'manual' && stepProgress[stepId] === 0
+      isCurrentStep &&
+      step.startType === 'manual' &&
+      (stepProgress[step.id] || 0) === 0
     )
   }
 
@@ -285,82 +413,130 @@ export default function RunRoutineComponent({
         </div>
       </div>
 
-      {routine.swimLanes?.map((swimlane) => (
-        <div key={swimlane.id} className="mt-4">
-          <H4>{swimlane.name}</H4>
+      {routine.swimLanes?.map((swimlane) => {
+        const swimlaneStatus = swimlanesStatus[swimlane.id]
+        const isWaiting = swimlaneStatus?.isWaiting
+        const waitTime = waitTimeRemaining[swimlane.id] || 0
 
-          <ScrollArea className="mt-2 h-auto w-full">
-            <div className="flex w-full gap-4 p-4">
-              {swimlane.steps.map((step, index) => {
-                const isActive = activeSteps[swimlane.id] === step.id
-                const isCompleted = stepProgress[step.id] === 100
-                const isPending =
-                  swimlane.steps.findIndex(
-                    (s) => s.id === activeSteps[swimlane.id],
-                  ) < index
-                const progress = stepProgress[step.id] || 0
-                const remainingTime =
-                  remainingTimeInSeconds[step.id] || step.durationInSeconds
+        return (
+          <div key={swimlane.id} className="mt-4">
+            <H4>{swimlane.name}</H4>
 
-                return (
-                  <Card
-                    key={step.id}
-                    className={`min-w-[250px] transition-shadow ${
-                      isActive
-                        ? 'border-primary shadow-lg'
-                        : isCompleted
-                          ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
-                          : isPending
-                            ? 'opacity-60'
-                            : ''
-                    }`}
-                  >
+            <ScrollArea className="mt-2 h-auto w-full">
+              <div className="flex w-full gap-4 p-4">
+                {isWaiting && (
+                  <Card className="min-w-[250px] border-amber-400 bg-amber-50 dark:bg-amber-900/20">
                     <CardHeader className="p-3">
                       <CardTitle className="flex items-center justify-between text-sm">
-                        {step.name}
-                        {isCompleted && (
-                          <span className="text-xs text-green-500">
-                            Completed
-                          </span>
-                        )}
+                        Waiting
+                        <TimerIcon className="h-4 w-4 text-amber-500" />
                       </CardTitle>
                     </CardHeader>
-
                     <CardContent className="space-y-3 p-3">
                       <Muted className="text-xs">
-                        {isActive ? `Original duration: ` : `Duration: `}
-                        {formatSecondsToHHMMSS(step.durationInSeconds)}
+                        This swimlane will start in:
                       </Muted>
-
-                      {isActive && progress > 0 && (
-                        <>
-                          <Progress value={progress} className="h-2" />
-                          <Muted className="text-xs">
-                            Remaining:{' '}
-                            {formatSecondsToHHMMSS(Math.round(remainingTime))}
-                          </Muted>
-                        </>
-                      )}
-
-                      {shouldShowStartButton(swimlane.id, step.id) && (
-                        <Button
-                          size="sm"
-                          className="mt-2 w-full"
-                          onClick={() => handleManualStart(step.id)}
-                        >
-                          <PlayIcon className="mr-2 h-3 w-3" />
-                          Start
-                        </Button>
-                      )}
+                      <Progress
+                        value={
+                          (1 - waitTime / swimlaneStatus.waitTimeInSeconds) *
+                          100
+                        }
+                        className="h-2"
+                      />
+                      <Muted className="text-center text-sm font-semibold">
+                        {formatSecondsToHHMMSS(Math.round(waitTime))}
+                      </Muted>
                     </CardContent>
                   </Card>
-                )
-              })}
-            </div>
-            <ScrollBar orientation="horizontal" />
-          </ScrollArea>
-        </div>
-      ))}
+                )}
+
+                {/* Show all steps regardless of waiting status */}
+                {swimlane.steps.map((step, index) => {
+                  const currentStepIndex = swimlaneStatus?.currentStepIndex || 0
+                  const isActive = !isWaiting && currentStepIndex === index
+                  const isCompleted = !isWaiting && index < currentStepIndex
+                  const isPending = isWaiting || index > currentStepIndex
+                  const progress = isActive ? stepProgress[step.id] || 0 : 0
+                  const remainingTime = isActive
+                    ? remainingTimeInSeconds[step.id] || step.durationInSeconds
+                    : 0
+
+                  return (
+                    <Card
+                      key={step.id}
+                      className={`min-w-[250px] transition-shadow ${
+                        isActive
+                          ? 'border-primary shadow-lg'
+                          : isCompleted
+                            ? 'border-green-500 bg-green-50 dark:bg-green-900/20'
+                            : isWaiting
+                              ? 'border-dashed border-amber-300 opacity-75'
+                              : isPending
+                                ? 'opacity-60'
+                                : ''
+                      }`}
+                    >
+                      <CardHeader className="p-3">
+                        <CardTitle className="flex items-center justify-between text-sm">
+                          {step.name}
+                          {isWaiting && index === 0 && (
+                            <span className="text-xs text-amber-500">
+                              Up first
+                            </span>
+                          )}
+                          {isCompleted && (
+                            <span className="text-xs text-green-500">
+                              Completed
+                            </span>
+                          )}
+                        </CardTitle>
+                      </CardHeader>
+
+                      <CardContent className="space-y-3 p-3">
+                        <Muted className="text-xs">
+                          {isActive ? `Original duration: ` : `Duration: `}
+                          {formatSecondsToHHMMSS(step.durationInSeconds)}
+                        </Muted>
+
+                        {isWaiting && (
+                          <Muted className="text-xs italic">
+                            Start type:{' '}
+                            {step.startType === 'manual'
+                              ? 'Manual start'
+                              : 'Automatic'}
+                          </Muted>
+                        )}
+
+                        {isActive && progress > 0 && (
+                          <>
+                            <Progress value={progress} className="h-2" />
+                            <Muted className="text-xs">
+                              Remaining:{' '}
+                              {formatSecondsToHHMMSS(Math.round(remainingTime))}
+                            </Muted>
+                          </>
+                        )}
+
+                        {!isWaiting && shouldShowStartButton(step) && (
+                          <Button
+                            size="sm"
+                            className="mt-2 w-full"
+                            onClick={() => handleManualStart(step.id)}
+                          >
+                            <PlayIcon className="mr-2 h-3 w-3" />
+                            Start
+                          </Button>
+                        )}
+                      </CardContent>
+                    </Card>
+                  )
+                })}
+              </div>
+              <ScrollBar orientation="horizontal" />
+            </ScrollArea>
+          </div>
+        )
+      })}
     </div>
   )
 }
