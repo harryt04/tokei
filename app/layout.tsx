@@ -1,9 +1,4 @@
-import {
-  ClerkProvider,
-  RedirectToSignIn,
-  SignedIn,
-  SignedOut,
-} from '@clerk/nextjs'
+import { ClerkProvider, SignedIn } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 
@@ -48,9 +43,6 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <SidebarProvider>
-                <SignedOut>
-                  <RedirectToSignIn />
-                </SignedOut>
                 <SignedIn>
                   <AppSidebar />
                 </SignedIn>

@@ -5,6 +5,7 @@ import { notFound } from 'next/navigation'
 import { ObjectId } from 'mongodb'
 import ViewRoutine from '@/components/custom/view-routine'
 import { Routine } from '@/models'
+import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 
 export default async function RoutinePage(props: {
   params: Promise<{ id: string }>
@@ -25,7 +26,12 @@ export default async function RoutinePage(props: {
 
     return (
       <>
-        <ViewRoutine routine={routine}></ViewRoutine>
+        <SignedOut>
+          <RedirectToSignIn />
+        </SignedOut>
+        <SignedIn>
+          <ViewRoutine routine={routine}></ViewRoutine>
+        </SignedIn>
       </>
     )
   }
