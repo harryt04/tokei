@@ -339,9 +339,9 @@ export function SwimlanesList(props: SwimlanesListProps) {
                             setHasChanges(true)
                             scrollToEnd(swimLane.id)
                           }}
-                          ref={(el) =>
-                            (addButtonRefs.current[swimLane.id] = el)
-                          }
+                          ref={(el) => {
+                            addButtonRefs.current[swimLane.id] = el
+                          }}
                         >
                           <PlusIcon />
                         </Button>
