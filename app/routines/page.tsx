@@ -1,5 +1,4 @@
 'use server'
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import RoutinesList from '@/components/custom/routines-list'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
 import { currentUser } from '@clerk/nextjs/server'
@@ -27,12 +26,7 @@ export default async function Routines() {
 
   return (
     <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-      <SignedIn>
-        <RoutinesList initialRoutines={initialRoutines} />
-      </SignedIn>
+      <RoutinesList initialRoutines={initialRoutines} />
     </>
   )
 }
