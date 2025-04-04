@@ -66,7 +66,7 @@ export function AppSidebar() {
                 const isActive =
                   pathname === item.url ||
                   (item as any).childrenRoutes?.some((childRoute) =>
-                    pathname.startsWith(childRoute),
+                    pathname?.startsWith(childRoute),
                   )
 
                 return (
