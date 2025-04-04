@@ -229,7 +229,7 @@ export function SwimlanesList(props: SwimlanesListProps) {
 
                     <div className="relative mt-2">
                       <ScrollArea className="h-auto w-full rounded-md border border-dashed border-muted-foreground">
-                        <div className="flex w-full gap-4 p-4 pr-16">
+                        <div className="flex min-h-56 w-full gap-4 p-4 pr-16">
                           {' '}
                           {/* Added padding-right to make space for the fixed button */}
                           <Droppable
