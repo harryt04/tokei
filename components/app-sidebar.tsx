@@ -20,6 +20,7 @@ import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { ThemeSwitcher } from './custom/themeSwitcher'
+import { Badge } from './ui/badge'
 
 // Menu items.
 const items = [
@@ -30,6 +31,7 @@ const items = [
   },
   {
     title: `Routines`,
+    beta: true,
     url: '/routines',
     icon: Repeat2Icon,
     childrenRoutes: ['/routine/'],
@@ -84,6 +86,7 @@ export function AppSidebar() {
                       >
                         <item.icon />
                         <span>{item.title}</span>
+                        {item.beta && <Badge>Beta</Badge>}
                       </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
