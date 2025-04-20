@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { ThemeSwitcher } from './themeSwitcher'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Github } from 'lucide-react' // Assuming lucide-react for icons
+import { Github, Timer } from 'lucide-react' // Assuming lucide-react for icons
 
 function LandingPage() {
   return (
@@ -36,7 +36,10 @@ function LandingPage() {
             </p>
             <div className="flex gap-4">
               <Button asChild size="lg">
-                <Link href="/login">Start Timing Now</Link>
+                <Link href="/login">
+                  <Timer />
+                  Start Timing Now
+                </Link>
               </Button>
               <Button variant="outline" size="lg" asChild>
                 <a
@@ -44,7 +47,7 @@ function LandingPage() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <Github className="mr-2 h-4 w-4" />
+                  <Github />
                   GitHub
                 </a>
               </Button>
