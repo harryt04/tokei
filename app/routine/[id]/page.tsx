@@ -13,27 +13,33 @@ export default async function RoutinePage(props: {
   const { id } = await props.params
   const user = await currentUser()
   if (user) {
-    const client = await getMongoClient()
-    const db = client.db(mongoDBConfig.dbName)
-    const routinesCollection = db.collection(mongoDBConfig.collections.routines)
+    try {
+      const client = await getMongoClient()
+      const db = client.db(mongoDBConfig.dbName)
+      const routinesCollection = db.collection(
+        mongoDBConfig.collections.routines,
+      )
 
-    const routineDocument = await routinesCollection.findOne({
-      _id: new ObjectId(id),
-    })
-    if (!routineDocument) notFound()
+      const routineDocument = await routinesCollection.findOne({
+        _id: new ObjectId(id),
+      })
+      if (!routineDocument) notFound()
 
-    const routine = JSON.parse(JSON.stringify(routineDocument)) as Routine
+      const routine = JSON.parse(JSON.stringify(routineDocument)) as Routine
 
-    return (
-      <>
-        <SignedOut>
-          <RedirectToSignIn />
-        </SignedOut>
-        <SignedIn>
-          <ViewRoutine routine={routine}></ViewRoutine>
-        </SignedIn>
-      </>
-    )
+      return (
+        <>
+          <SignedOut>
+            <RedirectToSignIn />
+          </SignedOut>
+          <SignedIn>
+            <ViewRoutine routine={routine}></ViewRoutine>
+          </SignedIn>
+        </>
+      )
+    } catch (error) {
+      notFound()
+    }
   }
   return null
 }
