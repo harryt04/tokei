@@ -17,7 +17,7 @@ export async function GET(req: NextRequest) {
       fetch('https://harryt.dev/api/user', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, source: 'tokei' }),
+        body: JSON.stringify({ email, usesApps: ['tokei'] }),
       }).catch(() => {
         // Ignore errors from this call
       })
