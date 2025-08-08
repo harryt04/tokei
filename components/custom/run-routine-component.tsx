@@ -1,8 +1,10 @@
 'use client'
 import { Routine, RoutineStep } from '@/models'
-import React from 'react'
-import { H4 } from '../ui/typography'
+import React, { useState, useEffect, useRef } from 'react'
+import { H4, Muted } from '../ui/typography'
 import { Button } from '../ui/button'
+import { calculateSwimLaneRunTimes } from '@/lib/utils'
+import { toast } from '../ui/use-toast'
 import RoutineControls from './routine/RoutineControls'
 import SwimlaneComponent from './routine/SwimlaneComponent'
 
@@ -25,78 +27,76 @@ export default function RunRoutineComponent({
   endTime,
   onStatusChange,
 }: RunRoutineComponentProps) {
-  // TODO: Implement your state management here
-  const status = initialStatus // This will need to be replaced with proper state
-
-  // TODO: Implement event handlers
-  const handlePlayPause = () => {
-    // Implement your play/pause logic
-    console.log('Play/Pause clicked')
-  }
-
-  const handleStop = () => {
-    // Implement your stop logic
-    console.log('Stop clicked')
-  }
-
-  // TODO: Implement helper functions
-  const getCurrentStep = (swimlaneId: string) => {
-    // Implement your logic to get current step
-    return null
-  }
-
-  const shouldShowStartButton = (step: RoutineStep) => {
-    // Implement your logic to determine if start button should show
-    return false
-  }
-
-  // Example dummy data for UI rendering - replace with your state
-  const dummySwimlanesStatus: Record<string, SwimlaneStatus> = {}
-  const dummyStepProgress: Record<string, number> = {}
-  const dummyRemainingTimeInSeconds: Record<string, number> = {}
-  const dummyWaitTimeRemaining: Record<string, number> = {}
-
-  const handleManualStart = (stepId: string) => {
-    // Implement your logic for manual step start
-    console.log(`Manual start for step ${stepId}`)
-  }
-
-  if (status === 'stopped') {
-    return (
-      <div className="p-4 text-center">
-        <H4>Routine stopped</H4>
-        <Button onClick={() => window.location.reload()} className="mt-4">
-          Start Over
-        </Button>
-      </div>
-    )
-  }
-
-  return (
-    <div className="space-y-6 p-2">
-      <RoutineControls
-        routineName={routine.name}
-        status={status}
-        endTime={endTime}
-        onPlayPause={handlePlayPause}
-        onStop={handleStop}
-      />
-
-      {routine.swimLanes?.map((swimlane) => (
-        <SwimlaneComponent
-          key={swimlane.id}
-          swimlane={swimlane}
-          status={dummySwimlanesStatus[swimlane.id]}
-          waitTimeRemaining={dummyWaitTimeRemaining[swimlane.id] || 0}
-          stepProgress={dummyStepProgress}
-          remainingTimeInSeconds={dummyRemainingTimeInSeconds}
-          shouldShowStartButton={shouldShowStartButton}
-          onManualStart={handleManualStart}
-        />
-      ))}
-    </div>
+  const [status, setStatus] = useState<'running' | 'paused' | 'stopped'>(
+    initialStatus,
   )
-}
+  const statusRef = useRef<'running' | 'paused' | 'stopped'>(initialStatus)
+  const [swimlanesStatus, setSwimlanesStatus] = useState<
+    Record<string, SwimlaneStatus>
+  >({})
+  const [stepProgress, setStepProgress] = useState<Record<string, number>>({}) // stepId -> progress (0-100)
+  const [timers, setTimers] = useState<Record<string, NodeJS.Timeout>>({})
+  const [remainingTimeInSeconds, setRemainingTimeInSeconds] = useState<
+    Record<string, number>
+  >({})
+  const [waitTimers, setWaitTimers] = useState<Record<string, NodeJS.Timeout>>(
+    {},
+  )
+  const [waitTimeRemaining, setWaitTimeRemaining] = useState<
+    Record<string, number>
+  >({})
+
+  // Initialize swimlanes and calculate wait times
+  useEffect(() => {
+    if (!routine.swimLanes || routine.swimLanes.length === 0) return
+
+    // Calculate total duration for each swimlane
+    const swimlaneTimes = calculateSwimLaneRunTimes(routine.swimLanes)
+    const longestDuration = Math.max(...Object.values(swimlaneTimes))
+
+    // Initialize swimlane statuses with wait times
+    const initialSwimlaneStatus: Record<string, SwimlaneStatus> = {}
+    const initialStepProgress: Record<string, number> = {}
+    const initialWaitTimeRemaining: Record<string, number> = {}
+    const initialRemainingTime: Record<string, number> = {}
+
+    routine.swimLanes.forEach((swimlane) => {
+      const totalDuration = swimlaneTimes[swimlane.id] || 0
+      const waitTime = Math.max(0, longestDuration - totalDuration)
+      const isWaiting = waitTime > 0
+
+      initialSwimlaneStatus[swimlane.id] = {
+        currentStepIndex: 0,
+        waitTimeInSeconds: waitTime,
+        isWaiting,
+      }
+
+      if (isWaiting) {
+        // If waiting, we track the wait time remaining
+        initialWaitTimeRemaining[swimlane.id] = waitTime
+      } else if (swimlane.steps.length > 0) {
+        // Otherwise set up the first step
+        initialStepProgress[swimlane.steps[0].id] = 0
+        initialRemainingTime[swimlane.steps[0].id] =
+          swimlane.steps[0].durationInSeconds
+      }
+    })
+
+    setSwimlanesStatus(initialSwimlaneStatus)
+    setStepProgress(initialStepProgress)
+    setRemainingTimeInSeconds(initialRemainingTime)
+    setWaitTimeRemaining(initialWaitTimeRemaining)
+  }, [routine])
+
+  // Status change handler
+  useEffect(() => {
+    statusRef.current = status
+    if (onStatusChange) {
+      onStatusChange(status)
+    }
+
+    if (status === 'running') {
+      // Start wait timers and step timers
       startAllTimers()
     } else if (status === 'paused') {
       pauseAllTimers()
