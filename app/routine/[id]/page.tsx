@@ -6,6 +6,7 @@ import { ObjectId } from 'mongodb'
 import ViewRoutine from '@/components/custom/view-routine'
 import { Routine } from '@/models'
 import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
+import { addUser } from '@/lib/utils'
 
 export default async function RoutinePage(props: {
   params: Promise<{ id: string }>
@@ -13,6 +14,7 @@ export default async function RoutinePage(props: {
   const { id } = await props.params
   const user = await currentUser()
   if (user) {
+    addUser(user)
     try {
       const client = await getMongoClient()
       const db = client.db(mongoDBConfig.dbName)

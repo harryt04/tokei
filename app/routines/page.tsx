@@ -4,6 +4,7 @@ import RoutinesList from '@/components/custom/routines-list'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
 import { currentUser } from '@clerk/nextjs/server'
 import { Routine } from '@/models'
+import { addUser } from '@/lib/utils'
 
 export default async function Routines() {
   const user = await currentUser()
@@ -11,6 +12,7 @@ export default async function Routines() {
   let initialRoutines: Routine[] = []
 
   if (user) {
+    addUser(user)
     const client = await getMongoClient()
     const db = client.db(mongoDBConfig.dbName)
     const routinesCollection = db.collection(mongoDBConfig.collections.routines)
