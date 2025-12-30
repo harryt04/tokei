@@ -4,7 +4,12 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
 import { Button } from '../../ui/button'
-import { PlayIcon, PauseIcon, SkipForwardIcon, RotateCcwIcon } from 'lucide-react'
+import {
+  PlayIcon,
+  PauseIcon,
+  SkipForwardIcon,
+  RotateCcwIcon,
+} from 'lucide-react'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 
 interface StepCardProps {
@@ -99,6 +104,12 @@ export default function StepCard({
         )}
 
         <div className="mt-2 grid grid-cols-2 gap-2">
+          {showStartButton && (
+            <Button size="sm" className="flex flex-1" onClick={onManualStart}>
+              <PlayIcon className="mr-2 h-3 w-3" />
+              Start
+            </Button>
+          )}
           {showPauseButton && (
             <Button
               size="sm"

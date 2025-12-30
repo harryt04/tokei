@@ -40,6 +40,7 @@ export default function RunRoutineComponent({
     remainingTimeInSeconds,
     waitTimeRemaining,
     pausedSteps,
+    estimatedEndTime,
     handlePlayPause,
     handleStop,
     handleManualStart,
@@ -98,7 +99,7 @@ export default function RunRoutineComponent({
       <RoutineControls
         routineName={routine.name}
         status={status}
-        endTime={endTime}
+        endTime={estimatedEndTime ?? undefined}
         onPlayPause={handlePlayPause}
         onStop={handleStop}
       />

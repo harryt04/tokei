@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
 import { calculateSwimLaneRunTimes } from '@/lib/utils'
 import { toast } from '@/components/ui/use-toast'
@@ -26,6 +26,7 @@ export type UseRoutineTimerReturn = {
   remainingTimeInSeconds: Record<string, number>
   waitTimeRemaining: Record<string, number>
   pausedSteps: Set<string>
+  estimatedEndTime: Date | null
   handlePlayPause: () => void
   handleStop: () => void
   handleManualStart: (stepId: string) => void
@@ -712,6 +713,57 @@ export function useRoutineTimer({
     [swimlanesStatus, stepProgress, routine],
   )
 
+  /**
+   * Calculate the estimated end time based on current progress.
+   * Updates whenever wait times, step progress, or paused steps change.
+   */
+  const estimatedEndTime = useMemo(() => {
+    if (status === 'stopped' || !routine.swimLanes) return null
+
+    let maxRemainingTime = 0
+
+    routine.swimLanes.forEach((swimlane) => {
+      const slStatus = swimlanesStatus[swimlane.id]
+      if (!slStatus) return
+
+      let swimlaneRemaining = 0
+
+      // Add wait time if still waiting
+      if (slStatus.isWaiting) {
+        swimlaneRemaining += waitTimeRemaining[swimlane.id] || 0
+      }
+
+      // Add remaining time for current and future steps
+      for (let i = slStatus.currentStepIndex; i < swimlane.steps.length; i++) {
+        const step = swimlane.steps[i]
+
+        if (i === slStatus.currentStepIndex && !slStatus.isWaiting) {
+          // Current step - use remaining time from state
+          swimlaneRemaining += remainingTimeInSeconds[step.id] || 0
+        } else {
+          // Future steps - use full duration
+          swimlaneRemaining += step.durationInSeconds
+        }
+      }
+
+      maxRemainingTime = Math.max(maxRemainingTime, swimlaneRemaining)
+    })
+
+    // If routine or all steps are paused, we can't give an accurate estimate
+    if (status === 'paused') {
+      // Still calculate based on current remaining, but it won't count down
+      return new Date(Date.now() + maxRemainingTime * 1000)
+    }
+
+    return new Date(Date.now() + maxRemainingTime * 1000)
+  }, [
+    status,
+    routine.swimLanes,
+    swimlanesStatus,
+    waitTimeRemaining,
+    remainingTimeInSeconds,
+  ])
+
   return {
     status,
     swimlanesStatus,
@@ -719,6 +771,7 @@ export function useRoutineTimer({
     remainingTimeInSeconds,
     waitTimeRemaining,
     pausedSteps,
+    estimatedEndTime,
     handlePlayPause,
     handleStop,
     handleManualStart,
