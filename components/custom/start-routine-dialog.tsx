@@ -15,7 +15,7 @@ import { Input } from '../ui/input'
 import { Clock, PlayCircle } from 'lucide-react'
 import { Routine } from '@/models'
 import { format } from 'date-fns'
-import { getRoutineDurationInSeconds, formatSecondsToHHMMSS } from '@/lib/utils'
+import { getRoutineDurationInSeconds } from '@/lib/utils'
 
 export type StartRoutineDialogProps = {
   isOpen: boolean
@@ -31,15 +31,35 @@ export default function StartRoutineDialog({
   routine,
 }: StartRoutineDialogProps) {
   const [startMode, setStartMode] = useState<StartMode>('now')
-  const [endTime, setEndTime] = useState<string>(
-    format(new Date(Date.now() + 60 * 60 * 1000), 'HH:mm'), // Default to 1 hour from now
-  )
   const [error, setError] = useState<string | null>(null)
 
   // Calculate minimum required duration for this routine
   const routineDurationInSeconds = useMemo(
     () => getRoutineDurationInSeconds(routine),
     [routine],
+  )
+
+  // Calculate the earliest possible completion time
+  const earliestCompletionTime = useMemo(() => {
+    const now = new Date()
+    return new Date(now.getTime() + routineDurationInSeconds * 1000)
+  }, [routineDurationInSeconds])
+
+  // Format for the time input (HH:mm)
+  const earliestCompletionTimeFormatted = useMemo(
+    () => format(earliestCompletionTime, 'HH:mm'),
+    [earliestCompletionTime],
+  )
+
+  // Format for display (12-hour with AM/PM)
+  const earliestCompletionTimeDisplay = useMemo(
+    () => format(earliestCompletionTime, 'h:mm a'),
+    [earliestCompletionTime],
+  )
+
+  // Default the end time to the earliest possible completion time
+  const [endTime, setEndTime] = useState<string>(
+    earliestCompletionTimeFormatted,
   )
 
   const handleStartRoutine = () => {
@@ -68,10 +88,7 @@ export default function StartRoutineDialog({
 
       // Check if we have enough time
       if (timeAvailableInSeconds < routineDurationInSeconds) {
-        const minDuration = formatSecondsToHHMMSS(routineDurationInSeconds)
-        setError(
-          `This routine requires at least ${minDuration}. Please select a later end time.`,
-        )
+        setError(`Please select ${earliestCompletionTimeDisplay} or later.`)
         return
       }
     }
@@ -79,12 +96,6 @@ export default function StartRoutineDialog({
     setError(null)
     onClose(startMode, endTime)
   }
-
-  // Calculate the earliest possible completion time for display
-  const earliestCompletionTime = useMemo(() => {
-    const now = new Date()
-    return new Date(now.getTime() + routineDurationInSeconds * 1000)
-  }, [routineDurationInSeconds])
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -110,25 +121,35 @@ export default function StartRoutineDialog({
               </Label>
             </div>
 
-            <div className="flex items-center space-x-2">
-              <RadioGroupItem value="timed" id="timed" />
-              <Label
-                htmlFor="timed"
-                className="flex cursor-pointer items-center gap-2"
-              >
-                <Clock size={18} />
-                End at specific time
-              </Label>
+            <div className="flex flex-col space-y-1">
+              <div className="flex items-center space-x-2">
+                <RadioGroupItem value="timed" id="timed" />
+                <Label
+                  htmlFor="timed"
+                  className="flex cursor-pointer items-center gap-2"
+                >
+                  <Clock size={18} />
+                  End at specific time
+                </Label>
 
-              <div className="ml-2">
-                <Input
-                  type="time"
-                  value={endTime}
-                  onChange={(e) => setEndTime(e.target.value)}
-                  onFocus={() => setStartMode('timed')}
-                  className="w-32"
-                />
+                <div className="ml-2">
+                  <Input
+                    type="time"
+                    value={endTime}
+                    onChange={(e) => {
+                      setEndTime(e.target.value)
+                      setError(null)
+                    }}
+                    onFocus={() => setStartMode('timed')}
+                    className="w-32"
+                  />
+                </div>
               </div>
+              {startMode === 'timed' && (
+                <p className="ml-6 text-xs text-muted-foreground">
+                  Earliest: {earliestCompletionTimeDisplay}
+                </p>
+              )}
             </div>
           </RadioGroup>
           {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
