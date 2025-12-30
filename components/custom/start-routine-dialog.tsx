@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useState } from 'react'
+import React, { useState, useMemo } from 'react'
 import {
   Dialog,
   DialogContent,
@@ -12,10 +12,10 @@ import { Button } from '../ui/button'
 import { RadioGroup, RadioGroupItem } from '../ui/radio-group'
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
-import { Clock, PlayCircle, Eye } from 'lucide-react'
+import { Clock, PlayCircle } from 'lucide-react'
 import { Routine } from '@/models'
 import { format } from 'date-fns'
-import { getCompletionTime } from '@/lib/utils'
+import { getRoutineDurationInSeconds, formatSecondsToHHMMSS } from '@/lib/utils'
 
 export type StartRoutineDialogProps = {
   isOpen: boolean
@@ -36,22 +36,41 @@ export default function StartRoutineDialog({
   )
   const [error, setError] = useState<string | null>(null)
 
+  // Calculate minimum required duration for this routine
+  const routineDurationInSeconds = useMemo(
+    () => getRoutineDurationInSeconds(routine),
+    [routine],
+  )
+
   const handleStartRoutine = () => {
     if (startMode === 'timed') {
-      const completionTime = getCompletionTime(routine)
-      const selectedEndTime = new Date()
+      // Parse the selected end time
+      const now = new Date()
       const [hours, minutes] = endTime.split(':').map(Number)
-      selectedEndTime.setHours(hours, minutes, 0, 0)
+      const selectedEndTime = new Date(
+        now.getFullYear(),
+        now.getMonth(),
+        now.getDate(),
+        hours,
+        minutes,
+        0,
+        0,
+      )
 
-      if (selectedEndTime <= completionTime) {
+      // If the selected time is earlier than now, assume it's tomorrow
+      if (selectedEndTime <= now) {
+        selectedEndTime.setDate(selectedEndTime.getDate() + 1)
+      }
+
+      // Calculate time available from now until the selected end time
+      const timeAvailableInSeconds =
+        (selectedEndTime.getTime() - now.getTime()) / 1000
+
+      // Check if we have enough time
+      if (timeAvailableInSeconds < routineDurationInSeconds) {
+        const minDuration = formatSecondsToHHMMSS(routineDurationInSeconds)
         setError(
-          `The earliest this routine can finish is ${completionTime.toLocaleTimeString(
-            [],
-            {
-              hour: '2-digit',
-              minute: '2-digit',
-            },
-          )}.`,
+          `This routine requires at least ${minDuration}. Please select a later end time.`,
         )
         return
       }
@@ -60,6 +79,12 @@ export default function StartRoutineDialog({
     setError(null)
     onClose(startMode, endTime)
   }
+
+  // Calculate the earliest possible completion time for display
+  const earliestCompletionTime = useMemo(() => {
+    const now = new Date()
+    return new Date(now.getTime() + routineDurationInSeconds * 1000)
+  }, [routineDurationInSeconds])
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
@@ -98,9 +123,9 @@ export default function StartRoutineDialog({
               <div className="ml-2">
                 <Input
                   type="time"
-                  disabled={startMode !== 'timed'}
                   value={endTime}
                   onChange={(e) => setEndTime(e.target.value)}
+                  onFocus={() => setStartMode('timed')}
                   className="w-32"
                 />
               </div>

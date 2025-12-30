@@ -91,7 +91,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
       }
       case 'timed': {
         const endTimeDate = getDateGivenTimeOfDay(endTime)
-        setRoutineRunningState({ status: 'paused', endTime: endTimeDate })
+        setRoutineRunningState({ status: 'running', endTime: endTimeDate })
         break
       }
       default:

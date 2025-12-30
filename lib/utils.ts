@@ -74,19 +74,25 @@ export function calculateSwimLaneRunTimes(
 }
 
 /**
+ * Gets the total duration of a routine in seconds.
+ * Since swimlanes run in parallel, this is the duration of the longest swimlane.
+ * @param routine The routine object.
+ * @returns The total duration in seconds.
+ */
+export function getRoutineDurationInSeconds(routine: Routine): number {
+  if (!routine.swimLanes || routine.swimLanes.length === 0) return 0
+
+  const swimlaneTimes = calculateSwimLaneRunTimes(routine.swimLanes)
+  return Math.max(...Object.values(swimlaneTimes), 0)
+}
+
+/**
  * Calculates the completion time of a routine if started now.
  * @param routine The routine object.
  * @returns A Date object representing when the routine will complete.
  */
 export function getCompletionTime(routine: Routine): Date {
-  const totalDurationInSeconds =
-    routine.swimLanes?.reduce(
-      (total, swimLane) =>
-        total +
-        swimLane.steps.reduce((sum, step) => sum + step.durationInSeconds, 0),
-      0,
-    ) || 0
-
+  const totalDurationInSeconds = getRoutineDurationInSeconds(routine)
   const now = new Date()
   return new Date(now.getTime() + totalDurationInSeconds * 1000)
 }
