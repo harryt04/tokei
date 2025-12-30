@@ -31,17 +31,17 @@ export default function RoutineControls({
           >
             {status === 'running' ? (
               <>
-                <PauseIcon className="mr-2 h-4 w-4" /> Pause
+                <PauseIcon className="mr-2 h-4 w-4" /> Pause Routine
               </>
             ) : (
               <>
-                <PlayIcon className="mr-2 h-4 w-4" /> Resume
+                <PlayIcon className="mr-2 h-4 w-4" /> Resume Routine
               </>
             )}
           </Button>
           <Button variant="destructive" className="w-full" onClick={onStop}>
             <BanIcon className="mr-2 h-4 w-4" />
-            Stop
+            Cancel Routine
           </Button>
         </div>
 

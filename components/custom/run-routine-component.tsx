@@ -39,11 +39,15 @@ export default function RunRoutineComponent({
     stepProgress,
     remainingTimeInSeconds,
     waitTimeRemaining,
+    pausedSteps,
     handlePlayPause,
     handleStop,
     handleManualStart,
     handleSkipStep,
     handleSkipWait,
+    handlePauseStep,
+    handleResumeStep,
+    handleRestartStep,
     shouldShowStartButton,
   } = useRoutineTimer({
     routine,
@@ -140,8 +144,10 @@ export default function RunRoutineComponent({
           onManualStart={handleManualStart}
           onSkipStep={handleSkipStep}
           onSkipWait={handleSkipWait}
-          onPlayPause={handlePlayPause}
-          isPaused={status === 'paused'}
+          onPauseStep={handlePauseStep}
+          onResumeStep={handleResumeStep}
+          onRestartStep={handleRestartStep}
+          pausedSteps={pausedSteps}
           isBlockedByPrepTask={blockedSwimlaneIds.has(swimlane.id)}
         />
       ))}

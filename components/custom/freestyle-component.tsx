@@ -10,7 +10,7 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { PlayIcon, RefreshCwIcon, TrashIcon } from 'lucide-react'
+import { PlayIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
@@ -139,7 +139,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   props.removeTimer(timer.id)
                 }}
               >
-                <TrashIcon />
+                <Trash2Icon />
               </Button>
             </>
           )}

@@ -6,17 +6,17 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react'
-import { PrepTask, Routine, RoutineSwimLane } from '@/models'
+import { PrepTask, Routine } from '@/models'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
 import {
   PlusIcon,
-  Trash2Icon,
   GripVerticalIcon,
   LinkIcon,
   Link2OffIcon,
   SaveIcon,
   CheckIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -30,7 +30,6 @@ import {
 import { Muted } from '../ui/typography'
 import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
-import { Badge } from '../ui/badge'
 
 export type PrepTasksListProps = {
   routine: Routine
@@ -211,10 +210,10 @@ export const PrepTasksList = forwardRef<
                       </Select>
 
                       <Button
-                        variant="ghost"
                         size="icon"
                         onClick={() => handleDeleteTask(task.id)}
-                        className="text-destructive hover:text-destructive"
+                        variant="outline"
+                        className="hover:bg-destructive"
                       >
                         <Trash2Icon className="h-4 w-4" />
                       </Button>

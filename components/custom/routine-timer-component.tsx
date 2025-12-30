@@ -13,7 +13,7 @@ import { Button } from '../ui/button'
 import {
   PlayIcon,
   RefreshCwIcon,
-  TrashIcon,
+  Trash2Icon,
   GripVerticalIcon,
 } from 'lucide-react'
 import { Progress } from '../ui/progress'
@@ -149,12 +149,12 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
             placeholder="Step name"
           />
           <Button
-            variant="ghost"
             size="icon"
-            className="h-7 w-7"
+            variant="outline"
+            className="ml-2 w-14 hover:bg-destructive"
             onClick={() => props.removeStep(step.id)}
           >
-            <TrashIcon className="h-4 w-4" />
+            <Trash2Icon />
           </Button>
         </CardTitle>
       </CardHeader>

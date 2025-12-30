@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
 import { Button } from '../../ui/button'
-import { PlayIcon, PauseIcon, SkipForwardIcon } from 'lucide-react'
+import { PlayIcon, PauseIcon, SkipForwardIcon, RotateCcwIcon } from 'lucide-react'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 
 interface StepCardProps {
@@ -18,7 +18,9 @@ interface StepCardProps {
   showStartButton: boolean
   onManualStart: () => void
   onSkip: () => void
-  onPlayPause: () => void
+  onPauseStep: () => void
+  onResumeStep: () => void
+  onRestartStep: () => void
   isPaused: boolean
   isFirstStep: boolean
 }
@@ -34,14 +36,18 @@ export default function StepCard({
   showStartButton,
   onManualStart,
   onSkip,
-  onPlayPause,
+  onPauseStep,
+  onResumeStep,
+  onRestartStep,
   isPaused,
   isFirstStep,
 }: StepCardProps) {
   // Show skip button for active steps that are in progress or ready to start
   const showSkipButton = isActive && !isCompleted
-  // Show pause button when step is actively running (has progress)
+  // Show pause/resume button when step is actively running (has progress)
   const showPauseButton = isActive && progress > 0 && !isCompleted
+  // Show restart button when step has progress
+  const showRestartButton = isActive && progress > 0 && !isCompleted
 
   return (
     <Card
@@ -87,31 +93,26 @@ export default function StepCard({
             <Progress value={progress} className="h-2" />
             <Muted className="text-xs">
               Remaining: {formatSecondsToHHMMSS(Math.round(remainingTime))}
+              {isPaused && ' (Paused)'}
             </Muted>
           </>
         )}
 
-        <div className="mt-2 flex flex-1 gap-2">
-          {showStartButton && (
-            <Button size="sm" className="flex flex-1" onClick={onManualStart}>
-              <PlayIcon className="mr-2 h-3 w-3" />
-              Start
-            </Button>
-          )}
+        <div className="mt-2 grid grid-cols-2 gap-2">
           {showPauseButton && (
             <Button
               size="sm"
               variant={isPaused ? 'default' : 'outline'}
-              onClick={onPlayPause}
+              onClick={isPaused ? onResumeStep : onPauseStep}
             >
               {isPaused ? (
                 <>
-                  <PlayIcon />
+                  <PlayIcon className="mr-1 h-3 w-3" />
                   Resume
                 </>
               ) : (
                 <>
-                  <PauseIcon />
+                  <PauseIcon className="mr-1 h-3 w-3" />
                   Pause
                 </>
               )}
@@ -120,8 +121,20 @@ export default function StepCard({
 
           {showSkipButton && (
             <Button size="sm" variant="outline" onClick={onSkip}>
-              <SkipForwardIcon />
+              <SkipForwardIcon className="mr-1 h-3 w-3" />
               {progress > 0 ? 'Complete' : 'Skip'}
+            </Button>
+          )}
+
+          {showRestartButton && (
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={onRestartStep}
+              className="col-span-2"
+            >
+              <RotateCcwIcon className="mr-1 h-3 w-3" />
+              Start Over
             </Button>
           )}
         </div>

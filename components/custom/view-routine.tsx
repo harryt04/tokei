@@ -165,24 +165,25 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             </div>
           )}
 
-          {routineRunningState.status !== 'running' && (
-            <div className="flex gap-2">
-              <Button
-                variant="default"
-                onClick={() => setStartDialogOpen(true)}
-              >
-                <PlayIcon />
-                Start
-              </Button>
-              <Button
-                variant="destructive"
-                onClick={() => setDeleteDialogOpen(true)}
-              >
-                <Trash2Icon />
-                Delete
-              </Button>
-            </div>
-          )}
+          {routineRunningState.status !== 'running' &&
+            routineRunningState.status !== 'paused' && (
+              <div className="flex gap-2">
+                <Button
+                  variant="default"
+                  onClick={() => setStartDialogOpen(true)}
+                >
+                  <PlayIcon />
+                  Start
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={() => setDeleteDialogOpen(true)}
+                >
+                  <Trash2Icon />
+                  Delete
+                </Button>
+              </div>
+            )}
         </div>
 
         {updateError && <p className="text-sm text-red-500">{updateError}</p>}

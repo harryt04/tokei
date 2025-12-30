@@ -25,11 +25,15 @@ export type UseRoutineTimerReturn = {
   stepProgress: Record<string, number>
   remainingTimeInSeconds: Record<string, number>
   waitTimeRemaining: Record<string, number>
+  pausedSteps: Set<string>
   handlePlayPause: () => void
   handleStop: () => void
   handleManualStart: (stepId: string) => void
   handleSkipStep: (stepId: string) => void
   handleSkipWait: (swimlaneId: string) => void
+  handlePauseStep: (stepId: string) => void
+  handleResumeStep: (stepId: string) => void
+  handleRestartStep: (stepId: string) => void
   shouldShowStartButton: (step: RoutineStep) => boolean
 }
 
@@ -72,7 +76,15 @@ export function useRoutineTimer({
   const stepTimersRef = useRef<Record<string, NodeJS.Timeout>>({})
   const waitTimersRef = useRef<Record<string, NodeJS.Timeout>>({})
 
+  // Track which steps are individually paused
+  const [pausedSteps, setPausedSteps] = useState<Set<string>>(new Set())
+  const pausedStepsRef = useRef<Set<string>>(new Set())
+
   // Keep refs in sync with state
+  useEffect(() => {
+    pausedStepsRef.current = pausedSteps
+  }, [pausedSteps])
+
   useEffect(() => {
     swimlanesStatusRef.current = swimlanesStatus
   }, [swimlanesStatus])
@@ -284,6 +296,8 @@ export function useRoutineTimer({
 
     const timerId = setInterval(() => {
       if (statusRef.current !== 'running') return
+      // Check if this specific step is paused
+      if (pausedStepsRef.current.has(step.id)) return
 
       setStepProgress((prev) => {
         const currentProgress = prev[step.id] || 0
@@ -587,6 +601,95 @@ export function useRoutineTimer({
     [routine],
   )
 
+  /**
+   * Pause a specific step's timer without affecting other steps.
+   */
+  const handlePauseStep = useCallback((stepId: string) => {
+    setPausedSteps((prev) => {
+      const next = new Set(prev)
+      next.add(stepId)
+      pausedStepsRef.current = next
+      return next
+    })
+
+    toast({
+      title: 'Step paused',
+      description: 'Timer paused for this step.',
+    })
+  }, [])
+
+  /**
+   * Resume a paused step's timer.
+   */
+  const handleResumeStep = useCallback((stepId: string) => {
+    setPausedSteps((prev) => {
+      const next = new Set(prev)
+      next.delete(stepId)
+      pausedStepsRef.current = next
+      return next
+    })
+
+    toast({
+      title: 'Step resumed',
+      description: 'Timer resumed for this step.',
+    })
+  }, [])
+
+  /**
+   * Restart a step from the beginning.
+   */
+  const handleRestartStep = useCallback(
+    (stepId: string) => {
+      let targetStep: RoutineStep | undefined
+
+      for (const swimlane of routine.swimLanes || []) {
+        const step = swimlane.steps.find((s) => s.id === stepId)
+        if (step) {
+          targetStep = step
+          break
+        }
+      }
+
+      if (!targetStep) return
+
+      // Clear any existing timer for this step
+      if (stepTimersRef.current[stepId]) {
+        clearInterval(stepTimersRef.current[stepId])
+        delete stepTimersRef.current[stepId]
+      }
+
+      // Remove from paused steps if it was paused
+      setPausedSteps((prev) => {
+        const next = new Set(prev)
+        next.delete(stepId)
+        pausedStepsRef.current = next
+        return next
+      })
+
+      // Reset progress to 0
+      setStepProgress((prev) => {
+        const newProgress = { ...prev, [stepId]: 0 }
+        stepProgressRef.current = newProgress
+        return newProgress
+      })
+
+      // Reset remaining time
+      setRemainingTimeInSeconds((prev) => ({
+        ...prev,
+        [stepId]: targetStep!.durationInSeconds,
+      }))
+
+      // Start the timer again
+      startStepTimer(targetStep)
+
+      toast({
+        title: 'Step restarted',
+        description: `"${targetStep.name}" started over.`,
+      })
+    },
+    [routine],
+  )
+
   const shouldShowStartButton = useCallback(
     (step: RoutineStep): boolean => {
       const swimlaneStatus = swimlanesStatus[step.swimLaneId]
@@ -615,11 +718,15 @@ export function useRoutineTimer({
     stepProgress,
     remainingTimeInSeconds,
     waitTimeRemaining,
+    pausedSteps,
     handlePlayPause,
     handleStop,
     handleManualStart,
     handleSkipStep,
     handleSkipWait,
+    handlePauseStep,
+    handleResumeStep,
+    handleRestartStep,
     shouldShowStartButton,
   }
 }
