@@ -166,7 +166,7 @@ export const PrepTasksList = forwardRef<
                           handleUpdateTask(task.id, { name: e.target.value })
                         }
                         placeholder="Task name (e.g., Grate cheese)"
-                        className="flex-1"
+                        className="flex-[2]"
                       />
 
                       <Select
@@ -178,7 +178,7 @@ export const PrepTasksList = forwardRef<
                           })
                         }
                       >
-                        <SelectTrigger className="w-48">
+                        <SelectTrigger className="flex-[1]">
                           <SelectValue placeholder="Complete before..." />
                         </SelectTrigger>
                         <SelectContent>
