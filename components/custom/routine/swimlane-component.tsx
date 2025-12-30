@@ -71,7 +71,9 @@ export default function SwimlaneComponent({
               waitTime={waitTimeRemaining}
               totalWaitTime={status?.waitTimeInSeconds || 0}
               isBlockedByPrepTask={isBlockedByPrepTask}
-              onSkip={isBlockedByPrepTask ? undefined : () => onSkipWait(swimlane.id)}
+              onSkip={
+                isBlockedByPrepTask ? undefined : () => onSkipWait(swimlane.id)
+              }
             />
           )}
 

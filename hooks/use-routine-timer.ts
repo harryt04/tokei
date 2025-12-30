@@ -55,7 +55,9 @@ export function useRoutineTimer({
   const statusRef = useRef<RoutineStatus>(initialStatus)
 
   // Blocked swimlanes ref to avoid stale closures
-  const blockedSwimlaneIdsRef = useRef<Set<string>>(blockedSwimlaneIds || new Set())
+  const blockedSwimlaneIdsRef = useRef<Set<string>>(
+    blockedSwimlaneIds || new Set(),
+  )
 
   // Swimlane status state
   const [swimlanesStatus, setSwimlanesStatus] = useState<
