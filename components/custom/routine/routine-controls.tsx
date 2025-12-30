@@ -37,7 +37,7 @@ export default function RoutineControls({
 
       <div className="flex gap-2">
         <Button
-          variant={status === 'running' ? 'outline' : 'default'}
+          variant="default"
           onClick={onPlayPause}
           size="sm"
           className="flex-1 sm:flex-none"

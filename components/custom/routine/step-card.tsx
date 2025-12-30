@@ -103,9 +103,9 @@ export default function StepCard({
           </>
         )}
 
-        <div className="mt-2 grid grid-cols-2 gap-2">
+        <div className="mt-2 flex flex-col gap-2">
           {showStartButton && (
-            <Button size="sm" className="flex flex-1" onClick={onManualStart}>
+            <Button size="sm" className="w-full" onClick={onManualStart}>
               <PlayIcon className="mr-2 h-3 w-3" />
               Start
             </Button>
@@ -113,8 +113,9 @@ export default function StepCard({
           {showPauseButton && (
             <Button
               size="sm"
-              variant={isPaused ? 'default' : 'outline'}
+              variant="secondary"
               onClick={isPaused ? onResumeStep : onPauseStep}
+              className="w-full"
             >
               {isPaused ? (
                 <>
@@ -131,7 +132,12 @@ export default function StepCard({
           )}
 
           {showSkipButton && (
-            <Button size="sm" variant="outline" onClick={onSkip}>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={onSkip}
+              className="w-full"
+            >
               <SkipForwardIcon className="mr-1 h-3 w-3" />
               {progress > 0 ? 'Complete' : 'Skip'}
             </Button>
@@ -140,9 +146,9 @@ export default function StepCard({
           {showRestartButton && (
             <Button
               size="sm"
-              variant="ghost"
+              variant="outline"
               onClick={onRestartStep}
-              className="col-span-2"
+              className="w-full hover:bg-destructive"
             >
               <RotateCcwIcon className="mr-1 h-3 w-3" />
               Start Over
