@@ -337,6 +337,9 @@ export function useRoutineTimer({
       return newStatus
     })
 
+    // Always recalculate wait times when a step completes - other swimlanes may start earlier
+    recalculateWaitTimes()
+
     if (nextStepIndex < swimlane.steps.length) {
       // Start next step
       const nextStep = swimlane.steps[nextStepIndex]
@@ -388,6 +391,93 @@ export function useRoutineTimer({
         setStatus('stopped')
       }
     }
+  }
+
+  /**
+   * Recalculate wait times for all waiting swimlanes based on current progress.
+   * Called when a step completes or is skipped, to start waiting swimlanes earlier.
+   */
+  const recalculateWaitTimes = () => {
+    if (!routine.swimLanes) return
+
+    // Calculate remaining STEP time for each swimlane (excluding wait times)
+    // This tells us how long each swimlane needs from when it starts/resumes
+    const stepsRemainingTimes: Record<string, number> = {}
+
+    routine.swimLanes.forEach((sl) => {
+      const slStatus = swimlanesStatusRef.current[sl.id]
+      if (!slStatus) return
+
+      if (slStatus.currentStepIndex >= sl.steps.length) {
+        // This swimlane is complete
+        stepsRemainingTimes[sl.id] = 0
+      } else if (slStatus.isWaiting) {
+        // Still waiting - all steps remain
+        const stepsRemaining = sl.steps.reduce(
+          (sum, step) => sum + step.durationInSeconds,
+          0,
+        )
+        stepsRemainingTimes[sl.id] = stepsRemaining
+      } else {
+        // In progress - calculate remaining time from current step onwards
+        let remaining = 0
+        for (let i = slStatus.currentStepIndex; i < sl.steps.length; i++) {
+          const step = sl.steps[i]
+          if (i === slStatus.currentStepIndex) {
+            // Current step - use remaining time based on progress
+            const progress = stepProgressRef.current[step.id] || 0
+            remaining += step.durationInSeconds * (1 - progress / 100)
+          } else {
+            remaining += step.durationInSeconds
+          }
+        }
+        stepsRemainingTimes[sl.id] = remaining
+      }
+    })
+
+    // Find the longest remaining steps time (this is what everything needs to align to)
+    const maxStepsRemaining = Math.max(...Object.values(stepsRemainingTimes))
+
+    // Adjust wait times for waiting swimlanes
+    routine.swimLanes.forEach((sl) => {
+      const slStatus = swimlanesStatusRef.current[sl.id]
+      if (!slStatus?.isWaiting) return
+
+      const thisSwimlanesSteps = stepsRemainingTimes[sl.id] || 0
+      const newWaitTime = Math.max(0, maxStepsRemaining - thisSwimlanesSteps)
+      const currentWaitRemaining = waitTimeRemainingRef.current[sl.id] || 0
+
+      // Only adjust if the new wait time is shorter
+      if (newWaitTime < currentWaitRemaining) {
+        if (newWaitTime <= 0) {
+          // Should start now! Skip the wait
+          if (waitTimersRef.current[sl.id]) {
+            clearInterval(waitTimersRef.current[sl.id])
+            delete waitTimersRef.current[sl.id]
+          }
+
+          setWaitTimeRemaining((prev) => {
+            const updated = { ...prev, [sl.id]: 0 }
+            waitTimeRemainingRef.current = updated
+            return updated
+          })
+
+          onWaitComplete(sl)
+
+          toast({
+            title: 'Starting early',
+            description: `"${sl.name}" can now start.`,
+          })
+        } else {
+          // Reduce wait time
+          setWaitTimeRemaining((prev) => {
+            const updated = { ...prev, [sl.id]: newWaitTime }
+            waitTimeRemainingRef.current = updated
+            return updated
+          })
+        }
+      }
+    })
   }
 
   // Public control handlers
