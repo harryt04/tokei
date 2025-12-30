@@ -19,7 +19,7 @@ import { UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
-import { ThemeSwitcher } from './custom/themeSwitcher'
+import { ThemeSwitcher } from './custom/theme-switcher'
 import { Badge } from './ui/badge'
 
 // Menu items.

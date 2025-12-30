@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
 import { Button } from '../../ui/button'
-import { PlayIcon } from 'lucide-react'
+import { PlayIcon, SkipForwardIcon } from 'lucide-react'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 
 interface StepCardProps {
@@ -17,6 +17,7 @@ interface StepCardProps {
   remainingTime: number
   showStartButton: boolean
   onManualStart: () => void
+  onSkip: () => void
   isFirstStep: boolean
 }
 
@@ -30,8 +31,12 @@ export default function StepCard({
   remainingTime,
   showStartButton,
   onManualStart,
+  onSkip,
   isFirstStep,
 }: StepCardProps) {
+  // Show skip button for active steps that are in progress or ready to start
+  const showSkipButton = isActive && !isCompleted
+
   return (
     <Card
       className={`min-w-[250px] transition-shadow ${
@@ -80,12 +85,26 @@ export default function StepCard({
           </>
         )}
 
-        {showStartButton && (
-          <Button size="sm" className="mt-2 w-full" onClick={onManualStart}>
-            <PlayIcon className="mr-2 h-3 w-3" />
-            Start
-          </Button>
-        )}
+        <div className="flex gap-2">
+          {showStartButton && (
+            <Button size="sm" className="mt-2 flex-1" onClick={onManualStart}>
+              <PlayIcon className="mr-2 h-3 w-3" />
+              Start
+            </Button>
+          )}
+
+          {showSkipButton && (
+            <Button
+              size="sm"
+              variant="outline"
+              className="mt-2 flex-1"
+              onClick={onSkip}
+            >
+              <SkipForwardIcon className="mr-2 h-3 w-3" />
+              {progress > 0 ? 'Complete' : 'Skip'}
+            </Button>
+          )}
+        </div>
       </CardContent>
     </Card>
   )

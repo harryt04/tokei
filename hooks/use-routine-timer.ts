@@ -28,6 +28,8 @@ export type UseRoutineTimerReturn = {
   handlePlayPause: () => void
   handleStop: () => void
   handleManualStart: (stepId: string) => void
+  handleSkipStep: (stepId: string) => void
+  handleSkipWait: (swimlaneId: string) => void
   shouldShowStartButton: (step: RoutineStep) => boolean
 }
 
@@ -417,6 +419,84 @@ export function useRoutineTimer({
     [routine],
   )
 
+  /**
+   * Skip the current step and move to the next one.
+   * Useful when a step has already been completed before starting the routine.
+   */
+  const handleSkipStep = useCallback(
+    (stepId: string) => {
+      let targetStep: RoutineStep | undefined
+
+      for (const swimlane of routine.swimLanes || []) {
+        const step = swimlane.steps.find((s) => s.id === stepId)
+        if (step) {
+          targetStep = step
+          break
+        }
+      }
+
+      if (!targetStep) return
+
+      // Clear any existing timer for this step
+      if (stepTimersRef.current[stepId]) {
+        clearInterval(stepTimersRef.current[stepId])
+        delete stepTimersRef.current[stepId]
+      }
+
+      // Mark step as complete (100% progress)
+      setStepProgress((prev) => {
+        const newProgress = { ...prev, [stepId]: 100 }
+        stepProgressRef.current = newProgress
+        return newProgress
+      })
+
+      // Trigger the step complete logic
+      onStepComplete(targetStep)
+
+      toast({
+        title: 'Step skipped',
+        description: `"${targetStep.name}" marked as complete.`,
+      })
+    },
+    [routine],
+  )
+
+  /**
+   * Skip the waiting period for a swimlane and start its first step immediately.
+   * Useful when you've already completed pre-routine work.
+   */
+  const handleSkipWait = useCallback(
+    (swimlaneId: string) => {
+      const swimlane = routine.swimLanes?.find((sl) => sl.id === swimlaneId)
+      if (!swimlane) return
+
+      const currentStatus = swimlanesStatusRef.current[swimlaneId]
+      if (!currentStatus?.isWaiting) return
+
+      // Clear the wait timer
+      if (waitTimersRef.current[swimlaneId]) {
+        clearInterval(waitTimersRef.current[swimlaneId])
+        delete waitTimersRef.current[swimlaneId]
+      }
+
+      // Set wait time to 0
+      setWaitTimeRemaining((prev) => {
+        const updated = { ...prev, [swimlaneId]: 0 }
+        waitTimeRemainingRef.current = updated
+        return updated
+      })
+
+      // Trigger wait complete logic
+      onWaitComplete(swimlane)
+
+      toast({
+        title: 'Wait skipped',
+        description: `Starting "${swimlane.name}" now.`,
+      })
+    },
+    [routine],
+  )
+
   const shouldShowStartButton = useCallback(
     (step: RoutineStep): boolean => {
       const swimlaneStatus = swimlanesStatus[step.swimLaneId]
@@ -448,6 +528,8 @@ export function useRoutineTimer({
     handlePlayPause,
     handleStop,
     handleManualStart,
+    handleSkipStep,
+    handleSkipWait,
     shouldShowStartButton,
   }
 }

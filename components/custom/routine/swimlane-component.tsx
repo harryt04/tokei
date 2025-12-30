@@ -2,8 +2,8 @@ import React from 'react'
 import { RoutineStep, RoutineSwimLane } from '@/models'
 import { H4 } from '../../ui/typography'
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area'
-import WaitingCard from './WaitingCard'
-import StepCard from './StepCard'
+import WaitingCard from './waiting-card'
+import StepCard from './step-card'
 import { Badge } from '../../ui/badge'
 import { AlertCircleIcon } from 'lucide-react'
 
@@ -21,6 +21,8 @@ interface SwimlaneComponentProps {
   remainingTimeInSeconds: Record<string, number>
   shouldShowStartButton: (step: RoutineStep) => boolean
   onManualStart: (stepId: string) => void
+  onSkipStep: (stepId: string) => void
+  onSkipWait: (swimlaneId: string) => void
   isBlockedByPrepTask?: boolean
 }
 
@@ -32,6 +34,8 @@ export default function SwimlaneComponent({
   remainingTimeInSeconds,
   shouldShowStartButton,
   onManualStart,
+  onSkipStep,
+  onSkipWait,
   isBlockedByPrepTask = false,
 }: SwimlaneComponentProps) {
   const isWaiting = status?.isWaiting
@@ -58,6 +62,7 @@ export default function SwimlaneComponent({
             <WaitingCard
               waitTime={waitTimeRemaining}
               totalWaitTime={status?.waitTimeInSeconds || 0}
+              onSkip={() => onSkipWait(swimlane.id)}
             />
           )}
 
@@ -81,6 +86,7 @@ export default function SwimlaneComponent({
               }
               showStartButton={shouldShowStartButton(step)}
               onManualStart={() => onManualStart(step.id)}
+              onSkip={() => onSkipStep(step.id)}
               isFirstStep={index === 0}
             />
           ))}

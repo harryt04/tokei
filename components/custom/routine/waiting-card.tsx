@@ -1,18 +1,21 @@
 import React from 'react'
-import { TimerIcon } from 'lucide-react'
+import { TimerIcon, SkipForwardIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
+import { Button } from '../../ui/button'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 
 interface WaitingCardProps {
   waitTime: number
   totalWaitTime: number
+  onSkip?: () => void
 }
 
 export default function WaitingCard({
   waitTime,
   totalWaitTime,
+  onSkip,
 }: WaitingCardProps) {
   return (
     <Card className="min-w-[250px] border-amber-400 bg-amber-50 dark:bg-amber-900/20">
@@ -31,6 +34,17 @@ export default function WaitingCard({
         <Muted className="text-center text-sm font-semibold">
           {formatSecondsToHHMMSS(Math.round(waitTime))}
         </Muted>
+        {onSkip && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="mt-2 w-full"
+            onClick={onSkip}
+          >
+            <SkipForwardIcon className="mr-2 h-3 w-3" />
+            Start Now
+          </Button>
+        )}
       </CardContent>
     </Card>
   )

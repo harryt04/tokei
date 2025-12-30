@@ -3,8 +3,8 @@ import { Routine } from '@/models'
 import React, { useState, useMemo } from 'react'
 import { H4 } from '../ui/typography'
 import { Button } from '../ui/button'
-import RoutineControls from './routine/RoutineControls'
-import SwimlaneComponent from './routine/SwimlaneComponent'
+import RoutineControls from './routine/routine-controls'
+import SwimlaneComponent from './routine/swimlane-component'
 import { PrepTasksChecklist } from './prep-tasks-checklist'
 import { RoutineNotes } from './routine-notes'
 import { useRoutineTimer } from '@/hooks/use-routine-timer'
@@ -42,6 +42,8 @@ export default function RunRoutineComponent({
     handlePlayPause,
     handleStop,
     handleManualStart,
+    handleSkipStep,
+    handleSkipWait,
     shouldShowStartButton,
   } = useRoutineTimer({
     routine,
@@ -136,6 +138,8 @@ export default function RunRoutineComponent({
           remainingTimeInSeconds={remainingTimeInSeconds}
           shouldShowStartButton={shouldShowStartButton}
           onManualStart={handleManualStart}
+          onSkipStep={handleSkipStep}
+          onSkipWait={handleSkipWait}
           isBlockedByPrepTask={blockedSwimlaneIds.has(swimlane.id)}
         />
       ))}

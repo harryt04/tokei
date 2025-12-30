@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ThemeSwitcher } from './themeSwitcher'
+import { ThemeSwitcher } from './theme-switcher'
 import { Button } from '../ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Github, Timer } from 'lucide-react' // Assuming lucide-react for icons
