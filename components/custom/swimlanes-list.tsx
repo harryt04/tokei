@@ -1,6 +1,13 @@
 'use client'
 import { Routine, RoutineStep, RoutineSwimLane } from '@/models'
-import React, { useState, useEffect, useRef, useLayoutEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useLayoutEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react'
 import { H4, Muted } from '../ui/typography'
 import { NoResultsComponent } from './no-results-component'
 import {
@@ -23,7 +30,16 @@ import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 export type SwimlanesListProps = {
   routine: Routine
 }
-export function SwimlanesList(props: SwimlanesListProps) {
+
+export type SwimlanesListHandle = {
+  saveIfDirty: () => Promise<void>
+  hasUnsavedChanges: () => boolean
+}
+
+export const SwimlanesList = forwardRef<
+  SwimlanesListHandle,
+  SwimlanesListProps
+>(function SwimlanesList(props, ref) {
   const [swimLanes, setSwimLanes] = useState<RoutineSwimLane[]>(
     props.routine.swimLanes ?? [],
   )
@@ -43,6 +59,16 @@ export function SwimlanesList(props: SwimlanesListProps) {
       JSON.stringify(swimLanes) !== JSON.stringify(props.routine.swimLanes),
     )
   }, [swimLanes, props.routine.swimLanes])
+
+  // Expose imperative methods for parent component
+  useImperativeHandle(ref, () => ({
+    saveIfDirty: async () => {
+      if (hasChanges && !isSaving) {
+        await handleSaveToDatabase()
+      }
+    },
+    hasUnsavedChanges: () => hasChanges,
+  }))
 
   const handleEdit = (swimLane: RoutineSwimLane) => {
     setEditingId(swimLane.id)
@@ -67,6 +93,7 @@ export function SwimlanesList(props: SwimlanesListProps) {
   }
 
   const handleSaveToDatabase = async () => {
+    if (isSaving) return
     setIsSaving(true)
     try {
       await updateRoutine(props.routine._id, {
@@ -362,4 +389,4 @@ export function SwimlanesList(props: SwimlanesListProps) {
       </div>
     </DragDropContext>
   )
-}
+})

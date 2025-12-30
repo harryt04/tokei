@@ -1,6 +1,11 @@
 'use client'
 
-import React, { useState, useEffect } from 'react'
+import React, {
+  useState,
+  useEffect,
+  useImperativeHandle,
+  forwardRef,
+} from 'react'
 import { PrepTask, Routine, RoutineSwimLane } from '@/models'
 import { Button } from '../ui/button'
 import { Input } from '../ui/input'
@@ -29,7 +34,15 @@ export type PrepTasksListProps = {
   routine: Routine
 }
 
-export function PrepTasksList({ routine }: PrepTasksListProps) {
+export type PrepTasksListHandle = {
+  saveIfDirty: () => Promise<void>
+  hasUnsavedChanges: () => boolean
+}
+
+export const PrepTasksList = forwardRef<
+  PrepTasksListHandle,
+  PrepTasksListProps
+>(function PrepTasksList({ routine }, ref) {
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>(
     routine.prepTasks ?? [],
   )
@@ -44,6 +57,16 @@ export function PrepTasksList({ routine }: PrepTasksListProps) {
     )
   }, [prepTasks, routine.prepTasks])
 
+  // Expose imperative methods for parent component
+  useImperativeHandle(ref, () => ({
+    saveIfDirty: async () => {
+      if (hasChanges && !isSaving) {
+        await handleSave()
+      }
+    },
+    hasUnsavedChanges: () => hasChanges,
+  }))
+
   const handleAddTask = () => {
     const newTask: PrepTask = {
       id: uuidv4(),
@@ -51,7 +74,6 @@ export function PrepTasksList({ routine }: PrepTasksListProps) {
     }
     setPrepTasks([...prepTasks, newTask])
   }
-
   const handleUpdateTask = (id: string, updates: Partial<PrepTask>) => {
     setPrepTasks((prev) =>
       prev.map((task) => (task.id === id ? { ...task, ...updates } : task)),
@@ -73,6 +95,7 @@ export function PrepTasksList({ routine }: PrepTasksListProps) {
   }
 
   const handleSave = async () => {
+    if (isSaving) return
     setIsSaving(true)
     try {
       // Filter out empty tasks
@@ -208,4 +231,4 @@ export function PrepTasksList({ routine }: PrepTasksListProps) {
       </div>
     </div>
   )
-}
+})

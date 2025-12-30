@@ -10,8 +10,8 @@ import Link from 'next/link'
 import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
 import { H4 } from '../ui/typography'
-import { SwimlanesList } from './swimlanes-list'
-import { PrepTasksList } from './prep-tasks-list'
+import { SwimlanesList, SwimlanesListHandle } from './swimlanes-list'
+import { PrepTasksList, PrepTasksListHandle } from './prep-tasks-list'
 import { RoutineNotes } from './routine-notes'
 import StartRoutineDialog, { StartMode } from './start-routine-dialog'
 import { getDateGivenTimeOfDay, getCompletionTime } from '@/lib/utils'
@@ -38,11 +38,31 @@ export default function ViewRoutine(props: ViewRoutineProps) {
     useState<RoutineRunningState>({ status: '' })
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [startDialogOpen, setStartDialogOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState('swimlanes')
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
+  const swimlanesListRef = useRef<SwimlanesListHandle>(null)
+  const prepTasksListRef = useRef<PrepTasksListHandle>(null)
   const router = useRouter()
 
   // Initialize useRoutines with the current routine
   const { updateRoutine, deleteRoutine } = useRoutines([routine])
+
+  // Handle tab change - save any unsaved changes before switching
+  const handleTabChange = async (newTab: string) => {
+    // Save current tab's changes before switching
+    if (
+      activeTab === 'swimlanes' &&
+      swimlanesListRef.current?.hasUnsavedChanges()
+    ) {
+      await swimlanesListRef.current.saveIfDirty()
+    } else if (
+      activeTab === 'prep' &&
+      prepTasksListRef.current?.hasUnsavedChanges()
+    ) {
+      await prepTasksListRef.current.saveIfDirty()
+    }
+    setActiveTab(newTab)
+  }
 
   const handleNameChange = (newName: string) => {
     setName(newName)
@@ -166,7 +186,11 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
       {routineRunningState.status === '' && (
         <div className="p-4">
-          <Tabs defaultValue="swimlanes" className="w-full">
+          <Tabs
+            value={activeTab}
+            onValueChange={handleTabChange}
+            className="w-full"
+          >
             <TabsList className="grid w-full grid-cols-3">
               <TabsTrigger value="swimlanes">Swimlanes</TabsTrigger>
               <TabsTrigger value="prep">
@@ -181,11 +205,11 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             </TabsList>
 
             <TabsContent value="swimlanes" className="mt-4">
-              <SwimlanesList routine={routine} />
+              <SwimlanesList ref={swimlanesListRef} routine={routine} />
             </TabsContent>
 
             <TabsContent value="prep" className="mt-4">
-              <PrepTasksList routine={routine} />
+              <PrepTasksList ref={prepTasksListRef} routine={routine} />
             </TabsContent>
 
             <TabsContent value="notes" className="mt-4">
