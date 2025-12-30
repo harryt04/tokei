@@ -2,10 +2,19 @@ export type RoutineInput = {
   name: string
 }
 
+export type PrepTask = {
+  id: string
+  name: string
+  // Optional: this prep task must be completed before this swimlane can start
+  mustCompleteBeforeSwimlaneId?: string
+}
+
 export type Routine = RoutineInput & {
   _id: string
   userId: string
   swimLanes?: RoutineSwimLane[]
+  prepTasks?: PrepTask[]
+  notes?: string
   syncConfig?: SwimLaneSyncConfig // Configuration for swimlane synchronization
 }
 

@@ -11,10 +11,13 @@ import ConfirmationDialog from './confirmation-dialog'
 import { Input } from '../ui/input'
 import { H4 } from '../ui/typography'
 import { SwimlanesList } from './swimlanes-list'
+import { PrepTasksList } from './prep-tasks-list'
+import { RoutineNotes } from './routine-notes'
 import StartRoutineDialog, { StartMode } from './start-routine-dialog'
 import { getDateGivenTimeOfDay, getCompletionTime } from '@/lib/utils'
 import RunRoutineComponent from './run-routine-component'
 import { toast } from '../ui/use-toast'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
 export type ViewRoutineProps = {
   routine: Routine
@@ -163,10 +166,32 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
       {routineRunningState.status === '' && (
         <div className="p-4">
-          <H4>Swimlanes</H4>
-          <Separator className="mt-2" />
+          <Tabs defaultValue="swimlanes" className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="swimlanes">Swimlanes</TabsTrigger>
+              <TabsTrigger value="prep">
+                Prep Tasks
+                {routine.prepTasks && routine.prepTasks.length > 0 && (
+                  <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-xs">
+                    {routine.prepTasks.length}
+                  </span>
+                )}
+              </TabsTrigger>
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+            </TabsList>
 
-          <SwimlanesList routine={routine} />
+            <TabsContent value="swimlanes" className="mt-4">
+              <SwimlanesList routine={routine} />
+            </TabsContent>
+
+            <TabsContent value="prep" className="mt-4">
+              <PrepTasksList routine={routine} />
+            </TabsContent>
+
+            <TabsContent value="notes" className="mt-4">
+              <RoutineNotes routine={routine} />
+            </TabsContent>
+          </Tabs>
         </div>
       )}
 

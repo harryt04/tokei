@@ -4,6 +4,8 @@ import { H4 } from '../../ui/typography'
 import { ScrollArea, ScrollBar } from '../../ui/scroll-area'
 import WaitingCard from './WaitingCard'
 import StepCard from './StepCard'
+import { Badge } from '../../ui/badge'
+import { AlertCircleIcon } from 'lucide-react'
 
 interface SwimlaneComponentProps {
   swimlane: RoutineSwimLane
@@ -19,6 +21,7 @@ interface SwimlaneComponentProps {
   remainingTimeInSeconds: Record<string, number>
   shouldShowStartButton: (step: RoutineStep) => boolean
   onManualStart: (stepId: string) => void
+  isBlockedByPrepTask?: boolean
 }
 
 export default function SwimlaneComponent({
@@ -29,13 +32,25 @@ export default function SwimlaneComponent({
   remainingTimeInSeconds,
   shouldShowStartButton,
   onManualStart,
+  isBlockedByPrepTask = false,
 }: SwimlaneComponentProps) {
   const isWaiting = status?.isWaiting
   const currentStepIndex = status?.currentStepIndex || 0
 
   return (
     <div className="mt-4">
-      <H4>{swimlane.name}</H4>
+      <div className="flex items-center gap-2">
+        <H4>{swimlane.name}</H4>
+        {isBlockedByPrepTask && (
+          <Badge
+            variant="outline"
+            className="border-amber-500 bg-amber-50 text-amber-700 dark:bg-amber-950 dark:text-amber-400"
+          >
+            <AlertCircleIcon className="mr-1 h-3 w-3" />
+            Waiting for prep task
+          </Badge>
+        )}
+      </div>
 
       <ScrollArea className="mt-2 h-auto w-full">
         <div className="flex w-full gap-4 p-4">
