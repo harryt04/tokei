@@ -168,64 +168,78 @@ export const PrepTasksList = forwardRef<
                     <div
                       ref={provided.innerRef}
                       {...provided.draggableProps}
-                      className={`flex items-center gap-2 rounded-md border bg-card p-2 ${
+                      className={`rounded-md border bg-card p-2 sm:p-3 ${
                         snapshot.isDragging ? 'shadow-lg' : ''
                       }`}
                     >
-                      <div
-                        {...provided.dragHandleProps}
-                        className="cursor-grab text-muted-foreground"
-                      >
-                        <GripVerticalIcon className="h-4 w-4" />
+                      {/* Mobile: vertical stack, Desktop: horizontal row */}
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                        {/* Drag handle + Task name row */}
+                        <div className="flex items-center gap-2 sm:flex-1">
+                          <div
+                            {...provided.dragHandleProps}
+                            className="cursor-grab touch-none text-muted-foreground"
+                          >
+                            <GripVerticalIcon className="h-5 w-5 sm:h-4 sm:w-4" />
+                          </div>
+
+                          <Input
+                            value={task.name}
+                            onChange={(e) =>
+                              handleUpdateTask(task.id, {
+                                name: e.target.value,
+                              })
+                            }
+                            placeholder="Task name (e.g., Grate cheese)"
+                            className="flex-1 text-base"
+                          />
+                        </div>
+
+                        {/* Select + Delete row on mobile */}
+                        <div className="flex items-center gap-2 pl-7 sm:pl-0">
+                          <Select
+                            value={task.mustCompleteBeforeSwimlaneId ?? 'none'}
+                            onValueChange={(value) =>
+                              handleUpdateTask(task.id, {
+                                mustCompleteBeforeSwimlaneId:
+                                  value === 'none' ? undefined : value,
+                              })
+                            }
+                          >
+                            <SelectTrigger className="w-full sm:w-[180px]">
+                              <SelectValue placeholder="Complete before..." />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">
+                                <span className="flex items-center gap-2">
+                                  <Link2OffIcon className="h-3 w-3" />
+                                  No dependency
+                                </span>
+                              </SelectItem>
+                              {routine.swimLanes?.map((swimlane) => (
+                                <SelectItem
+                                  key={swimlane.id}
+                                  value={swimlane.id}
+                                >
+                                  <span className="flex items-center gap-2">
+                                    <LinkIcon className="h-3 w-3" />
+                                    Before: {swimlane.name}
+                                  </span>
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+
+                          <Button
+                            size="icon"
+                            onClick={() => handleDeleteTask(task.id)}
+                            variant="outline"
+                            className="shrink-0 hover:bg-destructive"
+                          >
+                            <Trash2Icon className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
-
-                      <Input
-                        value={task.name}
-                        onChange={(e) =>
-                          handleUpdateTask(task.id, { name: e.target.value })
-                        }
-                        placeholder="Task name (e.g., Grate cheese)"
-                        className="flex-[2]"
-                      />
-
-                      <Select
-                        value={task.mustCompleteBeforeSwimlaneId ?? 'none'}
-                        onValueChange={(value) =>
-                          handleUpdateTask(task.id, {
-                            mustCompleteBeforeSwimlaneId:
-                              value === 'none' ? undefined : value,
-                          })
-                        }
-                      >
-                        <SelectTrigger className="flex-[1]">
-                          <SelectValue placeholder="Complete before..." />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="none">
-                            <span className="flex items-center gap-2">
-                              <Link2OffIcon className="h-3 w-3" />
-                              No dependency
-                            </span>
-                          </SelectItem>
-                          {routine.swimLanes?.map((swimlane) => (
-                            <SelectItem key={swimlane.id} value={swimlane.id}>
-                              <span className="flex items-center gap-2">
-                                <LinkIcon className="h-3 w-3" />
-                                Before: {swimlane.name}
-                              </span>
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-
-                      <Button
-                        size="icon"
-                        onClick={() => handleDeleteTask(task.id)}
-                        variant="outline"
-                        className="hover:bg-destructive"
-                      >
-                        <Trash2Icon className="h-4 w-4" />
-                      </Button>
                     </div>
                   )}
                 </Draggable>
@@ -236,8 +250,13 @@ export const PrepTasksList = forwardRef<
         </Droppable>
       </DragDropContext>
 
-      <div className="flex items-center justify-between">
-        <Button variant="outline" size="sm" onClick={handleAddTask}>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleAddTask}
+          className="w-full sm:w-auto"
+        >
           <PlusIcon className="mr-2 h-4 w-4" />
           Add Prep Task
         </Button>
@@ -246,6 +265,7 @@ export const PrepTasksList = forwardRef<
           onClick={handleSave}
           disabled={!hasChanges || isSaving}
           size="sm"
+          className="w-full sm:w-auto"
         >
           {isSaving ? (
             <span className="animate-pulse">Saving...</span>

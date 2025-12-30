@@ -164,9 +164,7 @@ export default function StartRoutineDialog({
           >
             Cancel
           </Button>
-          <Button onClick={handleStartRoutine}>
-            {startMode === 'now' ? 'View' : 'Start'} Routine
-          </Button>
+          <Button onClick={handleStartRoutine}>Start Routine</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

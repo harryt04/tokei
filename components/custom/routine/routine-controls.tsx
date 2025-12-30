@@ -19,37 +19,50 @@ export default function RoutineControls({
   onStop,
 }: RoutineControlsProps) {
   return (
-    <div className="flex items-center justify-between">
-      <H4>Running: {routineName}</H4>
-
-      <div className="flex flex-col gap-2">
-        <div className="grid grid-cols-2 gap-2">
-          <Button
-            variant={status === 'running' ? 'outline' : 'default'}
-            onClick={onPlayPause}
-            className="w-full"
-          >
-            {status === 'running' ? (
-              <>
-                <PauseIcon className="mr-2 h-4 w-4" /> Pause Routine
-              </>
-            ) : (
-              <>
-                <PlayIcon className="mr-2 h-4 w-4" /> Resume Routine
-              </>
-            )}
-          </Button>
-          <Button variant="destructive" className="w-full" onClick={onStop}>
-            <BanIcon className="mr-2 h-4 w-4" />
-            Cancel Routine
-          </Button>
-        </div>
-
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0 flex-1">
+        <H4 className="truncate text-base sm:text-lg">
+          Running: {routineName}
+        </H4>
         {endTime && (
-          <Muted className="text-right">
-            Estimated time of completion: {endTime.toLocaleTimeString()}
+          <Muted className="text-xs sm:text-sm">
+            ETC:{' '}
+            {endTime.toLocaleTimeString([], {
+              hour: 'numeric',
+              minute: '2-digit',
+            })}
           </Muted>
         )}
+      </div>
+
+      <div className="flex gap-2">
+        <Button
+          variant={status === 'running' ? 'outline' : 'default'}
+          onClick={onPlayPause}
+          size="sm"
+          className="flex-1 sm:flex-none"
+        >
+          {status === 'running' ? (
+            <>
+              <PauseIcon className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Pause</span>
+            </>
+          ) : (
+            <>
+              <PlayIcon className="h-4 w-4 sm:mr-1" />
+              <span className="hidden sm:inline">Resume</span>
+            </>
+          )}
+        </Button>
+        <Button
+          variant="destructive"
+          size="sm"
+          onClick={onStop}
+          className="flex-1 sm:flex-none"
+        >
+          <BanIcon className="h-4 w-4 sm:mr-1" />
+          <span className="hidden sm:inline">Cancel</span>
+        </Button>
       </div>
     </div>
   )

@@ -145,15 +145,17 @@ export default function ViewRoutine(props: ViewRoutineProps) {
     }
   }, [])
   return (
-    <div className="mx-auto w-full max-w-7xl overflow-x-hidden p-4">
-      <div className="flex w-full flex-row place-items-center md:gap-4">
-        <Link href="/routines">
-          <Button size="icon" variant="ghost">
-            <ArrowLeftIcon />
-          </Button>
-        </Link>
+    <div className="mx-auto w-full max-w-7xl overflow-x-hidden p-2 sm:p-4">
+      {/* Mobile: stack vertically, Desktop: horizontal row */}
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+        {/* Top row: back button + name */}
+        <div className="flex w-full items-center gap-2">
+          <Link href="/routines">
+            <Button size="icon" variant="ghost" className="shrink-0">
+              <ArrowLeftIcon />
+            </Button>
+          </Link>
 
-        <div className="flex w-full items-center justify-between">
           {isEditing ? (
             <Input
               type="text"
@@ -164,68 +166,84 @@ export default function ViewRoutine(props: ViewRoutineProps) {
                 if (e.key === 'Enter') handleBlur()
               }}
               autoFocus
-              className="text-md mx-8 w-full md:text-xl"
+              className="flex-1 text-base sm:text-lg md:text-xl"
             />
           ) : (
             <div
-              className="text-md m-0 flex h-10 w-full cursor-pointer items-center rounded-md border border-transparent bg-background px-2 lg:mx-8 lg:px-3 lg:py-2 lg:text-xl"
+              className="flex h-10 flex-1 cursor-pointer items-center truncate rounded-md border border-transparent bg-background px-2 text-base sm:text-lg md:text-xl"
               onClick={() => setIsEditing(true)}
             >
               {name}
             </div>
           )}
-
-          {routineRunningState.status !== 'running' &&
-            routineRunningState.status !== 'paused' && (
-              <div className="flex gap-2">
-                <Button
-                  variant="default"
-                  onClick={() => setStartDialogOpen(true)}
-                >
-                  <PlayIcon />
-                  Start
-                </Button>
-                <Button
-                  variant="destructive"
-                  onClick={() => setDeleteDialogOpen(true)}
-                >
-                  <Trash2Icon />
-                  Delete
-                </Button>
-              </div>
-            )}
         </div>
 
-        {updateError && <p className="text-sm text-red-500">{updateError}</p>}
+        {/* Action buttons - full width on mobile */}
+        {routineRunningState.status !== 'running' &&
+          routineRunningState.status !== 'paused' && (
+            <div className="flex w-full gap-2 sm:w-auto">
+              <Button
+                variant="default"
+                onClick={() => setStartDialogOpen(true)}
+                className="flex-1 sm:flex-none"
+              >
+                <PlayIcon className="mr-1 h-4 w-4 sm:mr-2" />
+                Start
+              </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setDeleteDialogOpen(true)}
+                className="flex-1 sm:flex-none"
+              >
+                <Trash2Icon className="mr-1 h-4 w-4 sm:mr-2" />
+                Delete
+              </Button>
+            </div>
+          )}
       </div>
-      <Separator className="mt-2" />
+
+      {updateError && (
+        <p className="mt-2 text-sm text-red-500">{updateError}</p>
+      )}
+      <Separator className="mt-3 sm:mt-2" />
       {/* end header */}
 
       {routineRunningState.status === '' && (
-        <div className="p-4">
+        <div className="px-0 py-2 sm:p-4">
           <Tabs
             value={activeTab}
             onValueChange={handleTabChange}
             className="w-full"
           >
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="swimlanes">
-                Swimlanes
+            <TabsList className="grid h-auto w-full grid-cols-3 p-1">
+              <TabsTrigger
+                value="swimlanes"
+                className="flex-col gap-0.5 px-2 py-1.5 text-xs sm:flex-row sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
+              >
+                <span>Swimlanes</span>
                 {swimlanesCount > 0 && (
-                  <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-xs">
+                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] sm:text-xs">
                     {swimlanesCount}
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="prep">
-                Prep Tasks
+              <TabsTrigger
+                value="prep"
+                className="flex-col gap-0.5 px-2 py-1.5 text-xs sm:flex-row sm:gap-1.5 sm:px-3 sm:py-2 sm:text-sm"
+              >
+                <span>Prep</span>
                 {prepTasksCount > 0 && (
-                  <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-xs">
+                  <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] sm:text-xs">
                     {prepTasksCount}
                   </span>
                 )}
               </TabsTrigger>
-              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger
+                value="notes"
+                className="px-2 py-1.5 text-xs sm:px-3 sm:py-2 sm:text-sm"
+              >
+                Notes
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="swimlanes" className="mt-4">
