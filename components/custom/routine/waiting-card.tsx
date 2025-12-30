@@ -1,5 +1,5 @@
 import React from 'react'
-import { TimerIcon, SkipForwardIcon } from 'lucide-react'
+import { TimerIcon, SkipForwardIcon, AlertCircleIcon } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
@@ -9,14 +9,39 @@ import { formatSecondsToHHMMSS } from '@/lib/utils'
 interface WaitingCardProps {
   waitTime: number
   totalWaitTime: number
+  isBlockedByPrepTask?: boolean
   onSkip?: () => void
 }
 
 export default function WaitingCard({
   waitTime,
   totalWaitTime,
+  isBlockedByPrepTask = false,
   onSkip,
 }: WaitingCardProps) {
+  // If blocked by prep task, show blocked message
+  if (isBlockedByPrepTask) {
+    return (
+      <Card className="min-w-[250px] border-amber-400 bg-amber-50 dark:bg-amber-900/20">
+        <CardHeader className="p-3">
+          <CardTitle className="flex items-center justify-between text-sm">
+            Blocked
+            <AlertCircleIcon className="h-4 w-4 text-amber-500" />
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3 p-3">
+          <Muted className="text-xs">
+            This swimlane is blocked by one or more incomplete prep tasks.
+          </Muted>
+          <br />
+          <Muted className="text-xs text-amber-600 dark:text-amber-400">
+            Complete the prep tasks above to start.
+          </Muted>
+        </CardContent>
+      </Card>
+    )
+  }
+
   return (
     <Card className="min-w-[250px] border-amber-400 bg-amber-50 dark:bg-amber-900/20">
       <CardHeader className="p-3">

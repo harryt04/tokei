@@ -16,6 +16,7 @@ export type UseRoutineTimerOptions = {
   routine: Routine
   initialStatus: 'running' | 'paused'
   endTime?: Date
+  blockedSwimlaneIds?: Set<string>
   onStatusChange?: (status: RoutineStatus) => void
 }
 
@@ -46,11 +47,15 @@ export function useRoutineTimer({
   routine,
   initialStatus,
   endTime,
+  blockedSwimlaneIds,
   onStatusChange,
 }: UseRoutineTimerOptions): UseRoutineTimerReturn {
   // Status state
   const [status, setStatus] = useState<RoutineStatus>(initialStatus)
   const statusRef = useRef<RoutineStatus>(initialStatus)
+
+  // Blocked swimlanes ref to avoid stale closures
+  const blockedSwimlaneIdsRef = useRef<Set<string>>(blockedSwimlaneIds || new Set())
 
   // Swimlane status state
   const [swimlanesStatus, setSwimlanesStatus] = useState<
@@ -85,6 +90,10 @@ export function useRoutineTimer({
   useEffect(() => {
     pausedStepsRef.current = pausedSteps
   }, [pausedSteps])
+
+  useEffect(() => {
+    blockedSwimlaneIdsRef.current = blockedSwimlaneIds || new Set()
+  }, [blockedSwimlaneIds])
 
   useEffect(() => {
     swimlanesStatusRef.current = swimlanesStatus
@@ -134,6 +143,26 @@ export function useRoutineTimer({
       pauseAllTimers()
     }
   }, [])
+
+  // When blockedSwimlaneIds changes, check if any previously blocked swimlanes can now start
+  useEffect(() => {
+    if (statusRef.current !== 'running' || !routine.swimLanes) return
+
+    routine.swimLanes.forEach((swimlane) => {
+      const slStatus = swimlanesStatusRef.current[swimlane.id]
+      if (!slStatus) return
+
+      // Check if this swimlane was waiting with 0 time remaining (blocked by prep task)
+      const waitRemaining = waitTimeRemainingRef.current[swimlane.id] || 0
+      const wasBlocked = slStatus.isWaiting && waitRemaining <= 0
+      const isNowUnblocked = !blockedSwimlaneIdsRef.current.has(swimlane.id)
+
+      if (wasBlocked && isNowUnblocked) {
+        // Prep task completed! Start this swimlane
+        onWaitComplete(swimlane, true)
+      }
+    })
+  }, [blockedSwimlaneIds, routine.swimLanes])
 
   /**
    * Calculate initial state for all swimlanes based on routine and optional end time.
@@ -252,6 +281,17 @@ export function useRoutineTimer({
    * @param forceStart - If true, start the first step even if it's manual (used when wait is skipped due to recalculation)
    */
   const onWaitComplete = (swimlane: RoutineSwimLane, forceStart = false) => {
+    // Check if this swimlane is blocked by incomplete prep tasks
+    const isBlocked = blockedSwimlaneIdsRef.current.has(swimlane.id)
+    if (isBlocked) {
+      // Don't start - keep waiting until prep tasks are complete
+      toast({
+        title: 'Waiting for prep tasks',
+        description: `"${swimlane.name}" is waiting for linked prep tasks to be completed.`,
+      })
+      return
+    }
+
     // Mark swimlane as no longer waiting
     setSwimlanesStatus((prev) => {
       const newStatus = {

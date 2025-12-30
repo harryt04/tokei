@@ -70,7 +70,8 @@ export default function SwimlaneComponent({
             <WaitingCard
               waitTime={waitTimeRemaining}
               totalWaitTime={status?.waitTimeInSeconds || 0}
-              onSkip={() => onSkipWait(swimlane.id)}
+              isBlockedByPrepTask={isBlockedByPrepTask}
+              onSkip={isBlockedByPrepTask ? undefined : () => onSkipWait(swimlane.id)}
             />
           )}
 

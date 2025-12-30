@@ -208,8 +208,8 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               <SelectValue placeholder="Start type" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="automatic">Automatic</SelectItem>
-              <SelectItem value="manual">Manual</SelectItem>
+              <SelectItem value="automatic">Automatically</SelectItem>
+              <SelectItem value="manual">Manually</SelectItem>
             </SelectContent>
           </Select>
         </div>

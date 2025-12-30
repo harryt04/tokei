@@ -33,6 +33,20 @@ export default function RunRoutineComponent({
   )
   const [notesOpen, setNotesOpen] = useState(false)
 
+  // Calculate which swimlanes are blocked by incomplete prep tasks
+  const blockedSwimlaneIds = useMemo(() => {
+    const blocked = new Set<string>()
+    routine.prepTasks?.forEach((task) => {
+      if (
+        task.mustCompleteBeforeSwimlaneId &&
+        !completedPrepTaskIds.has(task.id)
+      ) {
+        blocked.add(task.mustCompleteBeforeSwimlaneId)
+      }
+    })
+    return blocked
+  }, [routine.prepTasks, completedPrepTaskIds])
+
   const {
     status,
     swimlanesStatus,
@@ -54,22 +68,9 @@ export default function RunRoutineComponent({
     routine,
     initialStatus,
     endTime,
+    blockedSwimlaneIds,
     onStatusChange,
   })
-
-  // Calculate which swimlanes are blocked by incomplete prep tasks
-  const blockedSwimlaneIds = useMemo(() => {
-    const blocked = new Set<string>()
-    routine.prepTasks?.forEach((task) => {
-      if (
-        task.mustCompleteBeforeSwimlaneId &&
-        !completedPrepTaskIds.has(task.id)
-      ) {
-        blocked.add(task.mustCompleteBeforeSwimlaneId)
-      }
-    })
-    return blocked
-  }, [routine.prepTasks, completedPrepTaskIds])
 
   const handlePrepTaskToggle = (taskId: string, completed: boolean) => {
     setCompletedPrepTaskIds((prev) => {
