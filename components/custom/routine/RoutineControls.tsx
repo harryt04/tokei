@@ -22,30 +22,34 @@ export default function RoutineControls({
     <div className="flex items-center justify-between">
       <H4>Running: {routineName}</H4>
 
-      {endTime && (
-        <Muted>Estimated completion: {endTime.toLocaleTimeString()}</Muted>
-      )}
+      <div className="flex flex-col gap-2">
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant={status === 'running' ? 'outline' : 'default'}
+            onClick={onPlayPause}
+            className="w-full"
+          >
+            {status === 'running' ? (
+              <>
+                <PauseIcon className="mr-2 h-4 w-4" /> Pause
+              </>
+            ) : (
+              <>
+                <PlayIcon className="mr-2 h-4 w-4" /> Resume
+              </>
+            )}
+          </Button>
+          <Button variant="destructive" className="w-full" onClick={onStop}>
+            <BanIcon className="mr-2 h-4 w-4" />
+            Stop
+          </Button>
+        </div>
 
-      <div className="flex gap-2">
-        <Button
-          variant={status === 'running' ? 'outline' : 'default'}
-          onClick={onPlayPause}
-        >
-          {status === 'running' ? (
-            <>
-              <PauseIcon className="mr-2 h-4 w-4" /> Pause
-            </>
-          ) : (
-            <>
-              <PlayIcon className="mr-2 h-4 w-4" /> Resume
-            </>
-          )}
-        </Button>
-
-        <Button variant="destructive" onClick={onStop}>
-          <BanIcon className="mr-2 h-4 w-4" />
-          Stop
-        </Button>
+        {endTime && (
+          <Muted className="text-right">
+            Estimated completion: {endTime.toLocaleTimeString()}
+          </Muted>
+        )}
       </div>
     </div>
   )
