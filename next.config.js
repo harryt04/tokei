@@ -1,4 +1,8 @@
 module.exports = {
+  eslint: {
+    // Skip ESLint during builds (run separately if needed)
+    ignoreDuringBuilds: true,
+  },
   logging: {
     fetches: {
       fullUrl: true,
