@@ -39,6 +39,12 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [startDialogOpen, setStartDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('swimlanes')
+  const [swimlanesCount, setSwimlanesCount] = useState(
+    routine.swimLanes?.length ?? 0,
+  )
+  const [prepTasksCount, setPrepTasksCount] = useState(
+    routine.prepTasks?.length ?? 0,
+  )
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const swimlanesListRef = useRef<SwimlanesListHandle>(null)
   const prepTasksListRef = useRef<PrepTasksListHandle>(null)
@@ -192,12 +198,19 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             className="w-full"
           >
             <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="swimlanes">Swimlanes</TabsTrigger>
+              <TabsTrigger value="swimlanes">
+                Swimlanes
+                {swimlanesCount > 0 && (
+                  <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-xs">
+                    {swimlanesCount}
+                  </span>
+                )}
+              </TabsTrigger>
               <TabsTrigger value="prep">
                 Prep Tasks
-                {routine.prepTasks && routine.prepTasks.length > 0 && (
+                {prepTasksCount > 0 && (
                   <span className="ml-1.5 rounded-full bg-muted px-1.5 py-0.5 text-xs">
-                    {routine.prepTasks.length}
+                    {prepTasksCount}
                   </span>
                 )}
               </TabsTrigger>
@@ -205,11 +218,19 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             </TabsList>
 
             <TabsContent value="swimlanes" className="mt-4">
-              <SwimlanesList ref={swimlanesListRef} routine={routine} />
+              <SwimlanesList
+                ref={swimlanesListRef}
+                routine={routine}
+                onCountChange={setSwimlanesCount}
+              />
             </TabsContent>
 
             <TabsContent value="prep" className="mt-4">
-              <PrepTasksList ref={prepTasksListRef} routine={routine} />
+              <PrepTasksList
+                ref={prepTasksListRef}
+                routine={routine}
+                onCountChange={setPrepTasksCount}
+              />
             </TabsContent>
 
             <TabsContent value="notes" className="mt-4">

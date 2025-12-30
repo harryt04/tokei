@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef } from 'react'
 import { Routine } from '@/models'
 import { Textarea } from '../ui/textarea'
 import { Button } from '../ui/button'
+import { SaveIcon, CheckIcon } from 'lucide-react'
 import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
 import { Muted } from '../ui/typography'
@@ -17,6 +18,7 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
   const [notes, setNotes] = useState(routine.notes ?? '')
   const [hasChanges, setHasChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const { updateRoutine } = useRoutines([routine])
 
@@ -42,6 +44,8 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
         description: 'Notes saved successfully',
       })
       setHasChanges(false)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2000)
     } catch (error) {
       toast({
         title: 'Error',
@@ -86,11 +90,25 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
       />
       <div className="flex items-center justify-between">
         <Muted className="text-xs">Auto-saves after 2 seconds</Muted>
-        {hasChanges && (
-          <Button onClick={handleSave} disabled={isSaving} size="sm">
-            {isSaving ? 'Saving...' : 'Save Now'}
-          </Button>
-        )}
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges || isSaving}
+          size="sm"
+        >
+          {isSaving ? (
+            <span className="animate-pulse">Saving...</span>
+          ) : saveSuccess ? (
+            <>
+              <CheckIcon className="mr-1 h-4 w-4" />
+              Saved
+            </>
+          ) : (
+            <>
+              <SaveIcon className="mr-1 h-4 w-4" />
+              Save Now
+            </>
+          )}
+        </Button>
       </div>
     </div>
   )

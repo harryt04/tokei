@@ -29,6 +29,7 @@ import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 
 export type SwimlanesListProps = {
   routine: Routine
+  onCountChange?: (count: number) => void
 }
 
 export type SwimlanesListHandle = {
@@ -39,9 +40,9 @@ export type SwimlanesListHandle = {
 export const SwimlanesList = forwardRef<
   SwimlanesListHandle,
   SwimlanesListProps
->(function SwimlanesList(props, ref) {
+>(function SwimlanesList({ routine, onCountChange }, ref) {
   const [swimLanes, setSwimLanes] = useState<RoutineSwimLane[]>(
-    props.routine.swimLanes ?? [],
+    routine.swimLanes ?? [],
   )
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState<string>('')
@@ -51,14 +52,19 @@ export const SwimlanesList = forwardRef<
   const scrollContainerRefs = useRef<Record<string, HTMLDivElement | null>>({})
   const addButtonRefs = useRef<Record<string, HTMLButtonElement | null>>({})
 
-  const { updateRoutine } = useRoutines([props.routine])
+  const { updateRoutine } = useRoutines([routine])
+
+  // Notify parent of count changes
+  useEffect(() => {
+    onCountChange?.(swimLanes.length)
+  }, [swimLanes.length, onCountChange])
 
   // Track changes to swimLanes
   useEffect(() => {
     setHasChanges(
-      JSON.stringify(swimLanes) !== JSON.stringify(props.routine.swimLanes),
+      JSON.stringify(swimLanes) !== JSON.stringify(routine.swimLanes),
     )
-  }, [swimLanes, props.routine.swimLanes])
+  }, [swimLanes, routine.swimLanes])
 
   // Expose imperative methods for parent component
   useImperativeHandle(ref, () => ({
@@ -96,7 +102,7 @@ export const SwimlanesList = forwardRef<
     if (isSaving) return
     setIsSaving(true)
     try {
-      await updateRoutine(props.routine._id, {
+      await updateRoutine(routine._id, {
         swimLanes: swimLanes,
       })
       setSaveSuccess(true)

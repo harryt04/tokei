@@ -15,6 +15,8 @@ import {
   GripVerticalIcon,
   LinkIcon,
   Link2OffIcon,
+  SaveIcon,
+  CheckIcon,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
 import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
@@ -32,6 +34,7 @@ import { Badge } from '../ui/badge'
 
 export type PrepTasksListProps = {
   routine: Routine
+  onCountChange?: (count: number) => void
 }
 
 export type PrepTasksListHandle = {
@@ -42,13 +45,19 @@ export type PrepTasksListHandle = {
 export const PrepTasksList = forwardRef<
   PrepTasksListHandle,
   PrepTasksListProps
->(function PrepTasksList({ routine }, ref) {
+>(function PrepTasksList({ routine, onCountChange }, ref) {
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>(
     routine.prepTasks ?? [],
   )
   const [hasChanges, setHasChanges] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+  const [saveSuccess, setSaveSuccess] = useState(false)
   const { updateRoutine } = useRoutines([routine])
+
+  // Notify parent of count changes
+  useEffect(() => {
+    onCountChange?.(prepTasks.length)
+  }, [prepTasks.length, onCountChange])
 
   // Track changes
   useEffect(() => {
@@ -107,6 +116,8 @@ export const PrepTasksList = forwardRef<
         description: 'Prep tasks saved successfully',
       })
       setHasChanges(false)
+      setSaveSuccess(true)
+      setTimeout(() => setSaveSuccess(false), 2000)
     } catch (error) {
       toast({
         title: 'Error',
@@ -223,11 +234,25 @@ export const PrepTasksList = forwardRef<
           Add Prep Task
         </Button>
 
-        {hasChanges && (
-          <Button onClick={handleSave} disabled={isSaving} size="sm">
-            {isSaving ? 'Saving...' : 'Save Changes'}
-          </Button>
-        )}
+        <Button
+          onClick={handleSave}
+          disabled={!hasChanges || isSaving}
+          size="sm"
+        >
+          {isSaving ? (
+            <span className="animate-pulse">Saving...</span>
+          ) : saveSuccess ? (
+            <>
+              <CheckIcon className="mr-1 h-4 w-4" />
+              Saved
+            </>
+          ) : (
+            <>
+              <SaveIcon className="mr-1 h-4 w-4" />
+              Save Changes
+            </>
+          )}
+        </Button>
       </div>
     </div>
   )
