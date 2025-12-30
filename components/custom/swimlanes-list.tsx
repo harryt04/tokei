@@ -30,6 +30,7 @@ import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 export type SwimlanesListProps = {
   routine: Routine
   onCountChange?: (count: number) => void
+  onRoutineChange?: (updatedRoutine: Partial<Routine>) => void
 }
 
 export type SwimlanesListHandle = {
@@ -40,7 +41,7 @@ export type SwimlanesListHandle = {
 export const SwimlanesList = forwardRef<
   SwimlanesListHandle,
   SwimlanesListProps
->(function SwimlanesList({ routine, onCountChange }, ref) {
+>(function SwimlanesList({ routine, onCountChange, onRoutineChange }, ref) {
   const [swimLanes, setSwimLanes] = useState<RoutineSwimLane[]>(
     routine.swimLanes ?? [],
   )
@@ -105,6 +106,8 @@ export const SwimlanesList = forwardRef<
       await updateRoutine(routine._id, {
         swimLanes: swimLanes,
       })
+      // Notify parent of the updated routine
+      onRoutineChange?.({ swimLanes: swimLanes })
       setSaveSuccess(true)
       setTimeout(() => setSaveSuccess(false), 2000)
       toast({

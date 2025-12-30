@@ -29,9 +29,13 @@ type RoutineRunningState = {
 }
 
 export default function ViewRoutine(props: ViewRoutineProps) {
-  const { routine } = props
+  const { routine: initialRoutine } = props
+  // Local state to track the current routine with any updates
+  const [currentRoutine, setCurrentRoutine] = useState<Routine>(initialRoutine)
   const defaultName = `Unnamed Routine`
-  const [name, setName] = useState(!!routine.name ? routine.name : defaultName)
+  const [name, setName] = useState(
+    !!currentRoutine.name ? currentRoutine.name : defaultName,
+  )
   const [isEditing, setIsEditing] = useState(false)
   const [updateError, setUpdateError] = useState<string | null>(null)
   const [routineRunningState, setRoutineRunningState] =
@@ -40,10 +44,10 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const [startDialogOpen, setStartDialogOpen] = useState(false)
   const [activeTab, setActiveTab] = useState('swimlanes')
   const [swimlanesCount, setSwimlanesCount] = useState(
-    routine.swimLanes?.length ?? 0,
+    currentRoutine.swimLanes?.length ?? 0,
   )
   const [prepTasksCount, setPrepTasksCount] = useState(
-    routine.prepTasks?.length ?? 0,
+    currentRoutine.prepTasks?.length ?? 0,
   )
   const debounceTimeout = useRef<NodeJS.Timeout | null>(null)
   const swimlanesListRef = useRef<SwimlanesListHandle>(null)
@@ -51,7 +55,12 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const router = useRouter()
 
   // Initialize useRoutines with the current routine
-  const { updateRoutine, deleteRoutine } = useRoutines([routine])
+  const { updateRoutine, deleteRoutine } = useRoutines([currentRoutine])
+
+  // Callback when child components update the routine
+  const handleRoutineChange = (updatedRoutine: Partial<Routine>) => {
+    setCurrentRoutine((prev) => ({ ...prev, ...updatedRoutine }))
+  }
 
   // Handle tab change - save any unsaved changes before switching
   const handleTabChange = async (newTab: string) => {
@@ -74,7 +83,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
     setName(newName)
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
     debounceTimeout.current = setTimeout(() => {
-      if (newName !== routine.name) {
+      if (newName !== currentRoutine.name) {
         updateRoutineName(newName)
       }
     }, 2000)
@@ -83,7 +92,8 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const updateRoutineName = async (newName: string) => {
     try {
       setUpdateError(null)
-      await updateRoutine(routine._id!, { name: newName ?? defaultName })
+      await updateRoutine(currentRoutine._id!, { name: newName ?? defaultName })
+      handleRoutineChange({ name: newName ?? defaultName })
       // Optionally refresh the page data to ensure consistency
       router.refresh()
     } catch (err: any) {
@@ -94,7 +104,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
   const handleBlur = () => {
     if (debounceTimeout.current) clearTimeout(debounceTimeout.current)
-    if (name !== routine.name) {
+    if (name !== currentRoutine.name) {
       updateRoutineName(name)
     }
     setIsEditing(false)
@@ -102,7 +112,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
 
   const handleDelete = async () => {
     try {
-      await deleteRoutine(routine)
+      await deleteRoutine(currentRoutine)
       router.push('/routines') // Navigate back to routines list after deletion
     } catch (err: any) {
       console.error('Error deleting routine:', err)
@@ -113,7 +123,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
   const handleStartRoutine = (startMode: StartMode, endTime: string) => {
     switch (startMode) {
       case 'now': {
-        const completionTime = getCompletionTime(routine)
+        const completionTime = getCompletionTime(currentRoutine)
         console.log('completionTime: ', completionTime)
         setRoutineRunningState({ status: 'running', endTime: completionTime })
         break
@@ -221,21 +231,23 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             <TabsContent value="swimlanes" className="mt-4">
               <SwimlanesList
                 ref={swimlanesListRef}
-                routine={routine}
+                routine={currentRoutine}
                 onCountChange={setSwimlanesCount}
+                onRoutineChange={handleRoutineChange}
               />
             </TabsContent>
 
             <TabsContent value="prep" className="mt-4">
               <PrepTasksList
                 ref={prepTasksListRef}
-                routine={routine}
+                routine={currentRoutine}
                 onCountChange={setPrepTasksCount}
+                onRoutineChange={handleRoutineChange}
               />
             </TabsContent>
 
             <TabsContent value="notes" className="mt-4">
-              <RoutineNotes routine={routine} />
+              <RoutineNotes routine={currentRoutine} />
             </TabsContent>
           </Tabs>
         </div>
@@ -245,7 +257,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
         routineRunningState.status === 'paused') && (
         <div className="p-4">
           <RunRoutineComponent
-            routine={routine}
+            routine={currentRoutine}
             initialStatus={routineRunningState.status}
             endTime={routineRunningState.endTime}
             onStatusChange={(newStatus) => {
@@ -283,7 +295,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
           if (!startMode || !endTime) return
           handleStartRoutine(startMode, endTime)
         }}
-        routine={routine}
+        routine={currentRoutine}
       />
     </div>
   )

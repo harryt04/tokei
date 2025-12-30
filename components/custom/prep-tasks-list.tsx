@@ -34,6 +34,7 @@ import { toast } from '../ui/use-toast'
 export type PrepTasksListProps = {
   routine: Routine
   onCountChange?: (count: number) => void
+  onRoutineChange?: (updatedRoutine: Partial<Routine>) => void
 }
 
 export type PrepTasksListHandle = {
@@ -44,7 +45,7 @@ export type PrepTasksListHandle = {
 export const PrepTasksList = forwardRef<
   PrepTasksListHandle,
   PrepTasksListProps
->(function PrepTasksList({ routine, onCountChange }, ref) {
+>(function PrepTasksList({ routine, onCountChange, onRoutineChange }, ref) {
   const [prepTasks, setPrepTasks] = useState<PrepTask[]>(
     routine.prepTasks ?? [],
   )
@@ -52,6 +53,12 @@ export const PrepTasksList = forwardRef<
   const [isSaving, setIsSaving] = useState(false)
   const [saveSuccess, setSaveSuccess] = useState(false)
   const { updateRoutine } = useRoutines([routine])
+
+  // Sync local state when routine.prepTasks changes from parent
+  // This handles remount scenarios and external updates
+  useEffect(() => {
+    setPrepTasks(routine.prepTasks ?? [])
+  }, [routine.prepTasks])
 
   // Notify parent of count changes
   useEffect(() => {
@@ -110,6 +117,8 @@ export const PrepTasksList = forwardRef<
       const validTasks = prepTasks.filter((task) => task.name.trim() !== '')
       await updateRoutine(routine._id, { prepTasks: validTasks })
       setPrepTasks(validTasks)
+      // Notify parent of the updated routine
+      onRoutineChange?.({ prepTasks: validTasks })
       toast({
         title: 'Success',
         description: 'Prep tasks saved successfully',
