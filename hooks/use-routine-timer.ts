@@ -249,8 +249,9 @@ export function useRoutineTimer({
 
   /**
    * Handle when a swimlane's wait period completes.
+   * @param forceStart - If true, start the first step even if it's manual (used when wait is skipped due to recalculation)
    */
-  const onWaitComplete = (swimlane: RoutineSwimLane) => {
+  const onWaitComplete = (swimlane: RoutineSwimLane, forceStart = false) => {
     // Mark swimlane as no longer waiting
     setSwimlanesStatus((prev) => {
       const newStatus = {
@@ -276,7 +277,7 @@ export function useRoutineTimer({
         [firstStep.id]: firstStep.durationInSeconds,
       }))
 
-      if (firstStep.startType === 'automatic') {
+      if (firstStep.startType === 'automatic' || forceStart) {
         startStepTimer(firstStep)
       } else {
         toast({
@@ -477,7 +478,8 @@ export function useRoutineTimer({
             return updated
           })
 
-          onWaitComplete(sl)
+          // Force start since user action triggered this (completed a blocking step)
+          onWaitComplete(sl, true)
 
           toast({
             title: 'Starting early',

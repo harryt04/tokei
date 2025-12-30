@@ -47,7 +47,7 @@ export default function RoutineControls({
 
         {endTime && (
           <Muted className="text-right">
-            Estimated completion: {endTime.toLocaleTimeString()}
+            Estimated time of completion: {endTime.toLocaleTimeString()}
           </Muted>
         )}
       </div>
