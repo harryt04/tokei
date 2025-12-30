@@ -86,8 +86,8 @@ export default function StartRoutineDialog({
       const timeAvailableInSeconds =
         (selectedEndTime.getTime() - now.getTime()) / 1000
 
-      // Check if we have enough time
-      if (timeAvailableInSeconds < routineDurationInSeconds) {
+      // Check if we have enough time (allow 60 second buffer for UI interaction time)
+      if (timeAvailableInSeconds < routineDurationInSeconds - 60) {
         setError(`Please select ${earliestCompletionTimeDisplay} or later.`)
         return
       }
