@@ -140,6 +140,8 @@ export default function RunRoutineComponent({
           onManualStart={handleManualStart}
           onSkipStep={handleSkipStep}
           onSkipWait={handleSkipWait}
+          onPlayPause={handlePlayPause}
+          isPaused={status === 'paused'}
           isBlockedByPrepTask={blockedSwimlaneIds.has(swimlane.id)}
         />
       ))}

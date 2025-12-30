@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../../ui/card'
 import { Muted } from '../../ui/typography'
 import { Progress } from '../../ui/progress'
 import { Button } from '../../ui/button'
-import { PlayIcon, SkipForwardIcon } from 'lucide-react'
+import { PlayIcon, PauseIcon, SkipForwardIcon } from 'lucide-react'
 import { formatSecondsToHHMMSS } from '@/lib/utils'
 
 interface StepCardProps {
@@ -18,6 +18,8 @@ interface StepCardProps {
   showStartButton: boolean
   onManualStart: () => void
   onSkip: () => void
+  onPlayPause: () => void
+  isPaused: boolean
   isFirstStep: boolean
 }
 
@@ -32,10 +34,14 @@ export default function StepCard({
   showStartButton,
   onManualStart,
   onSkip,
+  onPlayPause,
+  isPaused,
   isFirstStep,
 }: StepCardProps) {
   // Show skip button for active steps that are in progress or ready to start
   const showSkipButton = isActive && !isCompleted
+  // Show pause button when step is actively running (has progress)
+  const showPauseButton = isActive && progress > 0 && !isCompleted
 
   return (
     <Card
@@ -85,22 +91,36 @@ export default function StepCard({
           </>
         )}
 
-        <div className="flex gap-2">
+        <div className="mt-2 flex flex-1 gap-2">
           {showStartButton && (
-            <Button size="sm" className="mt-2 flex-1" onClick={onManualStart}>
+            <Button size="sm" className="flex flex-1" onClick={onManualStart}>
               <PlayIcon className="mr-2 h-3 w-3" />
               Start
             </Button>
           )}
-
-          {showSkipButton && (
+          {showPauseButton && (
             <Button
               size="sm"
-              variant="outline"
-              className="mt-2 flex-1"
-              onClick={onSkip}
+              variant={isPaused ? 'default' : 'outline'}
+              onClick={onPlayPause}
             >
-              <SkipForwardIcon className="mr-2 h-3 w-3" />
+              {isPaused ? (
+                <>
+                  <PlayIcon />
+                  Resume
+                </>
+              ) : (
+                <>
+                  <PauseIcon />
+                  Pause
+                </>
+              )}
+            </Button>
+          )}
+
+          {showSkipButton && (
+            <Button size="sm" variant="outline" onClick={onSkip}>
+              <SkipForwardIcon />
               {progress > 0 ? 'Complete' : 'Skip'}
             </Button>
           )}

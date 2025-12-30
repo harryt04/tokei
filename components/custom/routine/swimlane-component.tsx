@@ -23,6 +23,8 @@ interface SwimlaneComponentProps {
   onManualStart: (stepId: string) => void
   onSkipStep: (stepId: string) => void
   onSkipWait: (swimlaneId: string) => void
+  onPlayPause: () => void
+  isPaused: boolean
   isBlockedByPrepTask?: boolean
 }
 
@@ -36,6 +38,8 @@ export default function SwimlaneComponent({
   onManualStart,
   onSkipStep,
   onSkipWait,
+  onPlayPause,
+  isPaused,
   isBlockedByPrepTask = false,
 }: SwimlaneComponentProps) {
   const isWaiting = status?.isWaiting
@@ -87,6 +91,8 @@ export default function SwimlaneComponent({
               showStartButton={shouldShowStartButton(step)}
               onManualStart={() => onManualStart(step.id)}
               onSkip={() => onSkipStep(step.id)}
+              onPlayPause={onPlayPause}
+              isPaused={isPaused}
               isFirstStep={index === 0}
             />
           ))}
