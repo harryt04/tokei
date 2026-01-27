@@ -47,8 +47,8 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
     return Number(hours) * 3600 + Number(minutes) * 60 + Number(seconds)
   }
 
-  const runTimer = () => {
-    const step = calculateTotalDuration() / 100
+  const runTimer = (totalDuration: number) => {
+    const step = totalDuration / 100
     setTimeout(() => {
       if (
         runningStateRef.current === 'stopped' ||
@@ -63,7 +63,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         }
         return previousProgress + 1
       })
-      runTimer()
+      runTimer(totalDuration)
     }, step * MILISECONDS)
   }
 
@@ -94,7 +94,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
     setRunningState('running')
     runningStateRef.current = 'running'
     setTimerProgress(0)
-    runTimer()
+    runTimer(totalDuration)
   }
 
   const handleStop = () => {
@@ -222,7 +222,10 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
 
         {runningState === 'running' && (
           <>
-            <Progress value={timerProgress}></Progress>
+            <Progress
+              value={timerProgress}
+              className="bg-transparent ring-1 ring-border ring-gray-500"
+            ></Progress>
           </>
         )}
       </CardContent>
