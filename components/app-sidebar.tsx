@@ -26,6 +26,7 @@ import { Badge } from './ui/badge'
 const items = [
   {
     title: `Freestyle`,
+    beta: true,
     url: '/freestyle',
     icon: BirdIcon,
   },
