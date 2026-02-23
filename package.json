@@ -11,7 +11,7 @@
     "prettify": "prettier --write ."
   },
   "dependencies": {
-    "@clerk/nextjs": "^6.37.3",
+    "@clerk/nextjs": "^6.38.1",
     "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-checkbox": "^1.1.1",
@@ -39,7 +39,7 @@
     "mongodb": "^6.21.0",
     "next": "^14.2.35",
     "next-themes": "^0.3.0",
-    "posthog-js": "^1.345.5",
+    "posthog-js": "^1.352.0",
     "posthog-node": "^4.18.0",
     "react": "^18",
     "react-countdown": "^2.3.6",
