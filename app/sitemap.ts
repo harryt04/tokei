@@ -3,11 +3,11 @@ import { MetadataRoute } from 'next'
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
     {
-      url: 'https://tokei.app',
+      url: 'https://tokei.harryt.dev',
       lastModified: new Date(),
     },
     {
-      url: 'https://tokei.app/login',
+      url: 'https://tokei.harryt.dev/login',
       lastModified: new Date(),
     },
   ]
