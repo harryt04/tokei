@@ -1,7 +1,13 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { BirdIcon, LogOutIcon, Repeat2Icon } from 'lucide-react'
+import {
+  BirdIcon,
+  BugIcon,
+  CodeIcon,
+  LogOutIcon,
+  Repeat2Icon,
+} from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -9,30 +15,30 @@ import {
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
+  SidebarHeader,
   SidebarMenu,
+  SidebarMenuBadge,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarTrigger,
+  SidebarRail,
+  SidebarSeparator,
   useSidebar,
 } from '@/components/ui/sidebar'
 import { authClient } from '@/lib/auth-client'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
-import { Button } from './ui/button'
 import { ThemeSwitcher } from './custom/theme-switcher'
-import { Badge } from './ui/badge'
 import { useRouter } from 'next/navigation'
 
 // Menu items.
 const items = [
   {
-    title: `Freestyle`,
+    title: 'Freestyle',
     url: '/freestyle',
     icon: BirdIcon,
   },
   {
-    title: `Routines`,
-    beta: true,
+    title: 'Routines',
+    badge: 'Beta',
     url: '/routines',
     icon: Repeat2Icon,
     childrenRoutes: ['/routine/'],
@@ -41,7 +47,7 @@ const items = [
 
 export function AppSidebar() {
   const { setOpenMobile } = useSidebar()
-  const pathname = usePathname() // Get the current route.
+  const pathname = usePathname()
   const { data: session } = authClient.useSession()
   const router = useRouter()
 
@@ -66,21 +72,20 @@ export function AppSidebar() {
 
   return (
     <Sidebar>
+      <SidebarHeader className="flex flex-row items-center justify-between p-4">
+        <span className="text-sm font-semibold">Tokei 時計</span>
+        <ThemeSwitcher />
+      </SidebarHeader>
+      <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel className="my-4">
-            <SidebarTrigger className="-ml-2 mr-4 p-5" />
-            <span className="w-full">Tokei 時計</span>
-            <div className={cn('flex w-full flex-row justify-end gap-4')}>
-              <ThemeSwitcher />
-            </div>
-          </SidebarGroupLabel>
+          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
           <SidebarGroupContent>
-            <SidebarMenu className="space-y-2 px-2">
+            <SidebarMenu>
               {items.map((item) => {
                 const isActive =
                   pathname === item.url ||
-                  (item as any).childrenRoutes?.some((childRoute) =>
+                  (item as any).childrenRoutes?.some((childRoute: string) =>
                     pathname?.startsWith(childRoute),
                   )
 
@@ -88,8 +93,8 @@ export function AppSidebar() {
                   <SidebarMenuItem key={item.title}>
                     <SidebarMenuButton
                       asChild
-                      variant={isActive ? 'outline' : 'default'}
-                      className="p-6"
+                      isActive={isActive}
+                      tooltip={item.title}
                     >
                       <Link
                         href={item.url}
@@ -99,9 +104,11 @@ export function AppSidebar() {
                       >
                         <item.icon />
                         <span>{item.title}</span>
-                        {item.beta && <Badge>Beta</Badge>}
                       </Link>
                     </SidebarMenuButton>
+                    {item.badge && (
+                      <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
+                    )}
                   </SidebarMenuItem>
                 )
               })}
@@ -109,38 +116,55 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter className={cn('p-4')}>
+      <SidebarFooter className="p-4">
         {session?.user && (
-          <div className="flex items-center justify-between rounded-md border p-3">
-            <div className="flex items-center gap-3">
-              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
-                {userInitials}
-              </div>
-              <span className="truncate text-sm">
-                {session.user.name || session.user.email}
-              </span>
-            </div>
-            <Button
-              variant="ghost"
-              size="icon"
-              onClick={handleSignOut}
-              title="Sign out"
-            >
-              <LogOutIcon className="h-4 w-4" />
-            </Button>
-          </div>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                onClick={handleSignOut}
+                tooltip="Sign out"
+                className="w-full"
+              >
+                <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-medium text-primary-foreground">
+                  {userInitials}
+                </div>
+                <span className="truncate">
+                  {session.user.name || session.user.email}
+                </span>
+                <LogOutIcon className="ml-auto h-4 w-4" />
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
         )}
-        <Button variant={'outline'}>
-          <Link href="https://github.com/harryt04/tokei/issues" target="_blank">
-            Report a bug
-          </Link>
-        </Button>
-        <Button variant={'outline'}>
-          <Link href="https://github.com/harryt04/tokei" target="_blank">
-            View source code
-          </Link>
-        </Button>
+        <SidebarSeparator />
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="Report a bug">
+              <a
+                href="https://github.com/harryt04/tokei/issues"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <BugIcon />
+                <span>Report a bug</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip="View source code">
+              <a
+                href="https://github.com/harryt04/tokei"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <CodeIcon />
+                <span>View source code</span>
+              </a>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
       </SidebarFooter>
+      <SidebarRail />
     </Sidebar>
   )
 }

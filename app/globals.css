@@ -84,7 +84,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-.max-width {
-  width: 100% !important;
-}

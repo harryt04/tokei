@@ -1,6 +1,5 @@
 'use client'
 import React, { useState, useMemo } from 'react'
-import MySidebarTrigger from './sidebar-trigger'
 import { Routine } from '@/models'
 import { RoutineComponent } from './routine-component'
 import { NoResultsComponent } from './no-results-component'
@@ -73,7 +72,6 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
 
   return (
     <>
-      <MySidebarTrigger />
       <div className="flex flex-col">
         <div className="ml-0 mt-8 flex w-full flex-col items-center gap-4 md:ml-4 md:flex-row">
           <Button variant="default" onClick={() => setIsFormOpen(true)}>
