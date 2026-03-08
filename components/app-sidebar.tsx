@@ -72,18 +72,6 @@ export function AppSidebar() {
             <SidebarTrigger className="-ml-2 mr-4 p-5" />
             <span className="w-full">Tokei 時計</span>
             <div className={cn('flex w-full flex-row justify-end gap-4')}>
-              <div className="flex h-full items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-medium">
-                  {userInitials}
-                </span>
-                <button
-                  onClick={handleSignOut}
-                  title="Sign out"
-                  className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
-                >
-                  <LogOutIcon className="h-4 w-4" />
-                </button>
-              </div>
               <ThemeSwitcher />
             </div>
           </SidebarGroupLabel>
@@ -122,6 +110,26 @@ export function AppSidebar() {
         </SidebarGroup>
       </SidebarContent>
       <SidebarFooter className={cn('p-4')}>
+        {session?.user && (
+          <div className="flex items-center justify-between rounded-md border p-3">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary text-sm font-medium text-primary-foreground">
+                {userInitials}
+              </div>
+              <span className="truncate text-sm">
+                {session.user.name || session.user.email}
+              </span>
+            </div>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleSignOut}
+              title="Sign out"
+            >
+              <LogOutIcon className="h-4 w-4" />
+            </Button>
+          </div>
+        )}
         <Button variant={'outline'}>
           <Link href="https://github.com/harryt04/tokei/issues" target="_blank">
             Report a bug
