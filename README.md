@@ -8,7 +8,7 @@ Built with:
 - TypeScript
 - Tailwind CSS
 - PostHog
-- Clerk
+- Better Auth
 - shadcn UI
 
 # Creating indexes for your own mongodb instance

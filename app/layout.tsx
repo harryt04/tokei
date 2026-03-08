@@ -1,4 +1,3 @@
-import { ClerkProvider, SignedIn } from '@clerk/nextjs'
 import type { Metadata } from 'next'
 import { Inter as FontSans } from 'next/font/google'
 
@@ -8,7 +7,7 @@ import { cn } from '@/lib/utils'
 import { PostHogProvider } from '@/providers/posthogProvider'
 import { ThemeProvider } from '@/providers/themeProvider'
 import { SidebarProvider } from '@/components/ui/sidebar'
-import { AppSidebar } from '@/components/app-sidebar'
+import { AuthSidebar } from '@/components/custom/auth-sidebar'
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -35,31 +34,27 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ClerkProvider>
-        <PostHogProvider>
-          <body
-            suppressHydrationWarning={true}
-            className={cn(
-              'min-h-screen bg-background font-sans antialiased',
-              fontSans.variable,
-            )}
+      <PostHogProvider>
+        <body
+          suppressHydrationWarning={true}
+          className={cn(
+            'min-h-screen bg-background font-sans antialiased',
+            fontSans.variable,
+          )}
+        >
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
           >
-            <ThemeProvider
-              attribute="class"
-              defaultTheme="system"
-              enableSystem
-              disableTransitionOnChange
-            >
-              <SidebarProvider>
-                <SignedIn>
-                  <AppSidebar />
-                </SignedIn>
-                {children}
-              </SidebarProvider>
-            </ThemeProvider>
-          </body>
-        </PostHogProvider>
-      </ClerkProvider>
+            <SidebarProvider>
+              <AuthSidebar />
+              {children}
+            </SidebarProvider>
+          </ThemeProvider>
+        </body>
+      </PostHogProvider>
     </html>
   )
 }

@@ -1,4 +1,5 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
 import { ObjectId } from 'mongodb'
@@ -6,7 +7,9 @@ import { extractParamFromUrl } from '@/lib/utils'
 
 // GET, PATCH, DELETE for a specific routine
 export async function GET(req: NextRequest) {
-  const user = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   const id = extractParamFromUrl(req, 'id')
 
   if (!id) {
@@ -14,7 +17,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    if (!user?.userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -26,7 +29,7 @@ export async function GET(req: NextRequest) {
       _id: new ObjectId(id),
     })
 
-    if (!routine || routine.userId !== user.userId) {
+    if (!routine || routine.userId !== session.user.id) {
       return NextResponse.json(
         { error: 'Routine not found or unauthorized' },
         { status: 404 },
@@ -44,11 +47,13 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const user = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   const id = extractParamFromUrl(req, 'id')
 
   try {
-    if (!user?.userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -65,7 +70,7 @@ export async function POST(req: NextRequest) {
 
     const routineToUpsert = {
       ...body,
-      userId: user.userId,
+      userId: session.user.id,
       updatedAt: new Date(),
     }
 
@@ -101,7 +106,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const user = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   const id = extractParamFromUrl(req, 'id')
 
   if (!id) {
@@ -109,7 +116,7 @@ export async function DELETE(req: NextRequest) {
   }
 
   try {
-    if (!user?.userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -121,7 +128,7 @@ export async function DELETE(req: NextRequest) {
       _id: new ObjectId(id),
     })
 
-    if (!existingRoutine || existingRoutine.userId !== user.userId) {
+    if (!existingRoutine || existingRoutine.userId !== session.user.id) {
       return NextResponse.json(
         { error: 'Routine not found or unauthorized' },
         { status: 404 },

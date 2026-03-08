@@ -1,23 +1,22 @@
 'use client'
 
-import { RedirectToSignIn, SignedOut, useClerk } from '@clerk/nextjs'
+import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 
 function LoginCard() {
-  const { user } = useClerk()
+  const { data: session, isPending } = authClient.useSession()
   const router = useRouter()
 
-  if (user) {
-    router.push('/freestyle')
-  }
+  useEffect(() => {
+    if (session) {
+      router.push('/freestyle')
+    } else if (!isPending) {
+      router.push('/sign-in')
+    }
+  }, [session, isPending, router])
 
-  return (
-    <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-    </>
-  )
+  return null
 }
 
 export { LoginCard }

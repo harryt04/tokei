@@ -1,47 +1,41 @@
-'use server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
-import { currentUser } from '@clerk/nextjs/server'
 import { notFound } from 'next/navigation'
 import { ObjectId } from 'mongodb'
 import ViewRoutine from '@/components/custom/view-routine'
 import { Routine } from '@/models'
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
 import { addUser } from '@/lib/utils'
 
 export default async function RoutinePage(props: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await props.params
-  const user = await currentUser()
-  if (user) {
-    addUser(user)
-    try {
-      const client = await getMongoClient()
-      const db = client.db(mongoDBConfig.dbName)
-      const routinesCollection = db.collection(
-        mongoDBConfig.collections.routines,
-      )
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
 
-      const routineDocument = await routinesCollection.findOne({
-        _id: new ObjectId(id),
-      })
-      if (!routineDocument) notFound()
-
-      const routine = JSON.parse(JSON.stringify(routineDocument)) as Routine
-
-      return (
-        <>
-          <SignedOut>
-            <RedirectToSignIn />
-          </SignedOut>
-          <SignedIn>
-            <ViewRoutine routine={routine}></ViewRoutine>
-          </SignedIn>
-        </>
-      )
-    } catch (error) {
-      notFound()
-    }
+  if (!session) {
+    redirect('/sign-in')
   }
-  return null
+
+  addUser(session.user)
+
+  try {
+    const client = await getMongoClient()
+    const db = client.db(mongoDBConfig.dbName)
+    const routinesCollection = db.collection(mongoDBConfig.collections.routines)
+
+    const routineDocument = await routinesCollection.findOne({
+      _id: new ObjectId(id),
+    })
+    if (!routineDocument) notFound()
+
+    const routine = JSON.parse(JSON.stringify(routineDocument)) as Routine
+
+    return <ViewRoutine routine={routine}></ViewRoutine>
+  } catch (error) {
+    notFound()
+  }
 }

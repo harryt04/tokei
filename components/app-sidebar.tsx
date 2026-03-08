@@ -1,7 +1,7 @@
 'use client'
 
 import { usePathname } from 'next/navigation'
-import { BirdIcon, Repeat2Icon, TimerIcon } from 'lucide-react'
+import { BirdIcon, LogOutIcon, Repeat2Icon } from 'lucide-react'
 import {
   Sidebar,
   SidebarContent,
@@ -15,12 +15,13 @@ import {
   SidebarTrigger,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { UserButton } from '@clerk/nextjs'
+import { authClient } from '@/lib/auth-client'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
 import { Button } from './ui/button'
 import { ThemeSwitcher } from './custom/theme-switcher'
 import { Badge } from './ui/badge'
+import { useRouter } from 'next/navigation'
 
 // Menu items.
 const items = [
@@ -41,6 +42,27 @@ const items = [
 export function AppSidebar() {
   const { setOpenMobile } = useSidebar()
   const pathname = usePathname() // Get the current route.
+  const { data: session } = authClient.useSession()
+  const router = useRouter()
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push('/')
+        },
+      },
+    })
+  }
+
+  const userInitials = session?.user?.name
+    ? session.user.name
+        .split(' ')
+        .map((n) => n[0])
+        .join('')
+        .toUpperCase()
+        .slice(0, 2)
+    : '?'
 
   return (
     <Sidebar>
@@ -50,14 +72,17 @@ export function AppSidebar() {
             <SidebarTrigger className="-ml-2 mr-4 p-5" />
             <span className="w-full">Tokei 時計</span>
             <div className={cn('flex w-full flex-row justify-end gap-4')}>
-              <div className="h-full w-fit pt-1.5">
-                <UserButton
-                  appearance={{
-                    elements: {
-                      userButtonPopoverCard: { pointerEvents: 'initial' },
-                    },
-                  }}
-                />
+              <div className="flex h-full items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-muted text-xs font-medium">
+                  {userInitials}
+                </span>
+                <button
+                  onClick={handleSignOut}
+                  title="Sign out"
+                  className="rounded-md p-1 text-muted-foreground hover:bg-accent hover:text-foreground"
+                >
+                  <LogOutIcon className="h-4 w-4" />
+                </button>
               </div>
               <ThemeSwitcher />
             </div>

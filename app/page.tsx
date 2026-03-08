@@ -1,20 +1,18 @@
 'use client'
 import { LandingPage } from '@/components/custom/landing-page'
-import { SignedOut, useClerk } from '@clerk/nextjs'
+import { authClient } from '@/lib/auth-client'
 import { useRouter } from 'next/navigation'
 
 export default function Home() {
-  const { user } = useClerk()
+  const { data: session, isPending } = authClient.useSession()
   const router = useRouter()
 
-  if (user) {
+  if (isPending) return null
+
+  if (session) {
     router.push('/freestyle')
+    return null
   }
-  return (
-    <>
-      <SignedOut>
-        <LandingPage />
-      </SignedOut>
-    </>
-  )
+
+  return <LandingPage />
 }

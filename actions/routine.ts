@@ -1,8 +1,6 @@
 'use server'
 
-import { User } from '@clerk/nextjs/server'
-
-export const getRoutine = async (routineId: string, user?: User) => {
+export const getRoutine = async (routineId: string, user?: { id?: string }) => {
   if (!user?.id) {
     return {
       notFound: true,
@@ -19,7 +17,7 @@ export const getRoutine = async (routineId: string, user?: User) => {
       headers: {
         'Content-Type': 'application/json',
       },
-      credentials: 'include', // Ensure cookies are sent for Clerk
+      credentials: 'include',
     },
   )
 

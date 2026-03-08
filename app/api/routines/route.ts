@@ -1,11 +1,14 @@
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 import { NextRequest, NextResponse } from 'next/server'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
 
 export async function GET(req: NextRequest) {
-  const user = await auth()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
   try {
-    if (!user?.userId) {
+    if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
@@ -16,7 +19,7 @@ export async function GET(req: NextRequest) {
 
     // Query the "routines" collection for documents created by the user
     const routines = await routinesCollection
-      .find({ userId: user.userId })
+      .find({ userId: session.user.id })
       .toArray()
 
     // Return the routines as JSON

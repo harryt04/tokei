@@ -1,40 +1,34 @@
-'use server'
-import { RedirectToSignIn, SignedIn, SignedOut } from '@clerk/nextjs'
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
+import { redirect } from 'next/navigation'
 import RoutinesList from '@/components/custom/routines-list'
 import { getMongoClient, mongoDBConfig } from '@/lib/mongo-client'
-import { currentUser } from '@clerk/nextjs/server'
 import { Routine } from '@/models'
 import { addUser } from '@/lib/utils'
 
 export default async function Routines() {
-  const user = await currentUser()
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  })
 
-  let initialRoutines: Routine[] = []
-
-  if (user) {
-    addUser(user)
-    const client = await getMongoClient()
-    const db = client.db(mongoDBConfig.dbName)
-    const routinesCollection = db.collection(mongoDBConfig.collections.routines)
-
-    const documents = await routinesCollection
-      .find({ userId: user.id })
-      .toArray()
-
-    initialRoutines = documents.map((doc) => ({
-      ...doc,
-      _id: doc._id.toString(),
-    })) as Routine[]
+  if (!session) {
+    redirect('/sign-in')
   }
 
-  return (
-    <>
-      <SignedOut>
-        <RedirectToSignIn />
-      </SignedOut>
-      <SignedIn>
-        <RoutinesList initialRoutines={initialRoutines} />
-      </SignedIn>
-    </>
-  )
+  addUser(session.user)
+
+  const client = await getMongoClient()
+  const db = client.db(mongoDBConfig.dbName)
+  const routinesCollection = db.collection(mongoDBConfig.collections.routines)
+
+  const documents = await routinesCollection
+    .find({ userId: session.user.id })
+    .toArray()
+
+  const initialRoutines = documents.map((doc) => ({
+    ...doc,
+    _id: doc._id.toString(),
+  })) as Routine[]
+
+  return <RoutinesList initialRoutines={initialRoutines} />
 }

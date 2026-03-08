@@ -6,7 +6,7 @@ This file is intended for agentic coding agents working in this repository.
 
 Tokei is a **Next.js 16 / TypeScript** web application using the App Router. It is a routine/timer management tool. Key infrastructure:
 
-- **Auth**: Clerk (`@clerk/nextjs`)
+- **Auth**: Better Auth (`better-auth`)
 - **Database**: MongoDB (singleton client via `lib/mongo-client.ts`)
 - **UI**: shadcn/ui (Radix primitives) + Tailwind CSS
 - **Analytics**: PostHog
@@ -119,7 +119,7 @@ Follow this layered order (unenforced, but consistent throughout the codebase):
 ```ts
 // 1. External packages
 import { useState, useCallback } from 'react'
-import { auth } from '@clerk/nextjs/server'
+import { auth } from '@/lib/auth'
 
 // 2. Internal via @/ alias
 import { Routine } from '@/models'
@@ -203,14 +203,14 @@ Standard HTTP status codes: 400 (bad request), 401 (unauthorized), 404 (not foun
 
 ## Key Files Reference
 
-| File                         | Purpose                                   |
-| ---------------------------- | ----------------------------------------- |
-| `models/routine.ts`          | Core domain types                         |
-| `lib/mongo-client.ts`        | MongoDB singleton + config                |
-| `lib/utils.ts`               | `cn()`, time formatters, shared helpers   |
-| `lib/api.ts`                 | Client-side fetch wrappers for API routes |
-| `hooks/use-routine-timer.ts` | Main timer logic (829 lines)              |
-| `hooks/use-routines.ts`      | CRUD state for routines                   |
-| `proxy.ts`                   | Clerk auth proxy (Next.js 16 convention)  |
-| `app/api/routine/route.ts`   | Single-routine CRUD API                   |
-| `app/api/routines/route.ts`  | List all routines API                     |
+| File                         | Purpose                                     |
+| ---------------------------- | ------------------------------------------- |
+| `models/routine.ts`          | Core domain types                           |
+| `lib/mongo-client.ts`        | MongoDB singleton + config                  |
+| `lib/utils.ts`               | `cn()`, time formatters, shared helpers     |
+| `lib/api.ts`                 | Client-side fetch wrappers for API routes   |
+| `hooks/use-routine-timer.ts` | Main timer logic (829 lines)                |
+| `hooks/use-routines.ts`      | CRUD state for routines                     |
+| `proxy.ts`                   | Better Auth cookie check proxy (Next.js 16) |
+| `app/api/routine/route.ts`   | Single-routine CRUD API                     |
+| `app/api/routines/route.ts`  | List all routines API                       |

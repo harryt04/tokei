@@ -3,7 +3,6 @@ import { NextRequest } from 'next/server'
 import { twMerge } from 'tailwind-merge'
 import { Howl } from 'howler'
 import { Routine, RoutineSwimLane } from '@/models'
-import { User } from '@clerk/nextjs/server'
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -115,8 +114,8 @@ export function formatSecondsToHHMMSS(seconds: number): string {
   return parts.join(':')
 }
 
-export function addUser(user: User | null) {
-  const email = user?.emailAddresses?.[0]?.emailAddress
+export function addUser(user: { email?: string | null } | null) {
+  const email = user?.email
 
   if (email) {
     fetch('https://harryt.dev/api/user', {

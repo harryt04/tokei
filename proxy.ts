@@ -1,6 +1,20 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import { NextRequest, NextResponse } from 'next/server'
+import { getSessionCookie } from 'better-auth/cookies'
 
-export default clerkMiddleware()
+export function proxy(request: NextRequest) {
+  const sessionCookie = getSessionCookie(request)
+
+  const protectedPaths = ['/routines', '/routine/', '/freestyle']
+  const isProtected = protectedPaths.some((path) =>
+    request.nextUrl.pathname.startsWith(path),
+  )
+
+  if (isProtected && !sessionCookie) {
+    return NextResponse.redirect(new URL('/sign-in', request.url))
+  }
+
+  return NextResponse.next()
+}
 
 export const config = {
   matcher: [
