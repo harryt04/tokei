@@ -48,7 +48,7 @@
     "mongodb": "^6.21.0",
     "next": "^16.1.6",
     "next-themes": "^0.3.0",
-    "posthog-js": "^1.358.1",
+    "posthog-js": "^1.359.1",
     "posthog-node": "^4.18.0",
     "react": "^18",
     "react-countdown": "^2.3.6",
