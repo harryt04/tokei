@@ -7,16 +7,16 @@ import { extractParamFromUrl } from '@/lib/utils'
 
 // GET, PATCH, DELETE for a specific routine
 export async function GET(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  const id = extractParamFromUrl(req, 'id')
-
-  if (!id) {
-    return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
-  }
-
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    const id = extractParamFromUrl(req, 'id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
+    }
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -47,12 +47,12 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  const id = extractParamFromUrl(req, 'id')
-
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    const id = extractParamFromUrl(req, 'id')
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
@@ -75,9 +75,13 @@ export async function POST(req: NextRequest) {
     }
 
     if (!existingRoutine) {
-      routinesCollection.insertOne(routineToUpsert)
+      const insertResult = await routinesCollection.insertOne(routineToUpsert)
       return NextResponse.json(
-        { success: true, updatedCount: 1, updatedRoutine: routineToUpsert },
+        {
+          success: true,
+          updatedCount: 1,
+          updatedRoutine: { ...routineToUpsert, _id: insertResult.insertedId },
+        },
         { status: 200 },
       )
     } else {
@@ -106,16 +110,16 @@ export async function POST(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const session = await auth.api.getSession({
-    headers: await headers(),
-  })
-  const id = extractParamFromUrl(req, 'id')
-
-  if (!id) {
-    return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
-  }
-
   try {
+    const session = await auth.api.getSession({
+      headers: await headers(),
+    })
+    const id = extractParamFromUrl(req, 'id')
+
+    if (!id) {
+      return NextResponse.json({ error: 'Missing ID' }, { status: 400 })
+    }
+
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }

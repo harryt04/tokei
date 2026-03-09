@@ -15,7 +15,9 @@
     "test": "jest",
     "test:watch": "jest --watch",
     "test:e2e": "npx playwright test",
-    "test:e2e:ui": "npx playwright test --ui"
+    "test:e2e:ui": "npx playwright test --ui",
+    "run-local-mongo": "brew services start mongodb-community@8.0",
+    "stop-local-mongo": "brew services stop mongodb-community@8.0"
   },
   "dependencies": {
     "@hello-pangea/dnd": "^18.0.1",

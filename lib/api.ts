@@ -31,9 +31,12 @@ export async function createRoutine(
 }
 
 export async function deleteRoutine(routineId: string): Promise<void> {
-  const response = await fetch(`/api/routine?id=${routineId}`, {
-    method: 'DELETE',
-  })
+  const response = await fetch(
+    `/api/routine?id=${encodeURIComponent(routineId)}`,
+    {
+      method: 'DELETE',
+    },
+  )
 
   if (!response.ok) {
     throw new Error(`Error: ${response.status} ${response.statusText}`)
@@ -44,11 +47,14 @@ export async function updateRoutine(
   routineId: string,
   updates: Partial<Routine>,
 ): Promise<Routine> {
-  const response = await fetch(`/api/routine?id=${routineId}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(updates),
-  })
+  const response = await fetch(
+    `/api/routine?id=${encodeURIComponent(routineId)}`,
+    {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(updates),
+    },
+  )
 
   if (!response.ok) {
     console.error('Unable to update routine: ', response)

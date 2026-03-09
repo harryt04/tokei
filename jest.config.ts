@@ -18,6 +18,8 @@ const config: Config = {
   },
   // Ignore Playwright tests
   testPathIgnorePatterns: ['/node_modules/', '/e2e/'],
+  // Suppress console noise from production code exercised in error-path tests
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
 }
 
 export default config
