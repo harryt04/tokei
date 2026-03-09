@@ -19,7 +19,7 @@ Tokei is a **Next.js 16 / TypeScript** web application using the App Router. It 
 ### Development
 
 ```bash
-npm run dev        # Start dev server (Turbopack)
+npm run dev        # Start dev server
 npm run build      # Production build
 npm run start      # Serve production build
 ```
@@ -31,13 +31,20 @@ npm run lint       # ESLint via next lint
 npm run prettify   # Prettier (writes in place)
 ```
 
-ESLint is intentionally skipped during builds (`ignoreDuringBuilds: true` moved to
-`eslint.config.js`). Run lint separately before committing.
+ESLint config lives in `.eslintrc.js`. ESLint is skipped during builds — run it separately before committing. Always run `npm run prettify` after editing `.ts`/`.tsx` files.
 
-### No Test Suite
+### Testing
 
-There is currently no test framework configured. No Jest, Vitest, or Playwright.
-Do not create test files unless the user explicitly requests adding a test framework.
+```bash
+npm test                        # Run all Jest unit tests
+npm run test:watch              # Jest in watch mode
+npx jest __tests__/lib/utils    # Run a single test file
+npx jest -t "test name"         # Run tests matching a name pattern
+npm run test:e2e                # Playwright end-to-end tests
+npm run test:e2e:ui             # Playwright with interactive UI
+```
+
+Unit tests live in `__tests__/` (mirrors the source tree). E2E tests live in `e2e/`. Jest is configured in `jest.config.ts`; Playwright in `playwright.config.ts`.
 
 ### Utilities
 
@@ -50,16 +57,19 @@ npm run create-indexes   # Create MongoDB indexes (via Gulp)
 ## Project Structure
 
 ```
+__tests__/        # Jest unit tests (mirrors source layout)
+e2e/              # Playwright end-to-end tests
 app/              # Next.js App Router: pages, layouts, API routes
   api/            # Route handlers (GET/POST/DELETE)
+actions/          # Next.js Server Actions
 components/
   custom/         # Application-specific components
+  custom/routine/ # Sub-components for the routine view
   ui/             # shadcn/ui primitives (do not hand-edit)
 hooks/            # Custom React hooks (all state management lives here)
 lib/              # Shared utilities and server-side singletons
 models/           # TypeScript types for domain entities
 providers/        # React context providers (theme, PostHog)
-actions/          # Next.js Server Actions
 public/           # Static assets
 ```
 
@@ -67,28 +77,22 @@ public/           # Static assets
 
 ## Code Style
 
-### Formatter: Prettier
-
-Settings (`prettier.config.js`):
+### Formatter: Prettier (`prettier.config.js`)
 
 - **No semicolons** (`semi: false`)
 - **Single quotes** (`singleQuote: true`)
 - **Trailing commas** everywhere (`trailingComma: 'all'`)
 - Tailwind classes auto-sorted via `prettier-plugin-tailwindcss`
 
-Always run `npm run prettify` after making changes to `.ts`/`.tsx` files.
-
 ### TypeScript
 
-- `strict: true` is set but `noImplicitAny: false` — `any` is permitted and used freely
+- `strict: true` but `noImplicitAny: false` — `any` is permitted and used freely
 - `strictNullChecks: true` — null/undefined must be handled
 - Path alias `@/` resolves to the repo root (e.g., `@/lib/utils`, `@/models`)
-- Use plain `type` aliases for all domain types — no classes, no Zod schemas in `models/`
+- Use plain `type` aliases for domain types — no classes, no Zod schemas in `models/`
 - Inline prop types are preferred: `({ routine }: { routine: Routine })`
 
-### ESLint
-
-Config in `.eslintrc.js`. Notably disabled rules:
+### ESLint (`.eslintrc.js`) — notably disabled rules
 
 - `@typescript-eslint/no-explicit-any` — `any` is allowed
 - `@typescript-eslint/no-unused-vars` — unused vars are allowed
@@ -104,7 +108,7 @@ Config in `.eslintrc.js`. Notably disabled rules:
 | React components    | `PascalCase`              | `RoutineComponent`, `AppSidebar`         |
 | Hooks               | `camelCase`, `use` prefix | `useRoutineTimer`, `useRoutines`         |
 | Functions/utilities | `camelCase`               | `fetchRoutines`, `formatSecondsToHHMMSS` |
-| Types / interfaces  | `PascalCase`              | `Routine`, `RoutineStep`, `SyncGroup`    |
+| Types               | `PascalCase`              | `Routine`, `RoutineStep`, `SyncGroup`    |
 | Component files     | `kebab-case.tsx`          | `routine-component.tsx`                  |
 | Hook files          | `use-kebab-case.ts`       | `use-routine-timer.ts`                   |
 | Constants           | `SCREAMING_SNAKE_CASE`    | `MINS_FROM_MILLI`                        |
@@ -119,7 +123,6 @@ Follow this layered order (unenforced, but consistent throughout the codebase):
 ```ts
 // 1. External packages
 import { useState, useCallback } from 'react'
-import { auth } from '@/lib/auth'
 
 // 2. Internal via @/ alias
 import { Routine } from '@/models'
@@ -146,7 +149,7 @@ import { Button } from './ui/button'
 - **No global state manager** (no Redux, Zustand, etc.)
 - All state lives in custom hooks in `hooks/`
 - Each hook exposes: data state, `loading`, `error`, and stable `useCallback`-memoized handlers
-- Use `useRef` in parallel with `useState` when state is read inside `setInterval` or other closures (prevents stale closures)
+- Use `useRef` in parallel with `useState` when state is read inside `setInterval` or closures (prevents stale closures)
 - Error type pattern: `catch (err: any) { setError(err.message || 'Fallback message') }`
 
 ---
@@ -156,10 +159,13 @@ import { Button } from './ui/button'
 All routes live in `app/api/` and follow this structure:
 
 ```ts
-export async function GET(req: NextRequest) {
-  const user = await auth() // Auth check first
+import { auth } from '@/lib/auth'
+import { headers } from 'next/headers'
 
-  if (!user?.userId) {
+export async function GET(req: NextRequest) {
+  const session = await auth.api.getSession({ headers: await headers() })
+
+  if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
@@ -207,10 +213,13 @@ Standard HTTP status codes: 400 (bad request), 401 (unauthorized), 404 (not foun
 | ---------------------------- | ------------------------------------------- |
 | `models/routine.ts`          | Core domain types                           |
 | `lib/mongo-client.ts`        | MongoDB singleton + config                  |
+| `lib/auth.ts`                | Better Auth server instance                 |
 | `lib/utils.ts`               | `cn()`, time formatters, shared helpers     |
 | `lib/api.ts`                 | Client-side fetch wrappers for API routes   |
-| `hooks/use-routine-timer.ts` | Main timer logic (829 lines)                |
+| `hooks/use-routine-timer.ts` | Main timer logic                            |
 | `hooks/use-routines.ts`      | CRUD state for routines                     |
 | `proxy.ts`                   | Better Auth cookie check proxy (Next.js 16) |
 | `app/api/routine/route.ts`   | Single-routine CRUD API                     |
 | `app/api/routines/route.ts`  | List all routines API                       |
+| `jest.config.ts`             | Jest configuration                          |
+| `playwright.config.ts`       | Playwright configuration                    |
