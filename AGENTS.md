@@ -29,7 +29,7 @@ npm run start      # Serve production build
 ```bash
 npm run lint       # ESLint via next lint
 npm run prettify   # Prettier (writes in place)
-**PR gate**: All PRs must pass `npm run ci` (prettier --check + lint + tsc --noEmit + jest). See `.github/workflows/ci.yml`.
+**PR gate**: All PRs must pass `npm run ci` (prettier+tsc+jest); lint separate. See `.github/workflows/ci.yml`.
 ```
 
 ESLint config lives in `.eslintrc.js`. ESLint is skipped during builds — run it separately before committing. Always run `npm run prettify` after editing `.ts`/`.tsx` files.
