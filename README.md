@@ -11,6 +11,10 @@ Built with:
 - Better Auth
 - shadcn UI
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute and the PR requirements (`npm run ci`).
+
 # Creating indexes for your own mongodb instance
 
 1. Supply your `defaultConnectionString` in `lib/mongo-client.ts`
