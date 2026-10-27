@@ -19,30 +19,30 @@ Tokei is a **Next.js 16 / TypeScript** web application using the App Router. It 
 ### Development
 
 ```bash
-npm run dev        # Start dev server
-npm run build      # Production build
-npm run start      # Serve production build
+pnpm run dev        # Start dev server
+pnpm run build      # Production build
+pnpm run start      # Serve production build
 ```
 
 ### Linting & Formatting
 
 ```bash
-npm run lint       # ESLint via next lint
-npm run prettify   # Prettier (writes in place)
-**PR gate**: All PRs must pass `npm run ci` (prettier+tsc+jest); lint separate. See `.github/workflows/ci.yml`.
+pnpm run lint       # ESLint via next lint
+pnpm run prettify   # Prettier (writes in place)
+**PR gate**: All PRs must pass `pnpm run ci` (prettier+tsc+jest); lint separate. See `.github/workflows/ci.yml`.
 ```
 
-ESLint config lives in `.eslintrc.js`. ESLint is skipped during builds — run it separately before committing. Always run `npm run prettify` after editing `.ts`/`.tsx` files.
+ESLint config lives in `.eslintrc.js`. ESLint is skipped during builds — run it separately before committing. Always run `pnpm run prettify` after editing `.ts`/`.tsx` files.
 
 ### Testing
 
 ```bash
-npm test                        # Run all Jest unit tests
-npm run test:watch              # Jest in watch mode
-npx jest __tests__/lib/utils    # Run a single test file
-npx jest -t "test name"         # Run tests matching a name pattern
-npm run test:e2e                # Playwright end-to-end tests
-npm run test:e2e:ui             # Playwright with interactive UI
+pnpm run test                        # Run all Jest unit tests
+pnpm run test:watch              # Jest in watch mode
+pnpm exec jest __tests__/lib/utils    # Run a single test file
+pnpm exec jest -t "test name"         # Run tests matching a name pattern
+pnpm run test:e2e                # Playwright end-to-end tests
+pnpm run test:e2e:ui             # Playwright with interactive UI
 ```
 
 Unit tests live in `__tests__/` (mirrors the source tree). E2E tests live in `e2e/`. Jest is configured in `jest.config.ts`; Playwright in `playwright.config.ts`.
@@ -50,7 +50,7 @@ Unit tests live in `__tests__/` (mirrors the source tree). E2E tests live in `e2
 ### Utilities
 
 ```bash
-npm run create-indexes   # Create MongoDB indexes (via Gulp)
+pnpm run create-indexes   # Create MongoDB indexes (via Gulp)
 ```
 
 ---

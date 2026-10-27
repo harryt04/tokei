@@ -13,10 +13,17 @@ Built with:
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute and the PR requirements (`npm run ci`).
+See [CONTRIBUTING.md](CONTRIBUTING.md) for how to contribute and the PR requirements (`pnpm run ci`).
 
 # Creating indexes for your own mongodb instance
 
 1. Supply your `defaultConnectionString` in `lib/mongo-client.ts`
-1. Run `npm run create-indexes` at the repo root to create indexes for the collections in your mongodb instance.
-   - If you get an error about gulp not being found, run `npm install -g gulp` to install gulp globally, then try again.
+1. Run `pnpm run create-indexes` at the repo root to create indexes for the collections in your mongodb instance.
+   - Gulp is a local development dependency; run `pnpm install --frozen-lockfile` if it is missing.
+
+## Package manager
+
+Use pnpm 11.24.0, pinned in `package.json`. Install it with
+`npm install --global pnpm@11.24.0` if pnpm is not available.
+Run `pnpm install --frozen-lockfile` after cloning. Commit `pnpm-lock.yaml`
+when dependencies change; do not generate npm or Yarn lockfiles.
