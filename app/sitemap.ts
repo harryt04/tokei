@@ -7,7 +7,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
     },
     {
-      url: 'https://tokei.harryt.dev/login',
+      url: 'https://tokei.harryt.dev/sign-in',
+      lastModified: new Date(),
+    },
+    {
+      url: 'https://tokei.harryt.dev/sign-up',
       lastModified: new Date(),
     },
   ]

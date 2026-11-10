@@ -133,7 +133,7 @@ export default function SignIn() {
             Don&apos;t have an account?{' '}
             <Link
               href="/sign-up"
-              className="font-medium text-primary underline-offset-4 hover:underline"
+              className="font-medium text-cyan-800 underline underline-offset-4 hover:no-underline dark:text-primary"
             >
               Sign up
             </Link>

@@ -20,6 +20,7 @@ const fontSans = FontSans({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://tokei.harryt.dev'),
   title: 'Tokei 時計',
   description: `Tokei (時計, meaning 'clock' in Japanese) is a free, open-source timer app built for power users. Designed specifically for chefs in the kitchen, it helps manage multiple timers simultaneously, ensuring all dishes are finished at the perfect moment.`,
   icons: {
