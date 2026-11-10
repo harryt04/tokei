@@ -47,7 +47,7 @@
     "howler": "^2.2.4",
     "lucide-react": "^0.426.0",
     "mongodb": "^6.21.0",
-    "next": "^16.1.6",
+    "next": "^16.4.1",
     "next-themes": "^0.3.0",
     "posthog-js": "^1.359.1",
     "posthog-node": "^4.18.0",
