@@ -9,7 +9,7 @@ Built with:
 - Tailwind CSS
 - PostHog
 - Better Auth
-- shadcn UI
+- UI SDK (`@ui-sdk/react` and `@ui-sdk/core`) components with shadcn/ui styling
 
 ## Contributing
 
