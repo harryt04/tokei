@@ -72,7 +72,7 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
     return (
       <div className="rounded-md border bg-muted/50 p-4">
         {notes ? (
-          <p className="whitespace-pre-wrap text-sm">{notes}</p>
+          <p className="text-sm whitespace-pre-wrap">{notes}</p>
         ) : (
           <Muted>No notes for this routine.</Muted>
         )}

@@ -8,7 +8,7 @@ function LandingPage() {
   return (
     <div className="flex min-h-screen w-full flex-col">
       {/* Header/Nav Placeholder */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur-sm supports-backdrop-filter:bg-background/60">
         <div className="container flex h-14 items-center justify-between">
           <Link href="/" className="mr-6 flex items-center space-x-2">
             <span className="font-bold">Tokei 時計</span>
@@ -58,18 +58,18 @@ function LandingPage() {
         {/* Features Section */}
         <section
           id="features"
-          className="w-full bg-slate-50/50 py-12 dark:bg-transparent lg:py-24"
+          className="w-full bg-slate-50/50 py-12 lg:py-24 dark:bg-transparent"
         >
           <div className="container space-y-6">
-            <div className="mx-auto flex max-w-[58rem] flex-col items-center space-y-4 text-center">
-              <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">
+            <div className="mx-auto flex max-w-232 flex-col items-center space-y-4 text-center">
+              <h2 className="text-3xl leading-[1.1] font-bold sm:text-3xl md:text-5xl">
                 Features
               </h2>
               <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">
                 Built for efficiency and precision in demanding environments.
               </p>
             </div>
-            <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-[64rem] md:grid-cols-3">
+            <div className="mx-auto grid justify-center gap-4 sm:grid-cols-2 md:max-w-5xl md:grid-cols-3">
               {/* Feature Card 1 */}
               <Card>
                 <CardHeader>
@@ -114,8 +114,8 @@ function LandingPage() {
         {/* Optional: Call to Action Section */}
         <section id="open-source" className="w-full py-12 lg:py-24">
           <div className="container">
-            <div className="mx-auto flex max-w-[58rem] flex-col items-center justify-center gap-4 text-center">
-              <h2 className="text-3xl font-bold leading-[1.1] sm:text-3xl md:text-5xl">
+            <div className="mx-auto flex max-w-232 flex-col items-center justify-center gap-4 text-center">
+              <h2 className="text-3xl leading-[1.1] font-bold sm:text-3xl md:text-5xl">
                 Ready to Get Started?
               </h2>
               <p className="max-w-[85%] leading-normal text-muted-foreground sm:text-lg sm:leading-7">

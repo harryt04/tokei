@@ -53,7 +53,7 @@ export default function SignIn() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center">
-      <div className="absolute right-4 top-4">
+      <div className="absolute top-4 right-4">
         <ThemeSwitcher />
       </div>
       <Card className="w-full max-w-md">
@@ -63,7 +63,7 @@ export default function SignIn() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleEmailSignIn} className="space-y-4">
-            <div className="space-y-2">
+            <div className="[&>input]:mt-2">
               <Label htmlFor="email">Email</Label>
               <Input
                 id="email"
@@ -74,7 +74,7 @@ export default function SignIn() {
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="[&>input]:mt-2">
               <Label htmlFor="password">Password</Label>
               <Input
                 id="password"

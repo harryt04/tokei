@@ -16,7 +16,7 @@ import { Separator } from '@/components/ui/separator'
 
 const fontSans = FontSans({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-inter',
 })
 
 export const metadata: Metadata = {

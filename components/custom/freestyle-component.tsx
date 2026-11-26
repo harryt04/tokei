@@ -128,7 +128,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
               })
               props.timerUpdated({ ...props.timer, name: e.target.value })
             }}
-            className="w-full border-none bg-transparent outline-none"
+            className="w-full border-none bg-transparent outline-hidden"
           />
           {!alarm && runningState !== 'running' && (
             <>
