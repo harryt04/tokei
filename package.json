@@ -21,7 +21,6 @@
     "stop-local-mongo": "brew services stop mongodb-community@8.0"
   },
   "dependencies": {
-    "@hello-pangea/dnd": "^18.0.1",
     "@hookform/resolvers": "^3.9.0",
     "@ui-sdk/core": "0.1.0-beta.17",
     "@ui-sdk/react": "0.1.0-beta.17",

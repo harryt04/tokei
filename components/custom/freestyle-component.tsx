@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef } from 'react'
+import React, { useId, useRef, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -10,9 +10,16 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { PlayIcon, RefreshCwIcon, SquareIcon, Trash2Icon } from 'lucide-react'
+import {
+  GripVerticalIcon,
+  PlayIcon,
+  RefreshCwIcon,
+  SquareIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
+import { SortableHandle } from '../ui/sortable'
 import { Progress } from '../ui/progress'
 import Countdown from 'react-countdown'
 import '../styles/freestyle.css'
@@ -28,6 +35,7 @@ type RunningState = 'stopped' | 'running' | 'completed'
 const MILISECONDS = 1000
 
 const FreestyleComponent = (props: FreestyleComponentProps) => {
+  const fieldId = useId()
   const [timer, setTimer] = useState<Timer>(props.timer)
   const [hours, setHours] = useState(
     Math.floor(props.timer?.duration / 3600).toString(),
@@ -116,19 +124,30 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="freestyle-header">
-          <input
-            type="text"
-            value={timer?.name ?? ''}
-            onChange={(e) => {
-              setTimer({
-                ...timer,
-                name: e.target.value,
-              })
-              props.timerUpdated({ ...props.timer, name: e.target.value })
-            }}
-            className="w-full border-none bg-transparent outline-hidden"
-          />
+        <CardTitle
+          className="freestyle-header"
+          aria-label={timer?.name?.trim() || 'Timer'}
+        >
+          <div className="flex min-w-0 items-center gap-2">
+            <SortableHandle
+              aria-label={`Reorder ${timer?.name?.trim() || 'timer'}`}
+              className="text-muted-foreground"
+            >
+              <GripVerticalIcon aria-hidden="true" className="size-4" />
+            </SortableHandle>
+            <input
+              type="text"
+              value={timer?.name ?? ''}
+              onChange={(e) => {
+                setTimer({
+                  ...timer,
+                  name: e.target.value,
+                })
+                props.timerUpdated({ ...props.timer, name: e.target.value })
+              }}
+              className="w-full border-none bg-transparent outline-hidden"
+            />
+          </div>
           {!alarm && runningState !== 'running' && (
             <>
               <Button
@@ -165,9 +184,9 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
             <>
               <div className="flex gap-6">
                 <div>
-                  <Label htmlFor="hours-input">Hours</Label>
+                  <Label htmlFor={`${fieldId}-hours-input`}>Hours</Label>
                   <Input
-                    id="hours-input"
+                    id={`${fieldId}-hours-input`}
                     type="number"
                     inputMode="numeric"
                     placeholder="Hours"
@@ -182,9 +201,9 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="min-input">Minutes</Label>
+                  <Label htmlFor={`${fieldId}-min-input`}>Minutes</Label>
                   <Input
-                    id="min-input"
+                    id={`${fieldId}-min-input`}
                     type="number"
                     inputMode="numeric"
                     placeholder="Minutes"
@@ -199,9 +218,9 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="sec-input">Seconds</Label>
+                  <Label htmlFor={`${fieldId}-sec-input`}>Seconds</Label>
                   <Input
-                    id="sec-input"
+                    id={`${fieldId}-sec-input`}
                     type="number"
                     inputMode="numeric"
                     placeholder="Seconds"

@@ -1,5 +1,5 @@
 'use client'
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useEffect, useId, useRef, useState } from 'react'
 import {
   Card,
   CardContent,
@@ -11,12 +11,12 @@ import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import {
-  PlayIcon,
   RefreshCwIcon,
   Trash2Icon,
   GripVerticalIcon,
   SquareIcon,
 } from 'lucide-react'
+import { SortableHandle } from '../ui/sortable'
 import { Progress } from '../ui/progress'
 import { RoutineStep } from '@/models'
 import {
@@ -31,8 +31,6 @@ export type RoutineTimerComponentProps = {
   step: RoutineStep
   stepUpdated: (updatedStep: RoutineStep) => void
   removeStep: (id: string) => void
-  isDragging?: boolean
-  dragHandleProps?: any
 }
 
 type RunningState = 'stopped' | 'running' | 'completed'
@@ -40,6 +38,7 @@ type RunningState = 'stopped' | 'running' | 'completed'
 const MILLISECONDS = 1000
 
 const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
+  const fieldId = useId()
   const [step, setStep] = useState<RoutineStep>(props.step)
   const [minutes, setMinutes] = useState(
     Math.floor(props.step?.durationInSeconds / 60).toString(),
@@ -132,16 +131,18 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
   }
 
   return (
-    <Card
-      className={`min-w-[250px] ${props.isDragging ? 'border-primary' : ''}`}
-    >
+    <Card className="min-w-[250px] group-data-[tokei-dragging]/step:border-primary">
       <CardHeader className="p-3">
-        <CardTitle className="flex items-center justify-between text-sm">
-          {props.dragHandleProps && (
-            <div {...props.dragHandleProps} className="mr-2 cursor-grab p-1">
-              <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
-            </div>
-          )}
+        <CardTitle
+          className="flex items-center justify-between text-sm"
+          aria-label={step.name.trim() || 'Step'}
+        >
+          <SortableHandle
+            aria-label={`Reorder ${step.name.trim() || 'step'}`}
+            className="mr-2 p-1"
+          >
+            <GripVerticalIcon className="h-4 w-4 text-muted-foreground" />
+          </SortableHandle>
           <Input
             value={step.name}
             onValueChange={(value) => handleNameChange(value)}
@@ -161,11 +162,11 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
       <CardContent className="p-3">
         <div className="mb-2 flex gap-2">
           <div className="flex-1">
-            <Label htmlFor="minutes-input" className="text-xs">
+            <Label htmlFor={`${fieldId}-minutes-input`} className="text-xs">
               Min
             </Label>
             <Input
-              id="minutes-input"
+              id={`${fieldId}-minutes-input`}
               type="number"
               inputMode="numeric"
               value={minutes}
@@ -177,11 +178,11 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
             />
           </div>
           <div className="flex-1">
-            <Label htmlFor="seconds-input" className="text-xs">
+            <Label htmlFor={`${fieldId}-seconds-input`} className="text-xs">
               Sec
             </Label>
             <Input
-              id="seconds-input"
+              id={`${fieldId}-seconds-input`}
               type="number"
               inputMode="numeric"
               value={seconds}
@@ -195,7 +196,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
         </div>
 
         <div className="mb-2">
-          <Label htmlFor="start-type" className="text-xs">
+          <Label htmlFor={`${fieldId}-start-type`} className="text-xs">
             Start
           </Label>
           <Select
@@ -204,7 +205,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               handleStartTypeChange(value)
             }
           >
-            <SelectTrigger id="start-type" className="h-7 text-sm">
+            <SelectTrigger id={`${fieldId}-start-type`} className="h-7 text-sm">
               <SelectValue placeholder="Start type" />
             </SelectTrigger>
             <SelectContent>

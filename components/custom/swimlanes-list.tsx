@@ -23,7 +23,12 @@ import { Input } from '../ui/input'
 import { ScrollArea, ScrollBar } from '../ui/scroll-area'
 import { useRoutines } from '@/hooks/use-routines'
 import { toast } from '../ui/use-toast'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import {
+  applySortableOrder,
+  SortableHandle,
+  SortableItem,
+  SortableList,
+} from '../ui/sortable'
 import RoutineTimerComponent from './routine-timer-component'
 import { calculateSwimLaneRunTimes, formatSecondsToHHMMSS } from '@/lib/utils'
 
@@ -126,21 +131,24 @@ export const SwimlanesList = forwardRef<
     }
   }
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return
-
-    const reorderedLanes = Array.from(swimLanes)
-    const [removed] = reorderedLanes.splice(result.source.index, 1)
-    reorderedLanes.splice(result.destination.index, 0, removed)
-
-    setSwimLanes(reorderedLanes)
+  const updateSteps = (
+    laneId: string,
+    update: (steps: RoutineStep[]) => RoutineStep[],
+  ) => {
+    setSwimLanes((current) =>
+      current.map((lane) =>
+        lane.id === laneId
+          ? { ...lane, steps: update(lane.steps ?? []) }
+          : lane,
+      ),
+    )
   }
 
   const scrollToEnd = (swimLaneId: string) => {
     // Set a slight delay to ensure the DOM has updated with the new step
     setTimeout(() => {
       const scrollArea = document.querySelector(
-        `[data-swimlane-id="${swimLaneId}"] [data-radix-scroll-area-viewport]`,
+        `[data-swimlane-id="${swimLaneId}"] [data-tokei-scroll-viewport]`,
       )
       if (scrollArea) {
         scrollArea.scrollLeft = scrollArea.scrollWidth
@@ -209,193 +217,156 @@ export const SwimlanesList = forwardRef<
     )
   const swimLanesRunTimes = calculateSwimLaneRunTimes(swimLanes)
 
+  const lanesById = new Map(swimLanes.map((lane) => [lane.id, lane]))
+
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Droppable droppableId="swimlanes">
-        {(provided) => (
-          <div
-            {...provided.droppableProps}
-            ref={provided.innerRef}
-            className="mt-4 flex flex-col gap-4"
-          >
-            {swimLanes.map((swimLane, index) => (
-              <Draggable
-                key={swimLane.id}
-                draggableId={swimLane.id}
-                index={index}
-              >
-                {(provided, snapshot) => (
-                  <div
-                    ref={provided.innerRef}
-                    {...provided.draggableProps}
-                    className={`rounded-md ${snapshot.isDragging ? 'border border-primary bg-background shadow-lg' : ''}`}
-                    data-swimlane-id={swimLane.id}
-                  >
-                    <div className="flex items-center gap-2">
-                      <div
-                        {...provided.dragHandleProps}
-                        className="cursor-grab rounded p-1 hover:bg-muted"
-                      >
-                        <GripVerticalIcon className="h-5 w-5 text-muted-foreground" />
-                      </div>
-                      {editingId === swimLane.id ? (
-                        <Input
-                          value={editValue}
-                          onValueChange={(value) => setEditValue(value)}
-                          onBlur={() => handleSave(swimLane.id)}
-                          onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
-                          className="font-semibold"
-                        />
-                      ) : (
-                        <>
-                          <H4
-                            onClick={() => handleEdit(swimLane)}
-                            className="cursor-pointer transition-colors hover:text-primary"
-                          >
-                            {swimLane.name}
-                          </H4>
-                          <Muted>
-                            {`${swimLane.steps?.length ?? 0} total steps - total time: ${formatSecondsToHHMMSS(
-                              swimLanesRunTimes[swimLane.id],
-                            )}`}
-                          </Muted>
-                        </>
-                      )}
-                    </div>
+    <>
+      <SortableList
+        aria-label="Swimlanes"
+        value={Array.from(lanesById.keys())}
+        label={(id) => lanesById.get(id)?.name.trim() || 'swimlane'}
+        onValueChange={(order) =>
+          setSwimLanes((current) => applySortableOrder(current, order))
+        }
+        className="mt-4 flex flex-col gap-4"
+      >
+        {(id) => {
+          const swimLane = lanesById.get(id)
+          if (!swimLane) return null
+          const stepsById = new Map(
+            (swimLane.steps ?? []).map((step) => [step.id, step]),
+          )
 
-                    <div className="relative mt-2">
-                      <ScrollArea className="h-auto w-full rounded-md border border-dashed border-muted-foreground">
-                        <div className="flex min-h-56 w-full gap-4 p-4 pr-16">
-                          {' '}
-                          {/* Added padding-right to make space for the fixed button */}
-                          <Droppable
-                            droppableId={`steps-${swimLane.id}`}
-                            direction="horizontal"
-                            type="swimlaneSteps"
-                          >
-                            {(provided) => (
-                              <div
-                                ref={provided.innerRef}
-                                {...provided.droppableProps}
-                                className="flex gap-4"
-                              >
-                                {swimLane.steps &&
-                                  swimLane.steps.map((step, stepIndex) => (
-                                    <Draggable
-                                      key={step.id}
-                                      draggableId={`step-${step.id}`}
-                                      index={stepIndex}
-                                    >
-                                      {(provided, snapshot) => (
-                                        <div
-                                          ref={provided.innerRef}
-                                          {...provided.draggableProps}
-                                        >
-                                          <RoutineTimerComponent
-                                            step={step}
-                                            isDragging={snapshot.isDragging}
-                                            dragHandleProps={
-                                              provided.dragHandleProps
-                                            }
-                                            stepUpdated={(updatedStep) => {
-                                              const updatedSwimLanes =
-                                                swimLanes.map((lane) => {
-                                                  if (lane.id === swimLane.id) {
-                                                    const updatedSteps = [
-                                                      ...lane.steps,
-                                                    ]
-                                                    updatedSteps[stepIndex] =
-                                                      updatedStep
-                                                    return {
-                                                      ...lane,
-                                                      steps: updatedSteps,
-                                                    }
-                                                  }
-                                                  return lane
-                                                })
-                                              setSwimLanes(updatedSwimLanes)
-                                              setHasChanges(true)
-                                            }}
-                                            removeStep={(stepId) => {
-                                              const updatedSwimLanes =
-                                                swimLanes.map((lane) => {
-                                                  if (lane.id === swimLane.id) {
-                                                    return {
-                                                      ...lane,
-                                                      steps: lane.steps.filter(
-                                                        (s) => s.id !== stepId,
-                                                      ),
-                                                    }
-                                                  }
-                                                  return lane
-                                                })
-                                              setSwimLanes(updatedSwimLanes)
-                                              setHasChanges(true)
-                                            }}
-                                          />
-                                        </div>
-                                      )}
-                                    </Draggable>
-                                  ))}
-                                {provided.placeholder}
-                              </div>
-                            )}
-                          </Droppable>
-                        </div>
-                        <ScrollBar orientation="horizontal" />
-                      </ScrollArea>
-
-                      {/* Fixed position add button that's always visible */}
-                      <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2">
-                        <Button
-                          variant="secondary"
-                          size="icon"
-                          className="h-auto min-h-48 shadow-md"
-                          onClick={() => {
-                            const newStep: RoutineStep = {
-                              id: uuidv4(),
-                              swimLaneId: swimLane.id,
-                              name: `Step ${(swimLane.steps?.length || 0) + 1}`,
-                              sequence: (swimLane.steps?.length || 0) + 1,
-                              durationInSeconds: 60,
-                              startType: 'automatic',
-                            }
-
-                            const updatedSwimLanes = swimLanes.map((lane) => {
-                              if (lane.id === swimLane.id) {
-                                return {
-                                  ...lane,
-                                  steps: [...(lane.steps || []), newStep],
-                                }
-                              }
-                              return lane
-                            })
-
-                            setSwimLanes(updatedSwimLanes)
-                            setHasChanges(true)
-                            scrollToEnd(swimLane.id)
-                          }}
-                          ref={(el) => {
-                            addButtonRefs.current[swimLane.id] = el
-                          }}
-                        >
-                          <PlusIcon />
-                        </Button>
-                      </div>
-                    </div>
-                  </div>
+          return (
+            <SortableItem
+              value={id}
+              className="rounded-md data-[tokei-dragging]:bg-background data-[tokei-dragging]:shadow-lg data-[tokei-dragging]:ring-1 data-[tokei-dragging]:ring-primary"
+              data-swimlane-id={id}
+            >
+              <div className="flex items-center gap-2">
+                <SortableHandle
+                  aria-label={`Reorder ${swimLane.name.trim() || 'swimlane'}`}
+                  className="p-1 hover:bg-muted"
+                >
+                  <GripVerticalIcon className="h-5 w-5 text-muted-foreground" />
+                </SortableHandle>
+                {editingId === swimLane.id ? (
+                  <Input
+                    value={editValue}
+                    onValueChange={(value) => setEditValue(value)}
+                    onBlur={() => handleSave(swimLane.id)}
+                    onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
+                    className="font-semibold"
+                  />
+                ) : (
+                  <>
+                    <H4
+                      onClick={() => handleEdit(swimLane)}
+                      className="cursor-pointer transition-colors hover:text-primary"
+                    >
+                      {swimLane.name}
+                    </H4>
+                    <Muted>
+                      {`${swimLane.steps?.length ?? 0} total steps - total time: ${formatSecondsToHHMMSS(
+                        swimLanesRunTimes[swimLane.id],
+                      )}`}
+                    </Muted>
+                  </>
                 )}
-              </Draggable>
-            ))}
-            {provided.placeholder}
-          </div>
-        )}
-      </Droppable>
+              </div>
+
+              <div className="relative mt-2">
+                <ScrollArea className="h-auto w-full rounded-md border border-dashed border-muted-foreground">
+                  <div className="flex min-h-56 w-full gap-4 p-4 pr-16">
+                    <SortableList
+                      aria-label={`Steps in ${swimLane.name}`}
+                      orientation="horizontal"
+                      preview
+                      value={Array.from(stepsById.keys())}
+                      label={(key) => stepsById.get(key)?.name.trim() || 'step'}
+                      onValueChange={(order) =>
+                        updateSteps(id, (steps) =>
+                          applySortableOrder(steps, order),
+                        )
+                      }
+                      className="flex gap-4"
+                    >
+                      {(key) => {
+                        const step = stepsById.get(key)
+                        if (!step) return null
+
+                        return (
+                          <SortableItem value={key} className="group/step">
+                            <RoutineTimerComponent
+                              step={step}
+                              stepUpdated={(updatedStep) =>
+                                updateSteps(id, (steps) =>
+                                  steps.map((item) =>
+                                    item.id === key ? updatedStep : item,
+                                  ),
+                                )
+                              }
+                              removeStep={(stepId) =>
+                                updateSteps(id, (steps) =>
+                                  steps.filter((item) => item.id !== stepId),
+                                )
+                              }
+                            />
+                          </SortableItem>
+                        )
+                      }}
+                    </SortableList>
+                  </div>
+                  <ScrollBar orientation="horizontal" />
+                </ScrollArea>
+
+                {/* Fixed position add button that's always visible */}
+                <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2">
+                  <Button
+                    variant="secondary"
+                    size="icon"
+                    className="h-auto min-h-48 shadow-md"
+                    onClick={() => {
+                      const newStep: RoutineStep = {
+                        id: uuidv4(),
+                        swimLaneId: swimLane.id,
+                        name: `Step ${(swimLane.steps?.length || 0) + 1}`,
+                        sequence: (swimLane.steps?.length || 0) + 1,
+                        durationInSeconds: 60,
+                        startType: 'automatic',
+                      }
+
+                      const updatedSwimLanes = swimLanes.map((lane) => {
+                        if (lane.id === swimLane.id) {
+                          return {
+                            ...lane,
+                            steps: [...(lane.steps || []), newStep],
+                          }
+                        }
+                        return lane
+                      })
+
+                      setSwimLanes(updatedSwimLanes)
+                      setHasChanges(true)
+                      scrollToEnd(swimLane.id)
+                    }}
+                    ref={(el) => {
+                      addButtonRefs.current[swimLane.id] = el
+                    }}
+                  >
+                    <PlusIcon />
+                  </Button>
+                </div>
+              </div>
+            </SortableItem>
+          )
+        }}
+      </SortableList>
 
       <div className="flex">
         <AddSwimlaneButton />
         <SaveButton />
       </div>
-    </DragDropContext>
+    </>
   )
 })
