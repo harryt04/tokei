@@ -4,6 +4,7 @@ import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
 
 import { cn } from '@/lib/utils'
+import { AgentBridge } from '@/providers/agent-bridge'
 import { PostHogProvider } from '@/providers/posthogProvider'
 import { ThemeProvider } from '@/providers/themeProvider'
 import {
@@ -54,6 +55,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <AgentBridge />
             <SidebarProvider>
               <AuthSidebar />
               <SidebarInset>

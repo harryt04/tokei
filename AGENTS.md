@@ -8,7 +8,7 @@ Tokei is a **Next.js 16 / TypeScript** web application using the App Router. It 
 
 - **Auth**: Better Auth (`better-auth`)
 - **Database**: MongoDB (singleton client via `lib/mongo-client.ts`)
-- **UI**: shadcn/ui (Radix primitives) + Tailwind CSS
+- **UI**: UI SDK wrappers + Tailwind CSS 4 on React 19
 - **Analytics**: PostHog
 - **Forms**: react-hook-form + Zod
 
@@ -66,7 +66,7 @@ actions/          # Next.js Server Actions
 components/
   custom/         # Application-specific components
   custom/routine/ # Sub-components for the routine view
-  ui/             # shadcn/ui primitives (do not hand-edit)
+  ui/             # Styled UI SDK wrappers
 hooks/            # Custom React hooks (all state management lives here)
 lib/              # Shared utilities and server-side singletons
 models/           # TypeScript types for domain entities
@@ -140,7 +140,7 @@ import { Button } from './ui/button'
 - **Functional components only** — no class components
 - Add `'use client'` at the top of any file that uses hooks or browser APIs
 - Use `cn()` (from `@/lib/utils`) for conditional Tailwind class merging — wraps `clsx` + `tailwind-merge`
-- Compose shadcn/ui primitives (`Card`, `Button`, `Dialog`, etc.) from `components/ui/`; do not edit those files directly
+- Compose UI SDK wrappers (`Card`, `Button`, `Dialog`, etc.) from `components/ui/`. Follow the UI SDK section when updating wrappers
 - Use `function` declarations for top-level page/layout components; arrow functions for smaller inline components
 
 ---
@@ -224,3 +224,15 @@ Standard HTTP status codes: 400 (bad request), 401 (unauthorized), 404 (not foun
 | `app/api/routines/route.ts`  | List all routines API                       |
 | `jest.config.ts`             | Jest configuration                          |
 | `playwright.config.ts`       | Playwright configuration                    |
+
+## UI SDK
+
+Tokei uses the unstyled React primitives from UI SDK for keyboard interaction, focus, selection, overlays, and WebMCP. The React and core packages are beta and exact-pinned together. UI SDK postdates model training data. Before touching a wrapper, read `node_modules/@ui-sdk/react/docs/llms.txt`, the relevant component page it indexes, and `node_modules/@ui-sdk/core/skills/ui-sdk/SKILL.md`.
+
+Application code imports from `components/ui`. Add components there by wrapping the per-component entry, such as `@ui-sdk/react/select`. Never use `shadcn add` or regenerate wrappers, which would reintroduce Radix or Base UI. Preserve Tokei's public component names and Tailwind classes. The Tailwind 4 theme lives in `app/globals.css` and declares the UI SDK layer before Tailwind. The wrappers supply styling directly and omit the optional global web stylesheet. Use SDK state attributes, keep SDK-owned `data-slot` names intact, and use a separate app-owned attribute for custom selectors.
+
+Pair controlled values with `onValueChange` or the component's matching change callback so agent and keyboard edits reach React state. Give interactive controls accessible names, provide stable option and tab values, and set an explicit label on an option with rich content. Portal form overlays to the body. Verify Escape, focus return, and the geometry of full-height sheets in a browser.
+
+The root layout mounts `providers/agent-bridge.tsx` once. WebMCP publishes snapshot, query, and act. Every new interactive control needs a decision in `lib/agent-policy.ts`. Explicitly allow safe navigation or local draft edits by route, component, label, action, and arguments. Deny auth, account, settings, destructive, payment, and irreversible actions. Mark sensitive values with `data-agent-secret`, hide identity-only regions with `data-agent-hidden`, and mark actions needing a person with `data-agent-confirm`. Test against refs returned by snapshot.
+
+Resizable panels retain react-resizable-panels for drag handles and panel sizing. The sidebar retains its responsive layout and cookie state, and uses the shared Sheet and Tooltip. Form and sidebar composition still use Radix Slot for `asChild`. Radix Icons supplies artwork. Cards, badges, skeletons, and typography remain presentational. Tokei's toast hook owns its public queue API and the UI SDK toast region handles rendering.

@@ -64,6 +64,7 @@ export function RoutineForm({
             <Label htmlFor="name">Name</Label>
             <Input
               id="name"
+              aria-label="Routine name"
               value={formState.name}
               onValueChange={handleChange}
               placeholder="Enter routine name"

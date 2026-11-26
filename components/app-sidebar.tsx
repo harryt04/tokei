@@ -26,6 +26,7 @@ import {
 } from '@/components/ui/sidebar'
 import { authClient } from '@/lib/auth-client'
 import Link from 'next/link'
+import { Button } from './ui/button'
 import { ThemeSwitcher } from './custom/theme-switcher'
 import { useRouter } from 'next/navigation'
 
@@ -96,15 +97,22 @@ export function AppSidebar() {
                       isActive={isActive}
                       tooltip={item.title}
                     >
-                      <Link
-                        href={item.url}
-                        onClick={() => {
-                          setOpenMobile(false)
-                        }}
+                      <Button
+                        asChild
+                        variant="ghost"
+                        className="justify-start"
+                        aria-label={item.title}
                       >
-                        <item.icon />
-                        <span>{item.title}</span>
-                      </Link>
+                        <Link
+                          href={item.url}
+                          onClick={() => {
+                            setOpenMobile(false)
+                          }}
+                        >
+                          <item.icon />
+                          <span>{item.title}</span>
+                        </Link>
+                      </Button>
                     </SidebarMenuButton>
                     {item.badge && (
                       <SidebarMenuBadge>{item.badge}</SidebarMenuBadge>
@@ -121,6 +129,9 @@ export function AppSidebar() {
           <SidebarMenu>
             <SidebarMenuItem>
               <SidebarMenuButton
+                data-agent-confirm="Signs out of the account"
+                data-agent-hidden
+                data-agent-secret
                 onClick={handleSignOut}
                 tooltip="Sign out"
                 className="w-full"

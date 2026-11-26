@@ -62,10 +62,15 @@ export default function SignIn() {
           <CardDescription>Enter your credentials to continue</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
+          <form
+            data-agent-confirm="Authenticates or creates an account"
+            onSubmit={handleEmailSignIn}
+            className="space-y-4"
+          >
             <div className="[&>input]:mt-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                data-agent-secret
                 id="email"
                 type="email"
                 placeholder="you@example.com"
@@ -77,6 +82,7 @@ export default function SignIn() {
             <div className="[&>input]:mt-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                data-agent-secret
                 id="password"
                 type="password"
                 placeholder="Your password"

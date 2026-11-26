@@ -63,10 +63,15 @@ export default function SignUp() {
           <CardDescription>Sign up to start using Tokei 時計</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleEmailSignUp} className="space-y-4">
+          <form
+            data-agent-confirm="Authenticates or creates an account"
+            onSubmit={handleEmailSignUp}
+            className="space-y-4"
+          >
             <div className="[&>input]:mt-2">
               <Label htmlFor="name">Name</Label>
               <Input
+                data-agent-secret
                 id="name"
                 type="text"
                 placeholder="Your name"
@@ -78,6 +83,7 @@ export default function SignUp() {
             <div className="[&>input]:mt-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                data-agent-secret
                 id="email"
                 type="email"
                 placeholder="you@example.com"
@@ -89,6 +95,7 @@ export default function SignUp() {
             <div className="[&>input]:mt-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                data-agent-secret
                 id="password"
                 type="password"
                 placeholder="Min 8 characters"
