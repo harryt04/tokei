@@ -84,7 +84,7 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
     <div className="space-y-2">
       <Textarea
         value={notes}
-        onChange={(e) => handleChange(e.target.value)}
+        onValueChange={(value) => handleChange(value)}
         placeholder="Add notes for this routine... e.g., ingredient lists, special instructions, tips, etc."
         className="min-h-24 resize-y"
       />

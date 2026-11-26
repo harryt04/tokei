@@ -70,7 +70,7 @@ export default function SignIn() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onValueChange={(value) => setEmail(value)}
                 required
               />
             </div>
@@ -81,7 +81,7 @@ export default function SignIn() {
                 type="password"
                 placeholder="Your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onValueChange={(value) => setPassword(value)}
                 required
               />
             </div>

@@ -185,9 +185,9 @@ export const PrepTasksList = forwardRef<
 
                           <Input
                             value={task.name}
-                            onChange={(e) =>
+                            onValueChange={(value) =>
                               handleUpdateTask(task.id, {
-                                name: e.target.value,
+                                name: value,
                               })
                             }
                             placeholder="Task name (e.g., Grate cheese)"
@@ -206,11 +206,14 @@ export const PrepTasksList = forwardRef<
                               })
                             }
                           >
-                            <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectTrigger
+                              aria-label="Complete before"
+                              className="w-full sm:w-[180px]"
+                            >
                               <SelectValue placeholder="Complete before..." />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="none">
+                              <SelectItem value="none" label="No dependency">
                                 <span className="flex items-center gap-2">
                                   <Link2OffIcon className="h-3 w-3" />
                                   No dependency
@@ -220,6 +223,7 @@ export const PrepTasksList = forwardRef<
                                 <SelectItem
                                   key={swimlane.id}
                                   value={swimlane.id}
+                                  label={`Before: ${swimlane.name}`}
                                 >
                                   <span className="flex items-center gap-2">
                                     <LinkIcon className="h-3 w-3" />

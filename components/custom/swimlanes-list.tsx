@@ -241,7 +241,7 @@ export const SwimlanesList = forwardRef<
                       {editingId === swimLane.id ? (
                         <Input
                           value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
+                          onValueChange={(value) => setEditValue(value)}
                           onBlur={() => handleSave(swimLane.id)}
                           onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
                           className="font-semibold"

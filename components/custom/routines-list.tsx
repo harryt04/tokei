@@ -83,7 +83,7 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
               type="text"
               placeholder="Search routines..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onValueChange={(value) => setSearchTerm(value)}
               className="pl-10"
             />
           </div>

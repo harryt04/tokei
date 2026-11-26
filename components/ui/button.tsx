@@ -1,5 +1,6 @@
+'use client'
 import * as React from 'react'
-import { Slot } from '@radix-ui/react-slot'
+import { Button as ButtonPart } from '@ui-sdk/react/button'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '@/lib/utils'
@@ -35,20 +36,25 @@ const buttonVariants = cva(
 
 export interface ButtonProps
   extends
-    React.ButtonHTMLAttributes<HTMLButtonElement>,
+    Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'onClick'>,
     VariantProps<typeof buttonVariants> {
+  onClick?: React.MouseEventHandler<HTMLElement>
   asChild?: boolean
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
-    const Comp = asChild ? Slot : 'button'
+  ({ className, variant, size, asChild = false, children, ...props }, ref) => {
     return (
-      <Comp
+      <ButtonPart
+        render={
+          asChild && React.isValidElement(children) ? children : undefined
+        }
         className={cn(buttonVariants({ variant, size, className }))}
         ref={ref}
         {...props}
-      />
+      >
+        {asChild ? undefined : children}
+      </ButtonPart>
     )
   },
 )

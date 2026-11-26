@@ -35,10 +35,10 @@ export function RoutineForm({
     }
   }, [routine])
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (name: string) => {
     setFormState({
       ...formState,
-      name: e.target.value,
+      name,
     })
   }
 
@@ -65,7 +65,7 @@ export function RoutineForm({
             <Input
               id="name"
               value={formState.name}
-              onChange={handleChange}
+              onValueChange={handleChange}
               placeholder="Enter routine name"
               className="mt-4 w-full"
             />

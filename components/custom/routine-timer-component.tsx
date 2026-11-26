@@ -144,7 +144,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
           )}
           <Input
             value={step.name}
-            onChange={(e) => handleNameChange(e.target.value)}
+            onValueChange={(value) => handleNameChange(value)}
             className="h-7 text-sm"
             placeholder="Step name"
           />
@@ -169,8 +169,8 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               type="number"
               inputMode="numeric"
               value={minutes}
-              onChange={(e) => {
-                setMinutes(Number(e.target.value).toString())
+              onValueChange={(value) => {
+                setMinutes(Number(value).toString())
               }}
               onWheel={(e) => e.currentTarget.blur()} // Prevent scroll from changing value
               className="h-7 text-sm"
@@ -185,8 +185,8 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
               type="number"
               inputMode="numeric"
               value={seconds}
-              onChange={(e) => {
-                setSeconds(Number(e.target.value).toString())
+              onValueChange={(value) => {
+                setSeconds(Number(value).toString())
               }}
               onWheel={(e) => e.currentTarget.blur()} // Prevent scroll from changing value
               className="h-7 text-sm"

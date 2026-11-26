@@ -71,7 +71,7 @@ export default function SignUp() {
                 type="text"
                 placeholder="Your name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onValueChange={(value) => setName(value)}
                 required
               />
             </div>
@@ -82,7 +82,7 @@ export default function SignUp() {
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onValueChange={(value) => setEmail(value)}
                 required
               />
             </div>
@@ -93,7 +93,7 @@ export default function SignUp() {
                 type="password"
                 placeholder="Min 8 characters"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onValueChange={(value) => setPassword(value)}
                 required
                 minLength={8}
               />
