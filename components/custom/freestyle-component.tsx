@@ -10,11 +10,10 @@ import {
 import { Label } from '../ui/label'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
-import { PlayIcon, RefreshCwIcon, Trash2Icon } from 'lucide-react'
+import { PlayIcon, RefreshCwIcon, SquareIcon, Trash2Icon } from 'lucide-react'
 import { Timer } from './freestyle-list'
 import { getDateNMinutesFromNow, playCustomAlarm } from '@/lib/utils'
 import { Progress } from '../ui/progress'
-import { StopIcon } from '@radix-ui/react-icons'
 import Countdown from 'react-countdown'
 import '../styles/freestyle.css'
 
@@ -224,6 +223,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
           <>
             <Progress
               value={timerProgress}
+              aria-label={`${timer?.name || 'Timer'} progress`}
               className="bg-transparent ring-1 ring-border ring-gray-500"
             ></Progress>
           </>
@@ -252,7 +252,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         {runningState === 'running' && (
           <>
             <Button onClick={handleStop} variant="secondary">
-              <StopIcon />
+              <SquareIcon />
               Stop
             </Button>
           </>
@@ -261,7 +261,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
         {alarm && (
           <>
             <Button onClick={handleStopAlarm} variant="secondary">
-              <StopIcon />
+              <SquareIcon />
               Stop alarm
             </Button>
           </>

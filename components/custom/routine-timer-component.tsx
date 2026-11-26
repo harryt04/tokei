@@ -15,9 +15,9 @@ import {
   RefreshCwIcon,
   Trash2Icon,
   GripVerticalIcon,
+  SquareIcon,
 } from 'lucide-react'
 import { Progress } from '../ui/progress'
-import { StopIcon } from '@radix-ui/react-icons'
 import { RoutineStep } from '@/models'
 import {
   Select,
@@ -215,7 +215,11 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
         </div>
 
         {runningState === 'running' && (
-          <Progress value={timerProgress} className="h-2" />
+          <Progress
+            value={timerProgress}
+            aria-label={`${step.name} progress`}
+            className="h-2"
+          />
         )}
       </CardContent>
 
@@ -227,7 +231,7 @@ const RoutineTimerComponent = (props: RoutineTimerComponentProps) => {
             size="sm"
             className="h-7 w-full text-xs"
           >
-            <StopIcon className="mr-1 h-3 w-3" />
+            <SquareIcon className="mr-1 h-3 w-3" />
             Stop
           </Button>
         )}
