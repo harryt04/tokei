@@ -41,11 +41,11 @@ afterAll(() => {
 
 describe('PostHogClient - non-production', () => {
   beforeEach(() => {
-    ;(process.env as any).NODE_ENV = 'test'
+    Object.assign(process.env, { NODE_ENV: 'test' })
   })
 
   it('returns a mock object in development/test', () => {
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     const client = PostHogClient()
 
     expect(client).toBeDefined()
@@ -53,7 +53,7 @@ describe('PostHogClient - non-production', () => {
   })
 
   it('mock capture is a no-op (does not throw)', () => {
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     const client = PostHogClient()
 
     expect(() =>
@@ -62,7 +62,7 @@ describe('PostHogClient - non-production', () => {
   })
 
   it('does not create a real PostHog client in non-production', () => {
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     PostHogClient()
 
     expect(mockPostHogConstructor).not.toHaveBeenCalled()
@@ -70,9 +70,9 @@ describe('PostHogClient - non-production', () => {
 
   it('returns mock even if NEXT_PUBLIC_POSTHOG_KEY is set', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_test_key'
-    ;(process.env as any).NODE_ENV = 'development'
+    Object.assign(process.env, { NODE_ENV: 'development' })
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     const client = PostHogClient()
 
     // Should still return mock because not in production
@@ -87,13 +87,13 @@ describe('PostHogClient - non-production', () => {
 
 describe('PostHogClient - production', () => {
   beforeEach(() => {
-    ;(process.env as any).NODE_ENV = 'production'
+    Object.assign(process.env, { NODE_ENV: 'production' })
   })
 
   it('throws when NEXT_PUBLIC_POSTHOG_KEY is not set', () => {
     delete process.env.NEXT_PUBLIC_POSTHOG_KEY
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
 
     expect(() => PostHogClient()).toThrow('NEXT_PUBLIC_POSTHOG_KEY is not set')
   })
@@ -102,7 +102,7 @@ describe('PostHogClient - production', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_test_key'
     process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://posthog.example.com'
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     const client = PostHogClient()
 
     expect(mockPostHogConstructor).toHaveBeenCalledWith('phc_test_key', {
@@ -117,7 +117,7 @@ describe('PostHogClient - production', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_key'
     process.env.NEXT_PUBLIC_POSTHOG_HOST = 'https://custom.host.com'
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     PostHogClient()
 
     const [, options] = mockPostHogConstructor.mock.calls[0]
@@ -128,7 +128,7 @@ describe('PostHogClient - production', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_key'
     delete process.env.NEXT_PUBLIC_POSTHOG_HOST
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     PostHogClient()
 
     const [, options] = mockPostHogConstructor.mock.calls[0]
@@ -138,7 +138,7 @@ describe('PostHogClient - production', () => {
   it('configures immediate flushing (flushAt: 1, flushInterval: 0)', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_key'
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
     PostHogClient()
 
     const [, options] = mockPostHogConstructor.mock.calls[0]
@@ -149,7 +149,7 @@ describe('PostHogClient - production', () => {
   it('creates a new client on each call (not a singleton)', () => {
     process.env.NEXT_PUBLIC_POSTHOG_KEY = 'phc_key'
 
-    const PostHogClient = require('@/lib/posthog-server').default
+    const PostHogClient = jest.requireActual('@/lib/posthog-server').default
 
     const client1 = PostHogClient()
     const client2 = PostHogClient()

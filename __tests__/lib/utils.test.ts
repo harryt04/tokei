@@ -541,7 +541,7 @@ describe('addUser', () => {
   })
 
   it('silently swallows fetch errors', async () => {
-    ;(global.fetch as jest.Mock).mockRejectedValue(new Error('Network error'))
+    jest.mocked(global.fetch).mockRejectedValue(new Error('Network error'))
 
     // Should not throw
     expect(() => addUser({ email: 'test@example.com' })).not.toThrow()
@@ -551,9 +551,9 @@ describe('addUser', () => {
   })
 
   it('silently swallows non-ok responses', async () => {
-    ;(global.fetch as jest.Mock).mockResolvedValue(
-      new Response('error', { status: 500 }),
-    )
+    jest
+      .mocked(global.fetch)
+      .mockResolvedValue(new Response('error', { status: 500 }))
 
     // addUser doesn't check response.ok, so this should not throw
     expect(() => addUser({ email: 'test@example.com' })).not.toThrow()
