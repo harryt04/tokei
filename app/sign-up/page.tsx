@@ -54,7 +54,7 @@ export default function SignUp() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center">
-      <div className="absolute right-4 top-4">
+      <div className="absolute top-4 right-4">
         <ThemeSwitcher />
       </div>
       <Card className="w-full max-w-md">
@@ -63,37 +63,44 @@ export default function SignUp() {
           <CardDescription>Sign up to start using Tokei 時計</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleEmailSignUp} className="space-y-4">
-            <div className="space-y-2">
+          <form
+            data-agent-confirm="Authenticates or creates an account"
+            onSubmit={handleEmailSignUp}
+            className="space-y-4"
+          >
+            <div className="[&>input]:mt-2">
               <Label htmlFor="name">Name</Label>
               <Input
+                data-agent-secret
                 id="name"
                 type="text"
                 placeholder="Your name"
                 value={name}
-                onChange={(e) => setName(e.target.value)}
+                onValueChange={(value) => setName(value)}
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="[&>input]:mt-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                data-agent-secret
                 id="email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onValueChange={(value) => setEmail(value)}
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="[&>input]:mt-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                data-agent-secret
                 id="password"
                 type="password"
                 placeholder="Min 8 characters"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onValueChange={(value) => setPassword(value)}
                 required
                 minLength={8}
               />

@@ -34,27 +34,27 @@ afterAll(() => {
 
 describe('mongoDBConfig', () => {
   it('database name includes NODE_ENV', () => {
-    ;(process.env as any).NODE_ENV = 'test'
+    Object.assign(process.env, { NODE_ENV: 'test' })
 
-    const { mongoDBConfig } = require('@/lib/mongo-client')
+    const { mongoDBConfig } = jest.requireActual('@/lib/mongo-client')
 
     expect(mongoDBConfig.dbName).toBe('tokei-test')
   })
 
   it('database name uses "development" in dev', () => {
-    ;(process.env as any).NODE_ENV = 'development'
+    Object.assign(process.env, { NODE_ENV: 'development' })
     jest.resetModules()
 
-    const { mongoDBConfig } = require('@/lib/mongo-client')
+    const { mongoDBConfig } = jest.requireActual('@/lib/mongo-client')
 
     expect(mongoDBConfig.dbName).toBe('tokei-development')
   })
 
   it('database name uses "production" in prod', () => {
-    ;(process.env as any).NODE_ENV = 'production'
+    Object.assign(process.env, { NODE_ENV: 'production' })
     jest.resetModules()
 
-    const { mongoDBConfig } = require('@/lib/mongo-client')
+    const { mongoDBConfig } = jest.requireActual('@/lib/mongo-client')
 
     expect(mongoDBConfig.dbName).toBe('tokei-production')
   })
@@ -63,13 +63,13 @@ describe('mongoDBConfig', () => {
     delete (process.env as any).NODE_ENV
     jest.resetModules()
 
-    const { mongoDBConfig } = require('@/lib/mongo-client')
+    const { mongoDBConfig } = jest.requireActual('@/lib/mongo-client')
 
     expect(mongoDBConfig.dbName).toBe('tokei-undefined')
   })
 
   it('collections.routines is "routines"', () => {
-    const { mongoDBConfig } = require('@/lib/mongo-client')
+    const { mongoDBConfig } = jest.requireActual('@/lib/mongo-client')
 
     expect(mongoDBConfig.collections.routines).toBe('routines')
   })
@@ -81,7 +81,7 @@ describe('mongoDBConfig', () => {
 
 describe('getMongoClient', () => {
   it('creates a MongoClient on first call', async () => {
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     await getMongoClient()
 
@@ -89,7 +89,7 @@ describe('getMongoClient', () => {
   })
 
   it('calls connect on first call', async () => {
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     await getMongoClient()
 
@@ -97,7 +97,7 @@ describe('getMongoClient', () => {
   })
 
   it('reuses the same client on subsequent calls (singleton)', async () => {
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     const client1 = await getMongoClient()
     const client2 = await getMongoClient()
@@ -109,7 +109,7 @@ describe('getMongoClient', () => {
   })
 
   it('returns the client object', async () => {
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     const client = await getMongoClient()
 
@@ -122,7 +122,7 @@ describe('getMongoClient', () => {
     jest.resetModules()
 
     // Re-require to pick up the env var
-    require('@/lib/mongo-client')
+    jest.requireActual('@/lib/mongo-client')
 
     // The module uses this string when creating the client
     // We can't directly observe the string passed, but at least it doesn't throw
@@ -134,7 +134,7 @@ describe('getMongoClient', () => {
     jest.resetModules()
 
     // Should not throw - falls back to hardcoded default
-    expect(() => require('@/lib/mongo-client')).not.toThrow()
+    expect(() => jest.requireActual('@/lib/mongo-client')).not.toThrow()
   })
 })
 
@@ -146,7 +146,7 @@ describe('getMongoClient - connection failures', () => {
   it('propagates connection errors', async () => {
     mockConnect.mockRejectedValueOnce(new Error('Connection refused'))
 
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     await expect(getMongoClient()).rejects.toThrow('Connection refused')
   })
@@ -155,7 +155,7 @@ describe('getMongoClient - connection failures', () => {
     const connectError = new Error('Connection refused')
     mockConnect.mockRejectedValue(connectError)
 
-    const { getMongoClient } = require('@/lib/mongo-client')
+    const { getMongoClient } = jest.requireActual('@/lib/mongo-client')
 
     await expect(getMongoClient()).rejects.toThrow('Connection refused')
     // Second call: client is set (non-null), clientPromise is a rejected promise

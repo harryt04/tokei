@@ -4,6 +4,7 @@ import { Inter as FontSans } from 'next/font/google'
 import './globals.css'
 
 import { cn } from '@/lib/utils'
+import { AgentBridge } from '@/providers/agent-bridge'
 import { PostHogProvider } from '@/providers/posthogProvider'
 import { ThemeProvider } from '@/providers/themeProvider'
 import {
@@ -16,7 +17,7 @@ import { Separator } from '@/components/ui/separator'
 
 const fontSans = FontSans({
   subsets: ['latin'],
-  variable: '--font-sans',
+  variable: '--font-inter',
 })
 
 export const metadata: Metadata = {
@@ -39,7 +40,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <PostHogProvider>
         <body
           suppressHydrationWarning={true}
@@ -54,6 +55,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <AgentBridge />
             <SidebarProvider>
               <AuthSidebar />
               <SidebarInset>

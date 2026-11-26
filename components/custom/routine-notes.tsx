@@ -72,7 +72,7 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
     return (
       <div className="rounded-md border bg-muted/50 p-4">
         {notes ? (
-          <p className="whitespace-pre-wrap text-sm">{notes}</p>
+          <p className="text-sm whitespace-pre-wrap">{notes}</p>
         ) : (
           <Muted>No notes for this routine.</Muted>
         )}
@@ -84,7 +84,7 @@ export function RoutineNotes({ routine, readOnly = false }: RoutineNotesProps) {
     <div className="space-y-2">
       <Textarea
         value={notes}
-        onChange={(e) => handleChange(e.target.value)}
+        onValueChange={(value) => handleChange(value)}
         placeholder="Add notes for this routine... e.g., ingredient lists, special instructions, tips, etc."
         className="min-h-24 resize-y"
       />

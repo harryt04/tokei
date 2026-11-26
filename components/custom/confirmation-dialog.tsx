@@ -41,7 +41,11 @@ export default function ConfirmationDialog({
           <Button variant="outline" onClick={onCancel}>
             {onCancelLabel}
           </Button>
-          <Button variant="destructive" onClick={onConfirm}>
+          <Button
+            variant="destructive"
+            data-agent-confirm={description}
+            onClick={onConfirm}
+          >
             {onConfirmLabel}
           </Button>
         </DialogFooter>

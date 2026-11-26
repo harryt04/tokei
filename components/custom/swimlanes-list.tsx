@@ -161,7 +161,7 @@ export const SwimlanesList = forwardRef<
           },
         ])
       }}
-      className="mr-2 mt-4"
+      className="mt-4 mr-2"
     >
       <PlusIcon className="mr-1" />
       Add swimlane
@@ -241,7 +241,7 @@ export const SwimlanesList = forwardRef<
                       {editingId === swimLane.id ? (
                         <Input
                           value={editValue}
-                          onChange={(e) => setEditValue(e.target.value)}
+                          onValueChange={(value) => setEditValue(value)}
                           onBlur={() => handleSave(swimLane.id)}
                           onKeyDown={(e) => handleKeyDown(e, swimLane.id)}
                           className="font-semibold"
@@ -346,7 +346,7 @@ export const SwimlanesList = forwardRef<
                       </ScrollArea>
 
                       {/* Fixed position add button that's always visible */}
-                      <div className="absolute right-2 top-1/2 z-10 -translate-y-1/2">
+                      <div className="absolute top-1/2 right-2 z-10 -translate-y-1/2">
                         <Button
                           variant="secondary"
                           size="icon"

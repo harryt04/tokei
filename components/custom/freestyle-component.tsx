@@ -128,7 +128,7 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
               })
               props.timerUpdated({ ...props.timer, name: e.target.value })
             }}
-            className="w-full border-none bg-transparent outline-none"
+            className="w-full border-none bg-transparent outline-hidden"
           />
           {!alarm && runningState !== 'running' && (
             <>
@@ -173,8 +173,8 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                     inputMode="numeric"
                     placeholder="Hours"
                     value={hours}
-                    onChange={(e) => {
-                      setHours(Number(e.target.value).toString())
+                    onValueChange={(value) => {
+                      setHours(Number(value).toString())
                       props.timerUpdated({
                         ...props.timer,
                         duration: calculateTotalDuration(),
@@ -190,8 +190,8 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                     inputMode="numeric"
                     placeholder="Minutes"
                     value={minutes}
-                    onChange={(e) => {
-                      setMinutes(Number(e.target.value).toString())
+                    onValueChange={(value) => {
+                      setMinutes(Number(value).toString())
                       props.timerUpdated({
                         ...props.timer,
                         duration: calculateTotalDuration(),
@@ -207,8 +207,8 @@ const FreestyleComponent = (props: FreestyleComponentProps) => {
                     inputMode="numeric"
                     placeholder="Seconds"
                     value={seconds}
-                    onChange={(e) => {
-                      setSeconds(Number(e.target.value).toString())
+                    onValueChange={(value) => {
+                      setSeconds(Number(value).toString())
                       props.timerUpdated({
                         ...props.timer,
                         duration: calculateTotalDuration(),

@@ -53,7 +53,7 @@ export default function SignIn() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center">
-      <div className="absolute right-4 top-4">
+      <div className="absolute top-4 right-4">
         <ThemeSwitcher />
       </div>
       <Card className="w-full max-w-md">
@@ -62,26 +62,32 @@ export default function SignIn() {
           <CardDescription>Enter your credentials to continue</CardDescription>
         </CardHeader>
         <CardContent>
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
-            <div className="space-y-2">
+          <form
+            data-agent-confirm="Authenticates or creates an account"
+            onSubmit={handleEmailSignIn}
+            className="space-y-4"
+          >
+            <div className="[&>input]:mt-2">
               <Label htmlFor="email">Email</Label>
               <Input
+                data-agent-secret
                 id="email"
                 type="email"
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onValueChange={(value) => setEmail(value)}
                 required
               />
             </div>
-            <div className="space-y-2">
+            <div className="[&>input]:mt-2">
               <Label htmlFor="password">Password</Label>
               <Input
+                data-agent-secret
                 id="password"
                 type="password"
                 placeholder="Your password"
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onValueChange={(value) => setPassword(value)}
                 required
               />
             </div>

@@ -136,8 +136,8 @@ export default function StartRoutineDialog({
                   <Input
                     type="time"
                     value={endTime}
-                    onChange={(e) => {
-                      setEndTime(e.target.value)
+                    onValueChange={(value) => {
+                      setEndTime(value)
                       setError(null)
                     }}
                     onFocus={() => setStartMode('timed')}

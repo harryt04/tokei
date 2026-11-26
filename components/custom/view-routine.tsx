@@ -160,7 +160,7 @@ export default function ViewRoutine(props: ViewRoutineProps) {
             <Input
               type="text"
               value={name}
-              onChange={(e) => handleNameChange(e.target.value)}
+              onValueChange={(value) => handleNameChange(value)}
               onBlur={handleBlur}
               onKeyDown={(e) => {
                 if (e.key === 'Enter') handleBlur()

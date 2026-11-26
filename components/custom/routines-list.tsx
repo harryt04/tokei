@@ -73,17 +73,18 @@ function RoutinesList({ initialRoutines = [] }: RoutinesListProps) {
   return (
     <>
       <div className="flex flex-col">
-        <div className="ml-0 mt-8 flex w-full flex-col items-center gap-4 md:ml-4 md:flex-row">
+        <div className="mt-8 ml-0 flex w-full flex-col items-center gap-4 md:ml-4 md:flex-row">
           <Button variant="default" onClick={() => setIsFormOpen(true)}>
             <PlusIcon /> Add Routine
           </Button>
           <div className="relative w-full max-w-sm">
-            <SearchIcon className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <SearchIcon className="absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
             <Input
               type="text"
+              aria-label="Search routines"
               placeholder="Search routines..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onValueChange={(value) => setSearchTerm(value)}
               className="pl-10"
             />
           </div>

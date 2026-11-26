@@ -1,11 +1,11 @@
 'use client'
 
-import * as CollapsiblePrimitive from '@radix-ui/react-collapsible'
+import * as Parts from '@ui-sdk/react/collapsible'
 
-const Collapsible = CollapsiblePrimitive.Root
+const Collapsible = Parts.Collapsible
 
-const CollapsibleTrigger = CollapsiblePrimitive.CollapsibleTrigger
+const CollapsibleTrigger = Parts.CollapsibleTrigger
 
-const CollapsibleContent = CollapsiblePrimitive.CollapsibleContent
+const CollapsibleContent = Parts.CollapsiblePanel
 
 export { Collapsible, CollapsibleTrigger, CollapsibleContent }

@@ -1,4 +1,4 @@
-import { FC } from 'react'
+import { FC, type JSX } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 
 export interface NoResultsProps {
