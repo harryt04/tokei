@@ -1,6 +1,6 @@
 'use client'
 import React, { useState, useEffect } from 'react'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import { applySortableOrder, SortableItem, SortableList } from '../ui/sortable'
 import FreestyleComponent from './freestyle-component'
 import { ClockIcon, PlusIcon } from 'lucide-react'
 import { Button } from '../ui/button'
@@ -51,93 +51,77 @@ function FreestyleList() {
     backupTimers(timers)
   }, [timers])
 
-  const onDragEnd = (result: any) => {
-    if (!result.destination) return
-
-    const reorderedTimers = Array.from(timers)
-    const [removed] = reorderedTimers.splice(result.source.index, 1)
-    reorderedTimers.splice(result.destination.index, 0, removed)
-
-    setTimers(reorderedTimers)
-  }
+  const timersById = new Map(timers.map((timer) => [timer.id, timer]))
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex w-full flex-col gap-4 p-4">
-        <Droppable droppableId="timers">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="flex flex-col gap-4"
-            >
-              {timers.map((timer, index) => (
-                <Draggable key={timer.id} draggableId={timer.id} index={index}>
-                  {(provided) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      {...provided.dragHandleProps}
-                    >
-                      <FreestyleComponent
-                        timer={timer}
-                        timerUpdated={(newTimer) => {
-                          setTimers((prevTimers) => {
-                            const updatedTimers = [...prevTimers]
-                            updatedTimers[index] = { ...newTimer }
-                            return updatedTimers
-                          })
-                        }}
-                        removeTimer={(id) => {
-                          setTimers((prevTimers) => {
-                            const newTimerList = prevTimers.filter(
-                              (t) => t.id !== id,
-                            )
-                            if (newTimerList.length === 0) backupTimers([])
-                            return newTimerList
-                          })
-                        }}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
+    <div className="flex w-full flex-col gap-4 p-4">
+      <SortableList
+        aria-label="Timers"
+        className="flex flex-col gap-4"
+        value={Array.from(timersById.keys())}
+        label={(id) => timersById.get(id)?.name.trim() || 'timer'}
+        onValueChange={(order) =>
+          setTimers((current) => applySortableOrder(current, order))
+        }
+      >
+        {(id) => {
+          const timer = timersById.get(id)
+          if (!timer) return null
 
-        {timers.length === 0 && (
-          <>
-            <NoResultsComponent
-              icon={<ClockIcon />}
-              title="No timers"
-              body={[
-                'Click the button below to get started.',
-                'Create as many timers as you need.',
-              ]}
-            />
-          </>
-        )}
+          return (
+            <SortableItem value={id}>
+              <FreestyleComponent
+                timer={timer}
+                timerUpdated={(updatedTimer) => {
+                  setTimers((current) =>
+                    current.map((item) =>
+                      item.id === id ? updatedTimer : item,
+                    ),
+                  )
+                }}
+                removeTimer={(id) => {
+                  setTimers((current) => {
+                    const remaining = current.filter((timer) => timer.id !== id)
+                    if (remaining.length === 0) backupTimers([])
+                    return remaining
+                  })
+                }}
+              />
+            </SortableItem>
+          )
+        }}
+      </SortableList>
 
-        <Button
-          variant="outline"
-          onClick={() => {
-            setTimers((previousTimers) => [
-              ...previousTimers,
-              {
-                id: uuidv4(),
-                name: `Timer ${previousTimers.length + 1}`,
-                duration: 0,
-              },
-            ])
-          }}
-        >
-          <PlusIcon />
-          Add timer
-        </Button>
-      </div>
-    </DragDropContext>
+      {timers.length === 0 && (
+        <>
+          <NoResultsComponent
+            icon={<ClockIcon />}
+            title="No timers"
+            body={[
+              'Click the button below to get started.',
+              'Create as many timers as you need.',
+            ]}
+          />
+        </>
+      )}
+
+      <Button
+        variant="outline"
+        onClick={() => {
+          setTimers((previousTimers) => [
+            ...previousTimers,
+            {
+              id: uuidv4(),
+              name: `Timer ${previousTimers.length + 1}`,
+              duration: 0,
+            },
+          ])
+        }}
+      >
+        <PlusIcon />
+        Add timer
+      </Button>
+    </div>
   )
 }
 

@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button'
-import { HomeIcon } from '@radix-ui/react-icons'
+import { HomeIcon } from 'lucide-react'
 import Link from 'next/link'
 
 export default async function NotFound() {

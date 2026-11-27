@@ -19,7 +19,12 @@ import {
   Trash2Icon,
 } from 'lucide-react'
 import { v4 as uuidv4 } from 'uuid'
-import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd'
+import {
+  applySortableOrder,
+  SortableHandle,
+  SortableItem,
+  SortableList,
+} from '../ui/sortable'
 import {
   Select,
   SelectContent,
@@ -99,16 +104,6 @@ export const PrepTasksList = forwardRef<
     setPrepTasks((prev) => prev.filter((task) => task.id !== id))
   }
 
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return
-
-    const reordered = Array.from(prepTasks)
-    const [removed] = reordered.splice(result.source.index, 1)
-    reordered.splice(result.destination.index, 0, removed)
-
-    setPrepTasks(reordered)
-  }
-
   const handleSave = async () => {
     if (isSaving) return
     setIsSaving(true)
@@ -137,122 +132,114 @@ export const PrepTasksList = forwardRef<
     }
   }
 
-  const getSwimlaneName = (swimlaneId?: string) => {
-    if (!swimlaneId) return null
-    const swimlane = routine.swimLanes?.find((sl) => sl.id === swimlaneId)
-    return swimlane?.name ?? 'Unknown'
-  }
+  const tasksById = new Map(prepTasks.map((task) => [task.id, task]))
 
   return (
     <div className="space-y-4">
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="prep-tasks">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-2"
-            >
-              {prepTasks.length === 0 && (
-                <Muted className="py-4 text-center">
-                  No prep tasks yet. Prep tasks are things you can do before or
-                  during your routine, like &quot;grate cheese&quot; or
-                  &quot;chop onions&quot;. They don&apos;t have a timer—just
-                  check them off when done.
-                </Muted>
-              )}
+      {prepTasks.length === 0 && (
+        <Muted className="py-4 text-center">
+          No prep tasks yet. Prep tasks are things you can do before or during
+          your routine, like &quot;grate cheese&quot; or &quot;chop
+          onions&quot;. They don&apos;t have a timer—just check them off when
+          done.
+        </Muted>
+      )}
+      {prepTasks.length > 0 && (
+        <SortableList
+          aria-label="Prep tasks"
+          value={Array.from(tasksById.keys())}
+          label={(id) => tasksById.get(id)?.name.trim() || 'prep task'}
+          onValueChange={(order) =>
+            setPrepTasks((current) => applySortableOrder(current, order))
+          }
+          className="space-y-2"
+        >
+          {(id) => {
+            const task = tasksById.get(id)
+            if (!task) return null
 
-              {prepTasks.map((task, index) => (
-                <Draggable key={task.id} draggableId={task.id} index={index}>
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`rounded-md border bg-card p-2 sm:p-3 ${
-                        snapshot.isDragging ? 'shadow-lg' : ''
-                      }`}
+            return (
+              <SortableItem
+                value={id}
+                className="rounded-md border bg-card p-2 data-[tokei-dragging]:shadow-lg sm:p-3"
+              >
+                {/* Mobile: vertical stack, Desktop: horizontal row */}
+                <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+                  {/* Drag handle + Task name row */}
+                  <div className="flex items-center gap-2 sm:flex-1">
+                    <SortableHandle
+                      aria-label={`Reorder ${task.name.trim() || 'prep task'}`}
+                      className="text-muted-foreground"
                     >
-                      {/* Mobile: vertical stack, Desktop: horizontal row */}
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-                        {/* Drag handle + Task name row */}
-                        <div className="flex items-center gap-2 sm:flex-1">
-                          <div
-                            {...provided.dragHandleProps}
-                            className="cursor-grab touch-none text-muted-foreground"
-                          >
-                            <GripVerticalIcon className="h-5 w-5 sm:h-4 sm:w-4" />
-                          </div>
+                      <GripVerticalIcon className="h-5 w-5 sm:h-4 sm:w-4" />
+                    </SortableHandle>
 
-                          <Input
-                            value={task.name}
-                            onValueChange={(value) =>
-                              handleUpdateTask(task.id, {
-                                name: value,
-                              })
-                            }
-                            placeholder="Task name (e.g., Grate cheese)"
-                            className="flex-1 text-base"
-                          />
-                        </div>
+                    <Input
+                      value={task.name}
+                      onValueChange={(value) =>
+                        handleUpdateTask(task.id, {
+                          name: value,
+                        })
+                      }
+                      placeholder="Task name (e.g., Grate cheese)"
+                      className="flex-1 text-base"
+                    />
+                  </div>
 
-                        {/* Select + Delete row on mobile */}
-                        <div className="flex items-center gap-2 pl-7 sm:pl-0">
-                          <Select
-                            value={task.mustCompleteBeforeSwimlaneId ?? 'none'}
-                            onValueChange={(value) =>
-                              handleUpdateTask(task.id, {
-                                mustCompleteBeforeSwimlaneId:
-                                  value === 'none' ? undefined : value,
-                              })
-                            }
+                  {/* Select + Delete row on mobile */}
+                  <div className="flex items-center gap-2 pl-7 sm:pl-0">
+                    <Select
+                      value={task.mustCompleteBeforeSwimlaneId ?? 'none'}
+                      onValueChange={(value) =>
+                        handleUpdateTask(task.id, {
+                          mustCompleteBeforeSwimlaneId:
+                            value === 'none' ? undefined : value,
+                        })
+                      }
+                    >
+                      <SelectTrigger
+                        aria-label="Complete before"
+                        className="w-full sm:w-[180px]"
+                      >
+                        <SelectValue placeholder="Complete before..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="none" label="No dependency">
+                          <span className="flex items-center gap-2">
+                            <Link2OffIcon className="h-3 w-3" />
+                            No dependency
+                          </span>
+                        </SelectItem>
+                        {routine.swimLanes?.map((swimlane) => (
+                          <SelectItem
+                            key={swimlane.id}
+                            value={swimlane.id}
+                            label={`Before: ${swimlane.name}`}
                           >
-                            <SelectTrigger
-                              aria-label="Complete before"
-                              className="w-full sm:w-[180px]"
-                            >
-                              <SelectValue placeholder="Complete before..." />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="none" label="No dependency">
-                                <span className="flex items-center gap-2">
-                                  <Link2OffIcon className="h-3 w-3" />
-                                  No dependency
-                                </span>
-                              </SelectItem>
-                              {routine.swimLanes?.map((swimlane) => (
-                                <SelectItem
-                                  key={swimlane.id}
-                                  value={swimlane.id}
-                                  label={`Before: ${swimlane.name}`}
-                                >
-                                  <span className="flex items-center gap-2">
-                                    <LinkIcon className="h-3 w-3" />
-                                    Before: {swimlane.name}
-                                  </span>
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
+                            <span className="flex items-center gap-2">
+                              <LinkIcon className="h-3 w-3" />
+                              Before: {swimlane.name}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
 
-                          <Button
-                            size="icon"
-                            onClick={() => handleDeleteTask(task.id)}
-                            variant="outline"
-                            className="shrink-0 hover:bg-destructive"
-                          >
-                            <Trash2Icon className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+                    <Button
+                      size="icon"
+                      onClick={() => handleDeleteTask(task.id)}
+                      variant="outline"
+                      className="shrink-0 hover:bg-destructive"
+                    >
+                      <Trash2Icon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+              </SortableItem>
+            )
+          }}
+        </SortableList>
+      )}
 
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <Button

@@ -1,5 +1,4 @@
 'use client'
-import { SpeakerLoudIcon } from '@radix-ui/react-icons'
 import React, { useState } from 'react'
 import { Button } from '../ui/button'
 

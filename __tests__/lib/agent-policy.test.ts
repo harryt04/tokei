@@ -55,3 +55,9 @@ it('refuses confirmed actions, extra arguments, unknown controls and sensitive r
     expect(allowAgentAction(navigate, path)).toBe(false)
   }
 })
+
+it('denies presses on reorder handles', () => {
+  expect(
+    allowAgentAction({ ...navigate, label: 'Reorder Timer 1' }, '/freestyle'),
+  ).toBe(false)
+})
